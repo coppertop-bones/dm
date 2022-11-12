@@ -37,7 +37,7 @@ import os, os.path, json, itertools, builtins, numpy as np, polars as pl, math
 from io import TextIOWrapper
 from coppertop.pipe import *
 from dm.core.types import txt, pylist, bframe, bmap, pytuple, pyfunc, btup, pydict, t as bt, num, \
-    matrix, pyset, t, pydict_keys, pydict_values
+    matrix, pyset, t
 from dm.core.text import strip
 from dm.core.aggman import collect
 from bones.core.errors import NotYetImplemented
@@ -294,106 +294,10 @@ def diffRows(p:matrix):
 def diffCols(p:matrix):
     return np.diff(p,axis=1)
 
-@coppertop(style=binary)
-def aj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt, direction:txt):
-    return f1.join_asof(f2, on=k, strategy='backward' if direction == 'prior' else 'forward')
-
-@coppertop(style=binary)
-def aj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt, direction:txt):
-    return f1.join_asof(f2, left_on=k1, right_on=k2, strategy='backward' if direction == 'prior' else 'forward')
-
-@coppertop(style = binary)
-def at(df:pl.DataFrame, k:txt):
-    return df.get_column(k)
-
 @coppertop
 def distinct(x:pylist) -> pyset:
     return set(x)
 
-@coppertop(style=binary)
-def drop(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
-    if n >= 0:
-        return f[n:]
-    else:
-        return f[:n]
-
-@coppertop(style=binary)
-def drop(f: pl.DataFrame, k:txt) -> pl.DataFrame:
-    return f.drop(k)
-
-@coppertop
-def first(f: pl.Series):
-    return f[0]
-
-@coppertop
-def first(f: pl.DataFrame) -> pl.DataFrame:
-    return f[:1]
-
-@coppertop
-def firstLast(f: pl.DataFrame) -> pl.DataFrame:
-    return f[[1, -1]]
-
-@coppertop
-def keys(df:pl.DataFrame) -> pylist:
-    return df.columns
-
-@coppertop
-def last(f: pl.DataFrame) -> pl.DataFrame:
-    return f[-1:]
-
-@coppertop
-def last(f: pl.Series):
-    return f[-1]
-
-@coppertop
-def numCols(df:pl.DataFrame) -> t.count:
-    return len(df.columns) | t.count
-
-@coppertop
-def numRows(df:pl.DataFrame) -> t.count:
-    return len(df) | t.count
-
 @coppertop
 def product(x:pylist+pyset+pytuple) -> num + t.count:
     return math.product(x)
-
-@coppertop(module='dm.polars.csv')
-def read(path:txt) -> pl.DataFrame:
-    return pl.read_csv(path, parse_dates=True)
-
-@coppertop(style=ternary)
-def rename(f:pl.DataFrame, old:pylist+pytuple+pydict_keys+pydict_values, new:pylist+pytuple+pydict_keys+pydict_values) -> pl.DataFrame:
-    oldNew = dict(builtins.zip(old, new))
-    return f.rename(oldNew)
-
-@coppertop(style=ternary)
-def rename(f:pl.DataFrame, old:txt, new:txt) -> pl.DataFrame:
-    oldNew = {old:new}
-    return f.rename(oldNew)
-
-@coppertop
-def shape(df:pl.DataFrame) -> pytuple:
-    return df.shape #(len(df) | t.count, len(df.columns) | t.count)
-
-@coppertop(style=binary)
-def take(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
-    if n >= 0:
-        return f[:n]
-    else:
-        return f[n:]
-
-@coppertop(style=binary)
-def take(f: pl.DataFrame, ks: pylist+pyset) -> pl.DataFrame:
-    return f.select(ks)
-
-@coppertop(style=binary)
-def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
-    return f.select(k)
-
-@coppertop(style=binary)
-def lj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt):
-    return f1.join(f2, on=k, how='left')
-
-@coppertop(style=binary)
-def lj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt):
-    return f1.join(f2, left_on=k1, right_on=k2, how='left')
