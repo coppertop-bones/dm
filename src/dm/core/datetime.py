@@ -210,16 +210,29 @@ def addMonths(d: date, months) -> date:
 
 
 @coppertop
-def nextIMMDate(d: date) -> date:
+def nextIMM(d: date) -> date:
     m = d >> month
     if m in (3, 6, 9, 12):
-        nextIMMDate = d >> thirdWednesdayOnOrAfter
-        if d < nextIMMDate:
-            return nextIMMDate
+        nextIMM = d >> thirdWednesdayOnOrAfter
+        if d < nextIMM:
+            return nextIMM
         else:
             return d >> firstOfMonth >> addMonths >> 3 >> dateOnOrAfter >> WED >> addDays >> 14
     elif m in (1, 4, 7, 10):
         return d >> firstOfMonth >> addMonths >> 2 >> dateOnOrAfter >> WED >> addDays >> 14
     else:
         return d >> firstOfMonth >> addMonths >> 1 >> dateOnOrAfter >> WED >> addDays >> 14
+
+
+_monthFromFuturesCode = dict(F=1, G=2, H=3, J=4, K=5, M=6, N=7, Q=8, U=9, V=10, X=11, Z=12)
+_futuresCodeFromMonth = ("F", "G", "H", "J", "K", "M", "N", "Q", "U", "V" ,"X", "Z")
+
+@coppertop
+def monthFromFutureCode(monthCode:txt):
+    return _monthFromFuturesCode[monthCode]
+
+@coppertop
+def futuresCodeFromMonth(m) -> txt:
+    return _futuresCodeFromMonth[m - 1]
+
 

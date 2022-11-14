@@ -34,6 +34,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 import builtins, polars as pl
 from coppertop.pipe import *
+from bones.core.errors import NotYetImplemented
 from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t
 
 
@@ -49,6 +50,15 @@ def aj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt, direction:txt):
 @coppertop(style=binary)
 def aj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt, direction:txt):
     return f1.join_asof(f2, left_on=k1, right_on=k2, strategy='backward' if direction == 'prior' else 'forward')
+
+
+# **********************************************************************************************************************
+# asc
+# **********************************************************************************************************************
+
+@coppertop(style=unary)
+def asc(f:pl.DataFrame) -> pl.DataFrame:
+    return f.sort(by=f >> keys >> at >> 0)
 
 
 # **********************************************************************************************************************
@@ -176,6 +186,15 @@ def rename(f:pl.DataFrame, old:txt, new:txt) -> pl.DataFrame:
 
 
 # **********************************************************************************************************************
+# select
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def select(f:pl.DataFrame, pred:pl.Expr) -> pl.DataFrame:
+    return f.filter(pred)
+
+
+# **********************************************************************************************************************
 # shape
 # **********************************************************************************************************************
 
@@ -204,8 +223,24 @@ def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
     return f.select(k)
 
 
+# **********************************************************************************************************************
+# takePanel
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
+    raise NotYetImplemented()
 
 
+# **********************************************************************************************************************
+# xasc
+# **********************************************************************************************************************
 
+@coppertop(style=binary)
+def xasc(f:pl.DataFrame, ks:pylist+pytuple) -> pl.DataFrame:
+    return f.sort(by=ks)
 
+@coppertop(style=binary)
+def xasc(f:pl.DataFrame, k:txt) -> pl.DataFrame:
+    return f.sort(by=k)
 

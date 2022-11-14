@@ -32,7 +32,7 @@ BONES_NS = ''
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import os, os.path, json, itertools, builtins, numpy as np
+import os, os.path, json, itertools, builtins, numpy as np, polars as pl
 
 from io import TextIOWrapper
 from coppertop.pipe import *
@@ -42,7 +42,7 @@ from dm.core.aggman import collect
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing
 from dm.core.conv import to
-from dm.core.aggman import zip
+from dm.core.aggman import zip, keys, at
 
 
 
@@ -88,21 +88,6 @@ def _pairwise(iterable):
     a, b = itertools.tee(iterable)
     next(b, None)
     return builtins.zip(a, b)
-
-
-# **********************************************************************************************************************
-# groupBy
-# **********************************************************************************************************************
-
-@coppertop
-def groupBy(a:bframe, keys):
-    "answers a collection of groups"
-    raise NotYetImplemented()
-
-@coppertop
-def groupBy(a:bframe, keys, directions):
-    "answers a collection of groups"
-    raise NotYetImplemented()
 
 
 getCwd = coppertop(style=nullary, name='getCwd')(os.getcwd)
@@ -275,4 +260,3 @@ def subset(a:bmap, f2:pyfunc) -> pytuple:
         else:
             B[k] = v
     return A, B
-

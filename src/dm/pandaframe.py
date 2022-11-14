@@ -37,6 +37,8 @@ import numpy as np, csv, pandas as pd, seaborn as sns
 
 from coppertop.pipe import *
 from dm.core.types import bframe, void, pydict
+from dm.core.aggman import array_
+from dm.core.conv import to
 from bones.core.sentinels import Void
 
 
@@ -52,7 +54,7 @@ pandaframe = pd.DataFrame
 def to(bf:bframe, t:pandaframe) -> pandaframe:
     df = pd.DataFrame()
     for f, d in bf._kvs():
-        df[f] = d
+        df[f] = d >> to >> array_
     return df
 
 

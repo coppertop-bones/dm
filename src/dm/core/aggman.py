@@ -106,7 +106,7 @@ def at(a:bframe, f:txt) -> (N**T)&tvarray:
     return a[f]
 
 @coppertop(style=binary)
-def at(a:(N**T1)[bframe], f:txt) -> (N**T2)[tvarray]:
+def at(a:(N**T1)[bframe], f:txt) -> (N**N**T2)[tvarray]:
     # T2 is a column in  the struct T1
     return a[f]
 
@@ -456,27 +456,19 @@ def count(m:matrix&tvarray) -> t.count:
     return nr
 
 @coppertop
-def count(m:array_) -> t.count:
-    assert m.ndim == 1
-    return m.shape[0]
-
-@coppertop
-def count(x:array_) -> t.count:
-    return x.shape[0] | t.count
-
-@coppertop
-def count(x:np.ndarray) -> t.count:
-    assert x.ndim == 1
-    return x.shape[0] | t.count
+def count(a:array_) -> t.count:
+    assert a.ndim == 1
+    return a.shape[0] | t.count
 
 
 # **********************************************************************************************************************
-# diffRows
+# diff
 # **********************************************************************************************************************
 
 @coppertop
-def diffRows(p:matrix):
-    return np.diff(p,axis=0)
+def diff(a:array_):
+    assert a.ndim == 1
+    return np.diff(a)
 
 
 # **********************************************************************************************************************
@@ -485,6 +477,15 @@ def diffRows(p:matrix):
 
 @coppertop
 def diffCols(p:matrix):
+    return np.diff(p,axis=0)
+
+
+# **********************************************************************************************************************
+# diffRows
+# **********************************************************************************************************************
+
+@coppertop
+def diffRows(p:matrix):
     return np.diff(p,axis=1)
 
 
@@ -548,6 +549,10 @@ def drop(xs:pylist, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
     return xs[n:]
 
 @coppertop(style=binary)
+def drop(xs:pydict_keys+pydict_values, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
+    return list(xs)[n:]
+
+@coppertop(style=binary)
 def drop(xs:txt, n:t.count) -> txt:     #(N**T(txt), count)-> N**T(txt)
     if n > 0:
         return xs[n:]
@@ -604,7 +609,7 @@ def drop(s:bstruct, name:txt) -> bstruct:
 
 @coppertop(style=binary)
 def drop(f:bframe, k:txt) -> bframe:
-    raise NotYetImplemented()
+    return bframe({k_:f[k_] for k_ in f >> keys >> drop >> k})
 
 @coppertop(style=binary)
 def drop(f:bframe, n:t.count) -> bframe:
@@ -1265,6 +1270,13 @@ def setOrder(a, ks):
 def shape(x:matrix&tvarray) -> pytuple:
     return x.shape
 
+@coppertop
+def shape(f:bframe) -> pytuple:
+    firstCol = None
+    for firstCol in f._values():
+        break
+    return (firstCol.shape[0], len(f._keys()))
+
 
 # **********************************************************************************************************************
 # shift
@@ -1571,7 +1583,7 @@ def takeDiag(m: matrix & tvarray) -> array_:
 
 @coppertop
 def takePanel(f:bframe) -> matrix&tvarray:
-    return (matrix&tvarray)(np.vstack(tuple(f._values())).T)   # numpy has deprecated using generator
+    return (matrix&tvarray)(np.hstack(f >> values))
 
 
 # **********************************************************************************************************************
@@ -1691,20 +1703,28 @@ def values(x:(T1**T2)[bstruct][T3]) -> (N**T2)[pylist]:
     )
 
 @coppertop
-def values(x:pydict) -> pylist:
-    return list(x.values())
+def values(x:pydict) -> pytuple:
+    return tuple(x.values())
 
 @coppertop
-def values(x:bmap) -> pylist:
-    return list(x._values())
+def values_(x:pydict) -> pydict_values:
+    return x.values()
 
 @coppertop
-def values(x:bmap) -> pylist:
-    return list(x._values())
+def values(x:bmap) -> pytuple:
+    return tuple(x._values())
 
 @coppertop
-def values(a:bframe) -> pylist:
-    return list(a._values())
+def values_(x:bmap) -> pydict_values:
+    return x._values()
+
+@coppertop
+def values(a:bframe) -> pytuple:
+    return tuple(a._values())
+
+@coppertop
+def values_(a:bframe) -> pydict_values:
+    return a._values()
 
 
 # **********************************************************************************************************************

@@ -32,12 +32,13 @@ BONES_NS = ''
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import csv
+import csv, numpy as np
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing
-from dm.core.types import bframe, txt, pydict, btup
+from dm.core.types import bframe, txt, pydict, btup, t, N, num, matrix
+from bones.lang.structs import tvarray
 
 
 # **********************************************************************************************************************
@@ -46,6 +47,66 @@ from dm.core.types import bframe, txt, pydict, btup
 
 @coppertop(style=binary)
 def aj(agg1:bframe, agg2:bframe):
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# firstCol
+# **********************************************************************************************************************
+
+def firstCol(a:matrix&tvarray) -> matrix&tvarray:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# firstLast
+# **********************************************************************************************************************
+
+@coppertop
+def firstLast(f:bframe) -> bframe:
+    return bframe({k:f[k][[0,-1]] for k in f._keys()})
+
+@coppertop
+def firstLast(f:bframe, n:t.count) -> bframe:
+    return bframe({k:(N**num)[tvarray](np.append(f[k][:n], f[k][-n:])) for k in f._keys()})
+
+
+# **********************************************************************************************************************
+# firstRow
+# **********************************************************************************************************************
+
+def firstRow(a:matrix&tvarray) -> matrix&tvarray:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# groupBy
+# **********************************************************************************************************************
+
+@coppertop
+def groupBy(a:bframe, keys):
+    "answers a collection of groups"
+    raise NotYetImplemented()
+
+@coppertop
+def groupBy(a:bframe, keys, directions):
+    "answers a collection of groups"
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# lastCol
+# **********************************************************************************************************************
+
+def lastCol(a:matrix&tvarray) -> matrix&tvarray:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# lastRow
+# **********************************************************************************************************************
+
+def lastRow(a:matrix&tvarray) -> matrix&tvarray:
     raise NotYetImplemented()
 
 

@@ -136,6 +136,10 @@ def to(x:matrix&tvarray, t:array_) -> array_:
     return array_(x.reshape(max(x.shape)))
 
 @coppertop(style=binary)
+def to(x:pylist, t:np.ndarray) -> np.ndarray:
+    return np.array(x)
+
+@coppertop(style=binary)
 def to(x:array_, t:np.ndarray) -> np.ndarray:
     return np.array(x)
 
@@ -173,5 +177,6 @@ def toRow(xs:pylist) -> matrix&tvarray:
 def toCol(xs:pylist) -> matrix&tvarray:
     if len(xs) == 0: raise ValueError("can't create an empty matrix")
     if isinstance(xs[0], str):
-        raise NotYetImplemented()
+        return tvarray(matrix&tvarray, [parseNum(x) for x in xs]).reshape(len(xs), 1)
     return tvarray(matrix&tvarray, xs).reshape(len(xs), 1)
+
