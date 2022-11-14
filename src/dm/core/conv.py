@@ -33,7 +33,8 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-import numpy as np, csv
+import numpy as np, csv, datetime
+from _strptime import _strptime
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
@@ -41,7 +42,7 @@ from bones.core.errors import NotYetImplemented
 from bones.lang.structs import tvarray
 from bones.lang.metatypes import BType
 from dm.core.aggman import values, collect
-from dm.core.datetime import toCTimeFormat, parseDate
+from dm.core.datetime import toCTimeFormat
 from dm.core.types import bframe, bmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
     num, npfloat, btup, bseq, matrix
 
@@ -122,6 +123,12 @@ def parseNum(x:txt) -> num:
     except:
         return np.nan
 
+@coppertop
+def parseDate(x:txt, cFormat:txt) -> date:
+    # rework to be more efficient in bulk by parsing format separately from x or handle x as an array / range
+    dt, micro, _ = _strptime(x, cFormat)
+    return datetime.date(dt[0], dt[1], dt[2])
+
 @coppertop(style=binary)
 def to(xs:pylist, t:array_) -> array_:
     return array_([parseNum(x) for x in xs])
@@ -132,7 +139,7 @@ def to(xs:pylist, t:(N**date)&tvarray, f:txt) -> (N**date)&tvarray:
     return tvarray((N**date)&tvarray, [parseDate(x, cFormat) for x in xs])
 
 @coppertop
-def toRowVec(xs:pylist) -> matrix&tvarray:
+def toRow(xs:pylist) -> matrix&tvarray:
     if len(xs) == 0: raise ValueError("can't create an empty matrix")
     if isinstance(xs[0], str):
         raise NotYetImplemented()
@@ -141,7 +148,7 @@ def toRowVec(xs:pylist) -> matrix&tvarray:
     return tvarray((N**date)&tvarray, [parseDate(x, cFormat) for x in xs])
 
 @coppertop
-def toColVec(xs:pylist) -> matrix&tvarray:
+def toCol(xs:pylist) -> matrix&tvarray:
     if len(xs) == 0: raise ValueError("can't create an empty matrix")
     if isinstance(xs[0], str):
         raise NotYetImplemented()

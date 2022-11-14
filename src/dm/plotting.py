@@ -29,13 +29,13 @@
 
 BONES_NS = 'dm.plot'
 
-import plotnine, numpy as np, statsmodels.api as sm
+import plotnine, numpy as np, statsmodels.api as sm, seaborn as sns
 
 from coppertop.pipe import *
 from dm.pandaframe import pandaframe
 from dm.p9 import P9
 from dm.core.aggman import atCol
-from dm.core.types import matrix, N, num, void
+from dm.core.types import matrix, N, num, void, pydict
 from bones.lang.structs import tvarray
 from bones.core.sentinels import Void
 from dm.core.conv import to
@@ -59,3 +59,18 @@ def qq(res:array_) -> void:
     sm.qqplot(res / np.std(res) >> to >> np.ndarray, line ='45')
     return Void
 
+@coppertop(module='seaborn')
+def correlogram(pdf:pandaframe) -> void:
+    return _correlogram(pdf)
+
+@coppertop(module='seaborn')
+def correlogram(pdf:pandaframe, kwargs:pydict) -> void:
+    return _correlogram(pdf, **kwargs)
+
+def _correlogram(pdf:pandaframe, kind="reg", diag_kind='kde') -> void:
+    sns.pairplot(
+        pdf,
+        kind="reg",
+        diag_kind="kde"
+    )
+    return Void

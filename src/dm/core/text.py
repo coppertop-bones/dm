@@ -39,6 +39,18 @@ from dm.core.types import pylist, pytuple, pydict, txt, index, bool
 
 
 @coppertop
+def pad(s:txt, options:pydict):
+    left = options.get('left', Missing)
+    right = options.get('right', Missing)
+    center = options.get('center', Missing)
+    pad = options.get('pad', ' ')
+    if right is not Missing:
+        return s.rjust(right, pad)
+    if center is not Missing:
+        return s.center(center, pad)
+    return s.ljust(left, pad)
+
+@coppertop
 def strip(s):
     return s.strip()
 
@@ -53,30 +65,6 @@ def splitOn(s, sep):
 @coppertop(style=binary)
 def splitOn(s, sep, maxsplit):
     return s.split(sep, maxsplit)
-
-# @coppertop
-# def ljust(s:txt, n:index, pad:txt=' ') -> txt:
-#     return s.ljust(n, pad)
-#
-# @coppertop
-# def rjust(s:txt, n:index, pad:txt=' ') -> txt:
-#     return s.rjust(n, pad)
-#
-# @coppertop
-# def cjust(s:txt, n:index, pad:txt=' ') -> txt:
-#     return s.center(n, pad)
-
-@coppertop
-def pad(s:txt, options:pydict):
-    left = options.get('left', Missing)
-    right = options.get('right', Missing)
-    center = options.get('center', Missing)
-    pad = options.get('pad', ' ')
-    if right is not Missing:
-        return s.rjust(right, pad)
-    if center is not Missing:
-        return s.center(center, pad)
-    return s.ljust(left, pad)
 
 # see https://realpython.com/python-formatted-output/ and https://www.python.org/dev/peps/pep-3101/
 @coppertop

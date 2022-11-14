@@ -41,11 +41,29 @@ from dm.core.types import bframe, txt, pydict, btup
 
 
 # **********************************************************************************************************************
-# frame.fromCsv
+# aj
 # **********************************************************************************************************************
 
-@coppertop(module='dm.frame')
-def fromCsv(pfn:txt, renames:pydict, conversions:pydict) -> bframe:
+@coppertop(style=binary)
+def aj(agg1:bframe, agg2:bframe):
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# lj
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def lj(agg1:bframe, agg2:bframe):
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# dm.frame.fromCsv
+# **********************************************************************************************************************
+
+@coppertop(module='dm.frame.csv')
+def read(pfn:txt, renames:pydict, conversions:pydict) -> bframe:
     with open(pfn, mode='r') as f:
         r = csv.DictReader(f)
         d = {}
@@ -61,8 +79,8 @@ def fromCsv(pfn:txt, renames:pydict, conversions:pydict) -> bframe:
             a[newk] = fn(d[k])
     return a
 
-@coppertop(module='dm.frame')
-def fromCsv(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> bframe:
+@coppertop(module='dm.frame.csv')
+def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> bframe:
     with open(pfn, mode='r') as f:
         r = csv.DictReader(f)
         d = {}
@@ -89,23 +107,5 @@ def sortBy(x:bframe, fields):
 
 @coppertop
 def sortBy(x:bframe, fields, directions):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# lj
-# **********************************************************************************************************************
-
-@coppertop(style=binary)
-def lj(agg1:bframe, agg2:bframe):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# aj
-# **********************************************************************************************************************
-
-@coppertop(style=binary)
-def aj(agg1:bframe, agg2:bframe):
     raise NotYetImplemented()
 

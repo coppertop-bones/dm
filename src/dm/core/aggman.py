@@ -68,20 +68,6 @@ array_ = (N**num) & tvarray
 matrix_ = matrix & tvarray
 
 
-# **********************************************************************************************************************
-# add
-# **********************************************************************************************************************
-
-@coppertop(style=binary)
-def add(xs:pylist, x) -> pylist:
-    return xs + [x]         # this is immutable
-
-@coppertop(style=binary)
-def add(xs:(N**T1)[bseq], x:T1) -> (N**T1)[bseq]:
-    xs = bseq(xs)
-    xs.append(x)
-    return xs
-
 
 # **********************************************************************************************************************
 # at - if the selector is N** then this means a depth access - use atAll for breadth
@@ -424,19 +410,28 @@ def collect(a:bmap, fn2) -> bmap:
     return answer
 
 @coppertop(style=binary)
-def collectV(a:bmap, fn1) -> pylist:
-    answer = list()
-    for v in a._values():
-        answer.append(fn1(v))
-    return answer
-
-@coppertop(style=binary)
 def collect(a:bframe, fn1):
     inputsAndOutput = [x for x in a._values()] + [None]
     with np.nditer(inputsAndOutput) as it:
         for vars in it:
             vars[-1][...] = fn1(*vars[:-1])
         return it.operands[len(inputsAndOutput) - 1].view(btup)
+
+@coppertop(style=binary)
+def collect(xs: pydict_items, f) -> pylist:
+    return [f(k, v) for k, v in xs]
+
+
+# **********************************************************************************************************************
+# collectV
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def collectV(a:bmap, fn1) -> pylist:
+    answer = list()
+    for v in a._values():
+        answer.append(fn1(v))
+    return answer
 
 
 # **********************************************************************************************************************
@@ -475,14 +470,31 @@ def count(x:np.ndarray) -> t.count:
     return x.shape[0] | t.count
 
 
-# # **********************************************************************************************************************
-# # countCols
-# # **********************************************************************************************************************
-#
-# @coppertop
-# def countCols(m:matrix&tvarray) -> t.count:
-#     nr, nc = m.shape
-#     return nc
+# **********************************************************************************************************************
+# diffRows
+# **********************************************************************************************************************
+
+@coppertop
+def diffRows(p:matrix):
+    return np.diff(p,axis=0)
+
+
+# **********************************************************************************************************************
+# diffCols
+# **********************************************************************************************************************
+
+@coppertop
+def diffCols(p:matrix):
+    return np.diff(p,axis=1)
+
+
+# **********************************************************************************************************************
+# distinct
+# **********************************************************************************************************************
+
+@coppertop
+def distinct(x:pylist) -> pyset:
+    return set(x)
 
 
 # **********************************************************************************************************************
@@ -498,14 +510,6 @@ def do(xs:pylist+pydict_keys+pydict_values+pytuple, f) -> void:
 # **********************************************************************************************************************
 # drop
 # **********************************************************************************************************************
-
-# @coppertop(style=binary)
-# def drop(xs:(T2**T1)[pylist], ks:(T2**T1)[pylist]) -> (T2**T1)[pylist]:
-#     answer = []
-#     for x in xs:
-#         if x not in ks:
-#             answer.append(x)
-#     return answer
 
 @coppertop(style=binary)
 def drop(xs:(N**T)[pylist], ks:(N**T)[pylist]) -> (N**T)[pylist]:
@@ -825,6 +829,28 @@ def icollect(xs:pylist, f2) -> pylist:
 
 
 # **********************************************************************************************************************
+# indexOf
+# **********************************************************************************************************************
+
+@coppertop
+def indexOf(xs, x):
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# indexesOf
+# **********************************************************************************************************************
+
+@coppertop
+def indexesOf(xs, x):
+    answer = []
+    for i, e in enumerate(xs):
+        if x == e:
+            answer.append(i)
+    return answer
+
+
+# **********************************************************************************************************************
 # inject
 # **********************************************************************************************************************
 
@@ -873,6 +899,27 @@ def interleave(xs:pylist+pytuple, sep:txt) -> txt:
 
 
 # **********************************************************************************************************************
+# intersects
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def intersects(a, b):
+    if not isinstance(a, (list, tuple, set, dict_keys, dict_values)):
+        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
+            return a == b
+        else:
+            return a in b
+    else:
+        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
+            return b in a
+        else:
+            for e in a:
+                if e in b:
+                    return True
+            return False
+
+
+# **********************************************************************************************************************
 # join
 # **********************************************************************************************************************
 
@@ -892,6 +939,10 @@ def join(d1:pydict, d2:pydict) -> pydict:
             raise KeyError(f'{k} already exists in d1 - use underride or override to merge (rather than join) two pydicts')
         answer[k] = v
     return answer
+
+@coppertop(style=binary)
+def join(xs:pylist, ys:pydict_keys) -> pylist:
+    return xs + list(ys)
 
 
 # **********************************************************************************************************************
@@ -1094,60 +1145,6 @@ def override(a:bstruct, b:bstruct) -> bstruct:
 
 
 # **********************************************************************************************************************
-# postAdd
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def postAdd(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# postAddCol
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def postAddCol(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# postAddRow
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def postAddRow(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# preAdd
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def preAdd(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# preAddCol
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def preAddCol(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# preAddRow
-# **********************************************************************************************************************
-
-@coppertop(style=ternary)
-def preAddRow(c, i, v):
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
 # rename
 # **********************************************************************************************************************
 
@@ -1179,6 +1176,15 @@ def replace(d:pydict, f:txt, new):
     d = dict(d)
     d[f] = new
     return d
+
+
+# **********************************************************************************************************************
+# scalarProduct aka innerProduct, dotProduct - scalarProduct is selected here as it conveys return type
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def scalarProduct(A:matrix&tvarray, B:matrix&tvarray) -> num:
+    return float(np.dot(A, B))
 
 
 # **********************************************************************************************************************
@@ -1390,6 +1396,31 @@ def splitOn(a, v):
 @coppertop(style=binary)
 def splitRow(a, b):
     raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# subsetOf
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def subsetOf(a, b):
+    if not isinstance(a, (list, set, tuple, dict_keys, dict_values)):
+        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
+            # 1, 1
+            return a == b
+        else:
+            # 1, 1+
+            return a in b
+    else:
+        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
+            # 1+, 1
+            return False
+        else:
+            # 1+, 1+
+            for e in a:
+                if e not in b:
+                    return False
+            return True
 
 
 # **********************************************************************************************************************
@@ -1701,33 +1732,3 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 @coppertop
 def zip(x):
     return builtins.zip(*x)
-
-
-
-
-
-
-
-@coppertop(style=binary)
-def append(xs:pylist, x) -> pylist:
-    return xs + [x]         # this is immutable
-
-@coppertop(style=binary)
-def appendTo(x, xs:pylist) -> pylist:
-    return xs + [x]         # this is immutable
-
-@coppertop(style=binary)
-def prepend(xs:pylist, x) -> pylist:
-    return [x] + xs         # this is immutable
-
-@coppertop(style=binary)
-def prependTo(x, xs:pylist) -> pylist:
-    return [x] + xs         # this is immutable
-
-@coppertop(style=binary)
-def join(xs:pylist, ys:pydict_keys) -> pylist:
-    return xs + list(ys)
-
-@coppertop(style=binary)
-def collect(xs:pydict_items, f) -> pylist:
-    return [f(k,v) for k,v in xs]

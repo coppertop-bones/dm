@@ -24,7 +24,7 @@ of bugs when using numpy.
 
 namespace location
 
-By default functions live in root - these are the easiest to use and mean less imports to maintain. Sometimes
+By default functions live in root - these are the easiest to use and means less imports to maintain. Sometimes
 a function would need a parameter to select which has no value other than to force the user to select which one to use. 
 Algorithms are typical examples - e.g. np.leastsq in the past has been different to scipy.leastsq. Rather than
 pass in a function selection parameter we use the name space as it leads to clearer code.

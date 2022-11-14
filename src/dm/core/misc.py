@@ -87,11 +87,6 @@ def doesNotFitWithin(a, b):
     does = a >> fitsWithin >> b
     return does >> not_
 
-@coppertop
-def til(n:count):
-    # First n natural numbers (starting at 0)
-    raise NotYetImplemented()
-
 @coppertop(style=nullary)
 def sequence(p1, p2):
     first , last = p1, p2
@@ -113,41 +108,3 @@ def sequence(p1, p2, n):
 def sequenceStep(p1, p2, step):
     first , last = p1, p2
     return list(np.arange(first, last + step, step))
-
-
-@coppertop(style=binary)
-def intersects(a, b):
-    if not isinstance(a, (list, tuple, set, dict_keys, dict_values)):
-        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
-            return a == b
-        else:
-            return a in b
-    else:
-        if not isinstance(b, (list, tuple, set, dict_keys, dict_values)):
-            return b in a
-        else:
-            for e in a:
-                if e in b:
-                    return True
-            return False
-
-@coppertop(style=binary)
-def subsetOf(a, b):
-    if not isinstance(a, (list, set, tuple, dict_keys, dict_values)):
-        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
-            # 1, 1
-            return a == b
-        else:
-            # 1, 1+
-            return a in b
-    else:
-        if not isinstance(b, (list, set, tuple, dict_keys, dict_values)):
-            # 1+, 1
-            return False
-        else:
-            # 1+, 1+
-            for e in a:
-                if e not in b:
-                    return False
-            return True
-

@@ -56,22 +56,3 @@ def to(bf:bframe, t:pandaframe) -> pandaframe:
     return df
 
 
-# **********************************************************************************************************************
-# to
-# **********************************************************************************************************************
-
-@coppertop(module='seaborn')
-def correlogram(pdf:pandaframe) -> void:
-    return _correlogram(pdf)
-
-@coppertop(module='seaborn')
-def correlogram(pdf:pandaframe, kwargs:pydict) -> void:
-    return _correlogram(pdf, **kwargs)
-
-def _correlogram(pdf:pandaframe, kind="reg", diag_kind='kde') -> void:
-    sns.pairplot(
-        pdf,
-        kind="reg",
-        diag_kind="kde"
-    )
-    return Void

@@ -32,12 +32,11 @@ BONES_NS = ''
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import os, os.path, json, itertools, builtins, numpy as np, polars as pl, math
+import os, os.path, json, itertools, builtins, numpy as np
 
 from io import TextIOWrapper
 from coppertop.pipe import *
-from dm.core.types import txt, pylist, bframe, bmap, pytuple, pyfunc, btup, pydict, t as bt, num, \
-    matrix, pyset, t
+from dm.core.types import txt, pylist, bframe, bmap, pytuple, pyfunc, btup, pydict, t as bt
 from dm.core.text import strip
 from dm.core.aggman import collect
 from bones.core.errors import NotYetImplemented
@@ -104,7 +103,6 @@ def groupBy(a:bframe, keys):
 def groupBy(a:bframe, keys, directions):
     "answers a collection of groups"
     raise NotYetImplemented()
-
 
 
 getCwd = coppertop(style=nullary, name='getCwd')(os.getcwd)
@@ -241,14 +239,6 @@ def replaceAll(xs, old, new):
     return (new if x == old else x for x in xs)
 
 @coppertop
-def indexesOf(xs, x):
-    answer = []
-    for i, e in enumerate(xs):
-        if x == e:
-            answer.append(i)
-    return answer
-
-@coppertop
 def fromto(x, s1):
     return x[s1:None]
 
@@ -286,18 +276,3 @@ def subset(a:bmap, f2:pyfunc) -> pytuple:
             B[k] = v
     return A, B
 
-@coppertop
-def diffRows(p:matrix):
-    return np.diff(p,axis=0)
-
-@coppertop
-def diffCols(p:matrix):
-    return np.diff(p,axis=1)
-
-@coppertop
-def distinct(x:pylist) -> pyset:
-    return set(x)
-
-@coppertop
-def product(x:pylist+pyset+pytuple) -> num + t.count:
-    return math.product(x)

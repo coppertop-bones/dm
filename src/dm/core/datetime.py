@@ -36,7 +36,6 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-from _strptime import _strptime
 import datetime
 from bones.core.sentinels import Missing
 from coppertop.pipe import *
@@ -104,12 +103,6 @@ def monthLongName(month, locale):
     return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]
 
 @coppertop
-def parseDate(x:txt, cFormat:txt) -> date:
-    # rework to be more efficient in bulk by parsing format separately from x or handle x as an array / range
-    dt, micro, _ = _strptime(x, cFormat)
-    return datetime.date(dt[0], dt[1], dt[2])
-
-@coppertop
 def toCTimeFormat(simpleFormat:txt) -> txt:
 
     # a little care is needed here to avoid clashes between formats
@@ -156,5 +149,5 @@ def toCTimeFormat(simpleFormat:txt) -> txt:
     return answer
 
 @coppertop
-def addDays(d:date, n:index):
+def addDays(d:date, n:index) -> date:
     return d + datetime.timedelta(n)

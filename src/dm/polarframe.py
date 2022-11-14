@@ -38,9 +38,131 @@ from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, tx
 
 
 
+# **********************************************************************************************************************
+# aj
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def aj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt, direction:txt):
+    return f1.join_asof(f2, on=k, strategy='backward' if direction == 'prior' else 'forward')
+
+@coppertop(style=binary)
+def aj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt, direction:txt):
+    return f1.join_asof(f2, left_on=k1, right_on=k2, strategy='backward' if direction == 'prior' else 'forward')
+
+
+# **********************************************************************************************************************
+# at
+# **********************************************************************************************************************
+
+@coppertop(style = binary)
+def at(df:pl.DataFrame, k:txt):
+    return df.get_column(k)
+
+
+# **********************************************************************************************************************
+# drop
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def drop(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
+    if n >= 0:
+        return f[n:]
+    else:
+        return f[:n]
+
+@coppertop(style=binary)
+def drop(f: pl.DataFrame, k:txt) -> pl.DataFrame:
+    return f.drop(k)
+
+
+# **********************************************************************************************************************
+# first
+# **********************************************************************************************************************
+
+@coppertop
+def first(f: pl.Series):
+    return f[0]
+
+@coppertop
+def first(f: pl.DataFrame) -> pl.DataFrame:
+    return f[:1]
+
+
+# **********************************************************************************************************************
+# firstLast
+# **********************************************************************************************************************
+
+@coppertop
+def firstLast(f: pl.DataFrame) -> pl.DataFrame:
+    return f[[1, -1]]
+
+
+# **********************************************************************************************************************
+# kays
+# **********************************************************************************************************************
+
+@coppertop
+def keys(df:pl.DataFrame) -> pylist:
+    return df.columns
+
+
+# **********************************************************************************************************************
+# last
+# **********************************************************************************************************************
+
+@coppertop
+def last(f: pl.DataFrame) -> pl.DataFrame:
+    return f[-1:]
+
+@coppertop
+def last(f: pl.Series):
+    return f[-1]
+
+
+# **********************************************************************************************************************
+# lj
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def lj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt):
+    return f1.join(f2, on=k, how='left')
+
+@coppertop(style=binary)
+def lj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt):
+    return f1.join(f2, left_on=k1, right_on=k2, how='left')
+
+
+# **********************************************************************************************************************
+# numCols
+# **********************************************************************************************************************
+
+@coppertop
+def numCols(df:pl.DataFrame) -> t.count:
+    return len(df.columns) | t.count
+
+
+# **********************************************************************************************************************
+# numRows
+# **********************************************************************************************************************
+
+@coppertop
+def numRows(df:pl.DataFrame) -> t.count:
+    return len(df) | t.count
+
+
+# **********************************************************************************************************************
+# read
+# **********************************************************************************************************************
+
 @coppertop(module='dm.polars.csv')
 def read(path:txt) -> pl.DataFrame:
     return pl.read_csv(path, parse_dates=True)
+
+
+# **********************************************************************************************************************
+# rename
+# **********************************************************************************************************************
 
 @coppertop(style=ternary)
 def rename(f:pl.DataFrame, old:pylist+pytuple+pydict_keys+pydict_values, new:pylist+pytuple+pydict_keys+pydict_values) -> pl.DataFrame:
@@ -52,9 +174,19 @@ def rename(f:pl.DataFrame, old:txt, new:txt) -> pl.DataFrame:
     oldNew = {old:new}
     return f.rename(oldNew)
 
+
+# **********************************************************************************************************************
+# shape
+# **********************************************************************************************************************
+
 @coppertop
 def shape(df:pl.DataFrame) -> pytuple:
     return df.shape #(len(df) | t.count, len(df.columns) | t.count)
+
+
+# **********************************************************************************************************************
+# take
+# **********************************************************************************************************************
 
 @coppertop(style=binary)
 def take(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
@@ -71,68 +203,7 @@ def take(f: pl.DataFrame, ks: pylist+pyset) -> pl.DataFrame:
 def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
     return f.select(k)
 
-@coppertop(style=binary)
-def lj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt):
-    return f1.join(f2, on=k, how='left')
 
-@coppertop(style=binary)
-def lj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt):
-    return f1.join(f2, left_on=k1, right_on=k2, how='left')
-
-@coppertop(style=binary)
-def drop(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
-    if n >= 0:
-        return f[n:]
-    else:
-        return f[:n]
-
-@coppertop(style=binary)
-def drop(f: pl.DataFrame, k:txt) -> pl.DataFrame:
-    return f.drop(k)
-
-@coppertop
-def first(f: pl.Series):
-    return f[0]
-
-@coppertop
-def first(f: pl.DataFrame) -> pl.DataFrame:
-    return f[:1]
-
-@coppertop
-def firstLast(f: pl.DataFrame) -> pl.DataFrame:
-    return f[[1, -1]]
-
-@coppertop
-def keys(df:pl.DataFrame) -> pylist:
-    return df.columns
-
-@coppertop
-def last(f: pl.DataFrame) -> pl.DataFrame:
-    return f[-1:]
-
-@coppertop
-def last(f: pl.Series):
-    return f[-1]
-
-@coppertop
-def numCols(df:pl.DataFrame) -> t.count:
-    return len(df.columns) | t.count
-
-@coppertop
-def numRows(df:pl.DataFrame) -> t.count:
-    return len(df) | t.count
-
-@coppertop(style=binary)
-def aj(f1:pl.DataFrame, f2:pl.DataFrame, k:txt, direction:txt):
-    return f1.join_asof(f2, on=k, strategy='backward' if direction == 'prior' else 'forward')
-
-@coppertop(style=binary)
-def aj(f1:pl.DataFrame, f2:pl.DataFrame, k1:txt, k2:txt, direction:txt):
-    return f1.join_asof(f2, left_on=k1, right_on=k2, strategy='backward' if direction == 'prior' else 'forward')
-
-@coppertop(style = binary)
-def at(df:pl.DataFrame, k:txt):
-    return df.get_column(k)
 
 
 
