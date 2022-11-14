@@ -50,6 +50,8 @@ from dm.core.types import bframe, bmap, txt, pylist, pydict, T1, N, pytuple, pyd
 array_ = (N**num)&tvarray
 matrix_ = matrix&tvarray
 
+_defaultDateFmt = toCTimeFormat('YYYY.MM.DD')
+
 
 # **********************************************************************************************************************
 # to
@@ -87,6 +89,10 @@ def to(x, t:pydict) -> pydict:
 @coppertop(style=binary)
 def to(x:txt, t:date, f:txt) -> date:
     return parseDate(x, toCTimeFormat(f))
+
+@coppertop(style=binary)
+def to(x:txt, t:date) -> date:
+    return parseDate(x, _defaultDateFmt)
 
 @coppertop(style=binary)
 def to(x, t:txt) -> txt:

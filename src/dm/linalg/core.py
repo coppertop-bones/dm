@@ -37,7 +37,7 @@ from dm.core.types import matrix, N, num, T
 from dm.linalg.types import orth, right, upper, lower, Cholesky, QR, SVD, left
 import dm.linalg.orient
 
-from broot import dm
+from groot import dm
 
 
 array_ = (N**num)[tvarray]

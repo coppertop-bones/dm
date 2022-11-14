@@ -60,7 +60,7 @@ BONES_NS = ''
 
 from coppertop.pipe import *
 import dm.pp
-from broot import drop, startsWith
+from groot import drop, startsWith
 import glob, os, shutil, datetime, sys, pathlib, stat
 from dm.core.types import txt, bool
 from bones.core.sentinels import Missing
