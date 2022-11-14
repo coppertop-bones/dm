@@ -44,7 +44,7 @@ from bones.lang.metatypes import BType
 from dm.core.aggman import values, collect
 from dm.core.datetime import toCTimeFormat
 from dm.core.types import bframe, bmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
-    num, npfloat, btup, bseq, matrix
+    num, npfloat, btup, bseq, matrix, t
 
 
 array_ = (N**num)&tvarray
@@ -86,6 +86,8 @@ def to(x:bmap, t:pydict) -> pydict:
 def to(x, t:pydict) -> pydict:
     return dict(x)
 
+
+
 @coppertop(style=binary)
 def to(x:txt, t:date, f:txt) -> date:
     return parseDate(x, toCTimeFormat(f))
@@ -93,6 +95,20 @@ def to(x:txt, t:date, f:txt) -> date:
 @coppertop(style=binary)
 def to(x:txt, t:date) -> date:
     return parseDate(x, _defaultDateFmt)
+
+@coppertop(style=binary)
+def to(x:date, t:txt) -> txt:
+    return x.strftime(_defaultDateFmt)
+
+@coppertop(style=binary)
+def to(d:date, t_:t.count) -> t.count:
+    return d.toordinal() | t.count
+
+@coppertop(style=binary)
+def to(greg:t.count+index, t:date) -> date:
+    return datetime.date.fromordinal(greg)
+
+
 
 @coppertop(style=binary)
 def to(x, t:txt) -> txt:

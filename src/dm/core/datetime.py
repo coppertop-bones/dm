@@ -39,7 +39,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import datetime
 from bones.core.sentinels import Missing
 from coppertop.pipe import *
-from dm.core.types import txt, index, date
+from dm.core.types import txt, index, date, offset
 
 
 @coppertop
@@ -148,6 +148,78 @@ def toCTimeFormat(simpleFormat:txt) -> txt:
     answer = answer.replace('z', '%Z')                              # Time zone name (empty string if the object is naive)
     return answer
 
-@coppertop
-def addDays(d:date, n:index) -> date:
+
+@coppertop(style=binary)
+def addDays(d:date, n) -> date:
     return d + datetime.timedelta(n)
+
+
+MON = 0
+TUE = 1
+WED = 2
+THU = 3
+FRI = 4
+SAT = 5
+SUN = 6
+
+
+@coppertop(style=binary)
+def dateOnOrAfter(d: date, weekday: offset) -> date:
+    wd = d.weekday()
+    if wd == weekday:
+        return d
+    else:
+        return d >> addDays >> ((weekday - wd) % 7)
+
+
+@coppertop
+def firstOfMonth(d: date) -> date:
+    return d >> addDays >> -(d.day - 1)
+
+
+@coppertop
+def thirdWednesday(d: date) -> date:
+    return d >> firstOfMonth >> dateOnOrAfter >> WED >> addDays >> 14
+
+
+@coppertop
+def firstThursday(d):
+    return d >> firstOfMonth >> dateOnOrAfter >> THU
+
+
+@coppertop
+def thirdWednesdayOnOrAfter(d: date) -> date:
+    fom = d >> firstOfMonth
+    thirdWed = fom >> dateOnOrAfter >> WED >> addDays >> 14
+    if thirdWed >= d:
+        return thirdWed
+    else:
+        return fom >> addMonths >> 1 >> dateOnOrAfter >> WED >> addDays >> 14
+
+
+@coppertop(style=binary)
+def addMonths(d: date, months) -> date:
+    # I can't think of a situation where we mindlessly add months - i.e. we have to think about how to handle dates after the 28
+    # thus we allow an error if the day is invalid as it means the client code needs a bit more thinking through
+    m = d.month + months
+    if m > 12:
+        m, yInc = m % 12, m // 12
+        return datetime.date(d.year + yInc, m, d.day)
+    else:
+        return datetime.date(d.year, m, d.day)
+
+
+@coppertop
+def nextIMMDate(d: date) -> date:
+    m = d >> month
+    if m in (3, 6, 9, 12):
+        nextIMMDate = d >> thirdWednesdayOnOrAfter
+        if d < nextIMMDate:
+            return nextIMMDate
+        else:
+            return d >> firstOfMonth >> addMonths >> 3 >> dateOnOrAfter >> WED >> addDays >> 14
+    elif m in (1, 4, 7, 10):
+        return d >> firstOfMonth >> addMonths >> 2 >> dateOnOrAfter >> WED >> addDays >> 14
+    else:
+        return d >> firstOfMonth >> addMonths >> 1 >> dateOnOrAfter >> WED >> addDays >> 14
+
