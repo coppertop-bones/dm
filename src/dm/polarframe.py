@@ -35,7 +35,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins, polars as pl
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t
+from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset
 
 
 
@@ -69,6 +69,10 @@ def asc(f:pl.DataFrame) -> pl.DataFrame:
 def at(df:pl.DataFrame, k:txt):
     return df.get_column(k)
 
+@coppertop(style = binary)
+def at(df:pl.DataFrame, o:offset):
+    return df.row(o)
+
 
 # **********************************************************************************************************************
 # drop
@@ -84,6 +88,14 @@ def drop(f: pl.DataFrame, n: t.count) -> pl.DataFrame:
 @coppertop(style=binary)
 def drop(f: pl.DataFrame, k:txt) -> pl.DataFrame:
     return f.drop(k)
+
+@coppertop(style=binary)
+def drop(f: pl.DataFrame, k:txt) -> pl.DataFrame:
+    return f.drop(k)
+
+@coppertop(style=binary)
+def drop(f: pl.DataFrame, ks:pylist) -> pl.DataFrame:
+    return f.drop(ks)
 
 
 # **********************************************************************************************************************

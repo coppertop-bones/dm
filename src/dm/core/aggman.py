@@ -549,6 +549,10 @@ def drop(xs:pylist, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
     return xs[n:]
 
 @coppertop(style=binary)
+def drop(xs:pytuple, n:t.count) -> pytuple:    #(N**T(im), count)-> N**T(im)
+    return xs[n:]
+
+@coppertop(style=binary)
 def drop(xs:pydict_keys+pydict_values, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
     return list(xs)[n:]
 
@@ -1251,6 +1255,13 @@ def select(a:bframe, fn1) -> bframe:
     # create new cols from the old cols and the offsets
     newCols = [c[os] for c in cols]
     return bframe(builtins.zip(fs, newCols))
+
+@coppertop(style=binary)
+def select(z:builtins.zip, f:pyfunc):
+    answer = []
+    for e in z:
+        if f(*e): answer.append(e)
+    return answer
 
 
 # **********************************************************************************************************************
