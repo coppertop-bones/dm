@@ -421,6 +421,25 @@ def collect(a:bframe, fn1):
 def collect(xs: pydict_items, f) -> pylist:
     return [f(k, v) for k, v in xs]
 
+def _collectHelper(xs:(N**T1)[bseq], f:T1^T2, tByT) -> dict:
+    t1 = tByT[T1]
+    fn, tByT_f, hasValue = f.d.selectFn((t1,))
+    t2 = fn.tRet
+    if hasT(t2):
+        raise NotYetImplemented()
+    answer = dict(tByT)
+    answer[T2] = t2
+    return answer
+
+@coppertop(style=binary, typeHelper=_collectHelper)
+def collect(xs:(N**T1)[bseq], f:T1^T2, tByT) -> (N**T2)[bseq]:
+    return bseq((N**tByT[T2])[bseq], [f(x) for x in xs])
+
+@coppertop(style=binary, typeHelper=_collectHelper)
+def collect(xs:(N**T1)[bseq, T3], f:T1^T2, tByT) -> (N**T2)[bseq, T3]:
+    fxs = [f(x) for x in xs]
+    return bseq((N**tByT[T2])[bseq, tByT[T3]], fxs)
+
 
 # **********************************************************************************************************************
 # collectV
@@ -720,19 +739,6 @@ def dropRows(m:matrix&tvarray, n:t.count):
 
 
 # **********************************************************************************************************************
-# [1,2,3,4] dropValues [2,3] == [1,4]
-# **********************************************************************************************************************
-
-@coppertop(style=binary)
-def dropValues(xs, ys):
-    answer = []
-    for x in xs:
-        if x not in ys:
-            answer.append(x)
-    return answer
-
-
-# **********************************************************************************************************************
 # eachCol_
 # TODO use sequence instead
 # **********************************************************************************************************************
@@ -774,7 +780,7 @@ def first(a:bframe) -> bframe:
     raise NotYetImplemented()
 
 @coppertop
-def first(x:pylist):
+def first(x:pylist+pytuple):
     return x[0]
 
 @coppertop
@@ -798,7 +804,7 @@ def firstLast(a:bframe) -> bframe:
     raise NotYetImplemented()
 
 @coppertop
-def firstLast(x:pylist) -> pytuple:
+def firstLast(x:pylist+pytuple) -> pytuple:
     return x[0], x[-1]
 
 @coppertop
@@ -953,6 +959,10 @@ def join(d1:pydict, d2:pydict) -> pydict:
 def join(xs:pylist, ys:pydict_keys) -> pylist:
     return xs + list(ys)
 
+@coppertop(style=binary)
+def join(xs:(N**T1)[bseq], ys:(N**T1)[bseq], tByT) -> (N**T1)[bseq]:
+    return bseq((N**(tByT[T1]))[bseq], xs.data + ys.data)
+
 
 # **********************************************************************************************************************
 # joinAll
@@ -1053,6 +1063,10 @@ def kvs(x:pydict) -> pydict_items:
 @coppertop
 def last(f:bframe) -> bframe:
     return bframe({k:f[k][[-1]] for k in f._keys()})
+
+@coppertop
+def last(x:pylist+pytuple):
+    return x[-1]
 
 
 # **********************************************************************************************************************
@@ -1736,6 +1750,36 @@ def values(a:bframe) -> pytuple:
 @coppertop
 def values_(a:bframe) -> pydict_values:
     return a._values()
+
+
+# **********************************************************************************************************************
+# [1,2,3,4] without [2,3] == [1,4]
+# without as python can't easily distinguish drop(N**T1, N**N) from drop(N**T1, N**T1) :(
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def without(xs:pylist+pytuple+pyset, elements:pylist+pytuple) -> pylist:
+    answer = []
+    for x in xs:
+        if x not in elements:
+            answer.append(x)
+    return answer
+
+@coppertop(style=binary)
+def without(xs:pylist+pytuple+pyset, element) -> pylist:
+    answer = []
+    for x in xs:
+        if x != element:
+            answer.append(x)
+    return answer
+
+@coppertop(style=binary)
+def without(xs:(N**T1)[bseq], element:T1, tByT) -> (N**T1)[bseq]:
+    answer = bseq((N**tByT[T1])[bseq])
+    for e in xs:
+        if e is not element:
+            answer.append(e)
+    return answer
 
 
 # **********************************************************************************************************************

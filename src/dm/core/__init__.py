@@ -29,6 +29,7 @@
 
 from . import aggman
 from . import conv
+from . import contextual_scope
 from . import datetime
 from . import frame
 from . import maths
