@@ -33,7 +33,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-import numpy as np, csv, datetime
+import numpy as np, csv, datetime, builtins
 from _strptime import _strptime
 
 from coppertop.pipe import *
@@ -180,3 +180,10 @@ def toCol(xs:pylist) -> matrix&tvarray:
         return tvarray(matrix&tvarray, [parseNum(x) for x in xs]).reshape(len(xs), 1)
     return tvarray(matrix&tvarray, xs).reshape(len(xs), 1)
 
+@coppertop(style = binary)
+def withKeys(vs, ks) -> pydict:
+    return dict(builtins.zip(ks, vs))
+
+@coppertop(style = binary)
+def withValues(ks, vs) -> pydict:
+    return dict(builtins.zip(ks, vs))

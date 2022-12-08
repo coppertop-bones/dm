@@ -1,2 +1,2 @@
 # dm
-danger mouse's standard library + more for coppertop-bones
+danger mouse's core library + more for coppertop-bones

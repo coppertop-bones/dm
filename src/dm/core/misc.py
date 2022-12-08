@@ -67,7 +67,7 @@ def not_(b):
 Not = coppertop(name='Not')(not_)
 not_ = coppertop(name='not_')(not_)
 
-repr = coppertop(name='repr')(builtins.repr)
+repr = coppertop(name='repr', dispatchEvenIfAllTypes=True)(builtins.repr)
 
 @coppertop
 def _t(x):

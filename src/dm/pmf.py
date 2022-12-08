@@ -205,18 +205,12 @@ def sample(cmf:CMF, n:index) -> matrix[tvarray]:
 def sample(kde:scipy.stats.kde.gaussian_kde, n:index) -> matrix[tvarray]:
     return kde.resample(n).flatten()
 
-
-
 @coppertop(style=binary)
 def pmfMul(lhs:structWithNKs[T1], rhs:structWithNKs[T2]) -> structWithNKs:
     # lhs kvs both {(x.k, x.v*(y.v)} (rhs kvs) normalise <:pmf>
-    return structWithNKs(both(
-        lhs,
-        lambda k1, v1, k2, v2: (k1, v1 * v2),
-        rhs
-    ))
-
-
+    return structWithNKs(
+        lhs >> both >> (lambda kLhs, vLhs, kRhs, vRhs: (kLhs, vLhs * vRhs)) >> rhs
+    )
 
 @coppertop(style=binary)
 def rvAdd(lhs:PMF, rhs:PMF) -> PMF:

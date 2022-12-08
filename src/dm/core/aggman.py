@@ -90,6 +90,16 @@ def at(s:bstruct+pydict+bmap, k:txt):
     return s[k]
 
 @coppertop(style=binary)
+def at(s:py, k:txt):
+    return s[k]
+
+@coppertop(style=binary)
+def at(s:bstruct+pydict+bmap, ks:pylist):
+    for k in ks:
+        s = s[k]
+    return s
+
+@coppertop(style=binary)
 def at(xs:pylist+pytuple, os:pylist):
     print('A WARNING')
     answer = []
@@ -395,6 +405,10 @@ def centerCols(panel:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
+def collect(xs, f) -> pylist:
+    return [f(x) for x in xs]
+
+@coppertop(style=binary)
 def collect(xs:pylist+pydict_keys+pydict_values+pytuple, f) -> pylist:
     return [f(x) for x in xs]
 
@@ -496,7 +510,7 @@ def diff(a:array_):
 
 @coppertop
 def diffCols(p:matrix):
-    return np.diff(p,axis=0)
+    return np.diff(p,axis=1)
 
 
 # **********************************************************************************************************************
@@ -505,7 +519,7 @@ def diffCols(p:matrix):
 
 @coppertop
 def diffRows(p:matrix):
-    return np.diff(p,axis=1)
+    return np.diff(p,axis=0)
 
 
 # **********************************************************************************************************************
@@ -528,7 +542,10 @@ def do(xs:pylist+pydict_keys+pydict_values+pytuple, f) -> void:
 
 
 # **********************************************************************************************************************
-# drop
+# drop - drops elements from a N**T2 or a T1**T2
+#        three cases of overload 1) drop count, 2) drop N/T1 or Ns/T1s 3) drop T2 or T2s
+#        this becomes ambiguous when T1 == T2 and in python we have to peek into the args :(, in bones we don't :)
+#        we could distinguish by having dropV as a companion - something to think about
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
@@ -565,15 +582,24 @@ def drop(xs:pylist+pydict_keys+pydict_values, e) -> pylist:    #(N**T1, T1)-> N*
 
 @coppertop(style=binary)
 def drop(xs:pylist, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
-    return xs[n:]
+    if n > 0:
+        return xs[n:]
+    else:
+        raise NotYetImplemented('drop(xs:txt, n:count) -> txt')
 
 @coppertop(style=binary)
 def drop(xs:pytuple, n:t.count) -> pytuple:    #(N**T(im), count)-> N**T(im)
-    return xs[n:]
+    if n > 0:
+        return xs[n:]
+    else:
+        raise NotYetImplemented('drop(xs:txt, n:count) -> txt')
 
 @coppertop(style=binary)
 def drop(xs:pydict_keys+pydict_values, n:t.count) -> pylist:    #(N**T(im), count)-> N**T(im)
-    return list(xs)[n:]
+    if n > 0:
+        return list(xs)[n:]
+    else:
+        raise NotYetImplemented('drop(xs:txt, n:count) -> txt')
 
 @coppertop(style=binary)
 def drop(xs:txt, n:t.count) -> txt:     #(N**T(txt), count)-> N**T(txt)
@@ -1136,6 +1162,10 @@ def numCols(f: bframe) -> t.count:
 def numCols(x:matrix&tvarray) -> t.count:
     return x.shape[1] | t.count
 
+@coppertop
+def numCols(x:np.ndarray) -> t.count:
+    return x.shape[1] | t.count
+
 
 # **********************************************************************************************************************
 # numRows
@@ -1150,6 +1180,10 @@ def numRows(f: bframe) -> t.count:
 
 @coppertop
 def numRows(x:matrix&tvarray) -> t.count:
+    return x.shape[0] | t.count
+
+@coppertop
+def numRows(x:np.ndarray) -> t.count:
     return x.shape[0] | t.count
 
 
@@ -1470,7 +1504,7 @@ def T(A:matrix&tvarray) -> matrix&tvarray:
 
 
 # **********************************************************************************************************************
-# take
+# take - for type analysis / issues see drop
 # **********************************************************************************************************************
 
 @coppertop(style=binary)

@@ -33,7 +33,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-import numpy as np, csv, pandas as pd, seaborn as sns
+import numpy as np, csv, pandas as pd, polars as pl
 
 from coppertop.pipe import *
 from dm.core.types import bframe, void, pydict
@@ -44,6 +44,7 @@ from bones.core.sentinels import Void
 
 
 pandaframe = pd.DataFrame
+polarframe = pl.DataFrame
 
 
 # **********************************************************************************************************************
@@ -56,5 +57,14 @@ def to(bf:bframe, t:pandaframe) -> pandaframe:
     for f, d in bf._kvs():
         df[f] = d >> to >> array_
     return df
+
+@coppertop(style=binary)
+def to(f:polarframe, t:pandaframe) -> pandaframe:
+    return f.to_pandas()
+
+@coppertop(style=binary)
+def to(f:pandaframe, t:polarframe) -> polarframe:
+    return pl.from_pandas(f)
+
 
 

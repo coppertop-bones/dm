@@ -32,10 +32,11 @@ BONES_NS = ''
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import builtins, polars as pl
+import builtins, polars as pl, numpy as np
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset
+from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset, matrix
+from bones.lang.structs import tvarray
 
 
 
@@ -239,9 +240,9 @@ def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
 # takePanel
 # **********************************************************************************************************************
 
-@coppertop(style=binary)
-def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
-    raise NotYetImplemented()
+@coppertop
+def takePanel(f: pl.DataFrame) -> matrix&tvarray:
+    return (matrix&tvarray)(f.to_numpy())
 
 
 # **********************************************************************************************************************
