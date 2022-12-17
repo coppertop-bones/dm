@@ -55,7 +55,7 @@
 # a folder is an fs object
 
 
-BONES_NS = ''
+BONES_NS = 'fs'
 
 
 from coppertop.pipe import *
