@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 setup(
     name='coppertop-dm',
     version='2022.11.05',
     python_requires='>=3.9',
     license='BSD',
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     url='https://github.com/coppertop-bones/dm/',
     author='David Briant',
     author_email='dangermouseb@forwarding.cc',

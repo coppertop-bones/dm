@@ -57,7 +57,7 @@ def PPS(lines):
         print(line)
     return lines
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def PP(x):
     print(x)
     return x
@@ -67,7 +67,7 @@ def PP(x, f):
     print(f(x))
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def RR(x):
     print(repr(x))
     return x
@@ -77,7 +77,7 @@ def RR(x, f):
     print(repr(f(x)))
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def SS(x):
     print(str(x))
     return x
@@ -87,18 +87,18 @@ def SS(x, f):
     print(str(f(x)))
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def DD(x):
     print(dir(x))
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def JJ(x):
     print('                                                                                                                                                                                                                                                                                      ', end='\r')
     print(x, end='\r')
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def HH(x):
     if hasattr(x, '_doc'):
         print(x._doc)
@@ -106,7 +106,7 @@ def HH(x):
         help(x)
     return x
 
-@coppertop
+@coppertop(dispatchEvenIfAllTypes=True)
 def TT(x):
     print(typeOf(x))
     return x
