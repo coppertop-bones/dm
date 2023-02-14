@@ -1383,7 +1383,7 @@ def sort(x:bmap) -> bmap:
     return bmap(sorted(x._kvs(), key=None, reverse=False))
 
 @coppertop
-def sort(x:pylist) -> pylist:
+def sort(x:pylist+pyset) -> pylist:
     return sorted(x, key=None, reverse=False)
 
 
@@ -1392,12 +1392,20 @@ def sort(x:pylist) -> pylist:
 # **********************************************************************************************************************
 
 @coppertop
-def sortRev(x:pylist) -> pylist:
+def sortRev(x:pylist+pyset) -> pylist:
     return sorted(x, key=None, reverse=True)
 
 @coppertop
 def sortRev(x:pydict) -> pydict:
     return dict(sorted(x.items(), key=None, reverse=True))
+
+@coppertop
+def sortRev(x:bmap) -> bmap:
+    raise NotYetImplemented()
+
+@coppertop
+def sortRev(x:bstruct) -> bstruct:
+    raise NotYetImplemented()
 
 
 # **********************************************************************************************************************
@@ -1405,7 +1413,7 @@ def sortRev(x:pydict) -> pydict:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def sortRevUsing(x:pylist, key:pyfunc) -> pylist:
+def sortRevUsing(x:pylist+pyset, key:pyfunc) -> pylist:
     return sorted(x, key=key, reverse=True)
 
 @coppertop(style=binary)
@@ -1418,7 +1426,7 @@ def sortRevUsing(x:pydict, key:pyfunc) -> pydict:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def sortUsing(x:pylist, key:pyfunc) -> pylist:
+def sortUsing(x:pylist+pyset, key:pyfunc) -> pylist:
     return sorted(x, key=key, reverse=False)
 
 @coppertop(style=binary)
@@ -1792,7 +1800,7 @@ def values_(a:bframe) -> pydict_values:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def without(xs:pylist+pytuple+pyset, elements:pylist+pytuple) -> pylist:
+def without(xs:pylist+pytuple+pyset, elements:pylist+pytuple+pyset) -> pylist:
     answer = []
     for x in xs:
         if x not in elements:
@@ -1811,7 +1819,7 @@ def without(xs:pylist+pytuple+pyset, element) -> pylist:
 def without(xs:(N**T1)[bseq], element:T1, tByT) -> (N**T1)[bseq]:
     answer = bseq((N**tByT[T1])[bseq])
     for e in xs:
-        if e is not element:
+        if e != element:
             answer.append(e)
     return answer
 
@@ -1835,9 +1843,9 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 
 
 # **********************************************************************************************************************
-# zip
+# zipall
 # **********************************************************************************************************************
 
 @coppertop
-def zip(x):
+def zipall(x:pylist+pytuple):
     return builtins.zip(*x)
