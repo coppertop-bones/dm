@@ -1030,30 +1030,39 @@ def joinAll(xs:pylist+pytuple) -> txt + ((N**T1)[bseq]) + pylist + pytuple:
 # **********************************************************************************************************************
 
 @coppertop
-def keys(d:pydict) -> pydict_keys:     # (T2**T1)(map) -> (N**T1)(iter)
-    return d.keys()
+def keys(d:pydict) -> pylist:     # (T1**T2)&map -> (N**T1)&pylist
+    return list(d.keys())
 
 @coppertop
-def keys(x:(T1**T2)[bmap][T3]) -> (N**T1)[pydict_keys]:
+def keys(x:(T1**T2)[bmap][T3]) -> (N**T1)[pylist]:
     return tv(
         (N**x._t.parent.parent.indexType)[pylist],
-        x._keys()
+        list(x._keys())
     )
 
 @coppertop
-def keys(s:bmap) -> pydict_keys:
-    return s._keys()
+def keys(m:bmap) -> pylist:
+    return list(m.keys())
 
 @coppertop
-def keys(s:bmap) -> pydict_keys:
-    return s._keys()
+def keys(f:bframe) -> pylist:
+    return list(f._keys())
 
 @coppertop
-def keys(a:bframe) -> pydict_keys:
-    return a._keys()
+def keys(s:(bstruct & T1)+bstruct) -> list: #(N**txt)[pydict_keys]: needs a tvdict_keys!!!
+    return list(s._keys())
+
+
+# **********************************************************************************************************************
+# keys_
+# **********************************************************************************************************************
 
 @coppertop
-def keys(s:(bstruct & T1)+bstruct) -> pydict_keys: #(N**txt)[pydict_keys]: needs a tvdict_keys!!!
+def keys_(d:pydict) -> pydict_keys:     # (T2**T1)(map) -> (N**T1)(iter)
+    return d.keys()
+
+@coppertop
+def keys_(s:bmap) -> pydict_keys:
     return s._keys()
 
 
@@ -1843,9 +1852,9 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 
 
 # **********************************************************************************************************************
-# zipall
+# zipAll
 # **********************************************************************************************************************
 
 @coppertop
-def zipall(x:pylist+pytuple):
+def zipAll(x:pylist+pytuple):
     return builtins.zip(*x)

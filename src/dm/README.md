@@ -35,3 +35,17 @@ All these could have identical function signatures.
 
 type / data conversions are a notable exception- it is considered that passing in a selection parameter is much
 clearer than selecting via name or namespace.
+
+
+capitalisation
+
+Public apis must be cammelCase for the sake of being guessable. Imagine being told be a colleague use "ZIP ALL" on the
+phone, and it is capitalised zipall - an unnecessary annoyance.
+
+
+semantics
+
+Use Cambridge, Oxford and American Heritage dictionaries, in that order, to distinguish meaning. E.g. in SQL it is 
+DISTINCT but some libraries have confusingly started using the word unique which is a different concept.
+
+

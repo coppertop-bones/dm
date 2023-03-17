@@ -37,8 +37,9 @@ import builtins
 from bones import jones
 from coppertop.pipe import *
 from dm.core.maths import closeTo
-from dm.core.types import bmap, T1, T2, T3, T4, T5, T6, bool, pydict, bstruct, matrix
+from dm.core.types import bmap, T1, T2, T3, T4, T5, T6, bool, pydict, bstruct, matrix, txt, pytuple
 from bones.lang.structs import tvarray
+from bones.core.errors import NotYetImplemented
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
@@ -52,35 +53,57 @@ def check(actual, fn, expected):
             res = fn(actual)
             assert res == expected, f'Expected type <{expected}> but got type <{fn(actual)}>'
         else:
-            res = fn(actual, expected)
-            ppAct = repr(actual)
-            ppExp = repr(expected)
-            assert res == True, f'\nChecking fn \'{fn}\' failed the following:\nactual:   {ppAct}\nexpected: {ppExp}'
+            if isinstance(fn, jones._unary):
+                raise NotYetImplemented()
+            elif isinstance(fn, jones._binary):
+                actual, passes, ppAct, ppExp = fn(actual, expected)
+                assert passes, f"\n'{fn}\' failed the following:\nactual:   {ppAct}\nexpected: {ppExp}"
+            elif isinstance(fn, jones._ternary):
+                return actual >> _finishCheckWithTernary(_, fn, expected, _)
+    return actual
+
+@coppertop(style=binary)
+def _finishCheckWithTernary(actual, ternary, arg2, expected):
+    actual, passes, ppAct, ppExp = actual >> ternary >> arg2 >> expected
+    assert passes, f"\n'{ternary.name} >> {arg2.name}' failed the following:\nactual:   {ppAct}\nexpected: {ppExp}"
     return actual
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equal(a, b) -> bool:
-    return a == b
+def raises(fn0, exceptionType) -> pytuple:
+    try:
+        actual = fn0()
+        return actual, False, repr(actual), exceptionType.__name__
+    except Exception as ex:
+        return ex, isinstance(ex, exceptionType), type(ex).__name__, exceptionType.__name__
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equal(a:matrix&tvarray, b:matrix&tvarray) -> bool:
-    return bool((a == b).all())
+def equals(a, b) -> pytuple:
+    return a, a == b, repr(a), repr(b)
+
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def equals(a:matrix&tvarray, b:matrix&tvarray) -> pytuple:
+    return a, bool((a == b).all()), repr(a), repr(b)
 
 @coppertop(style=binary)
-def different(a, b) -> bool:
-    return a != b
+def different(a, b) -> pytuple:
+    return a, a != b, repr(a), repr(b)
 
 @coppertop(style=binary)
-def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
-    return bool((a != b).any())
+def different(a:matrix&tvarray, b:matrix&tvarray) -> pytuple:
+    return a, bool((a != b).any()), repr(a), repr(b)
+
+@coppertop(style=ternary)
+def same(a, fn1, b):
+    actual, expected = fn1(a), fn1(b)
+    return actual, actual == expected, repr(actual), repr(expected)
 
 @coppertop(style=binary)
-def sameLen(a, b):
-    return len(a) == len(b)
+def lenAs(a, b):
+    return a, len(a) == len(b), repr(a), repr(b)
 
 @coppertop(style=binary)
 def sameShape(a, b):
-    return a.shape == b.shape
+    return a, a.shape == b.shape, repr(a), repr(b)
 
 
 # **********************************************************************************************************************
@@ -88,23 +111,23 @@ def sameShape(a, b):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def sameKeys(a:pydict, b:pydict) -> bool:
-    return a.keys() == b.keys()
+def sameKeys(a:pydict, b:pydict) -> pytuple:
+    return a, a.keys() == b.keys(), repr(a), repr(b)
 
 @coppertop(style=binary)
-def sameNames(a:bmap, b:bmap) -> bool:
-    return a._keys() == b._keys()
+def sameNames(a:bmap, b:bmap) -> pytuple:
+    return a, a._keys() == b._keys(), repr(a), repr(b)
 
 # some adhoc are defined like this (num ** account)[bstruct]["positions"]
 @coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T4 ** T2)[bstruct][T5]) -> bool:
-    return a._keys() == b._keys()
+def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T4 ** T2)[bstruct][T5]) -> pytuple:
+    return a, a._keys() == b._keys(), repr(a), repr(b)
 
 
 @coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T5 ** T4)[bstruct][T6]) -> bool:
+def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T5 ** T4)[bstruct][T6]) -> pytuple:
     assert a._keys() != b._keys()
-    return False
+    return a, False, repr(a), repr(b)
 
 # many structs should be typed (BTStruct)[bstruct] and possibly (BTStruct)[bstruct][T]   e.g. xy in pixels and xy in data
 

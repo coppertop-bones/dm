@@ -42,7 +42,6 @@ from dm.core.aggman import collect
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing
 from dm.core.conv import to
-from dm.core.aggman import zip, keys, at
 
 
 
@@ -87,7 +86,7 @@ def _pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = itertools.tee(iterable)
     next(b, None)
-    return builtins.zip(a, b)
+    return zip(a, b, strict=True)
 
 
 getCwd = coppertop(style=nullary, name='getCwd')(os.getcwd)
@@ -123,12 +122,12 @@ def readJson(f:TextIOWrapper):
 
 @coppertop(style=binary, module='bmap')
 def ksJoinVs(ks, vs) -> bmap:
-    return [ks, vs] >> zip >> to >> bmap
+    return zip(ks, vs, strict=True) >> to >> bmap
 bmap.ksJoinVs = ksJoinVs
 
 @coppertop(style=binary, module='pydict')
 def ksJoinVs(ks, vs) -> pydict:
-    return [ks, vs] >> zip >> to >> pydict
+    return zip(ks, vs, strict=True) >> to >> pydict
 pydict.ksJoinVs = ksJoinVs
 
 

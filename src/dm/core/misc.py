@@ -36,12 +36,12 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins, numpy as np
 
 from coppertop.pipe import *
-from bones.core.sentinels import Missing, dict_keys, dict_values
+from bones.core.sentinels import Missing, dict_keys, dict_values, dict_items, function
 from bones.core.errors import NotYetImplemented
 from bones.lang.metatypes import cacheAndUpdate, fitsWithin as _fitsWithin, BTAtom as _BTAtom
 from dm.core.aggman import inject
 from bones.lang.structs import tv
-from dm.core.types import T, count
+from dm.core.types import T, pylist, txt, pydict
 
 
 _SBT = _BTAtom.define('ShouldBeTyped')      # temporary type to allow"  'DE000762534' >> box | tISIN - i.e. make the box then type it
@@ -108,3 +108,27 @@ def sequence(p1, p2, n):
 def sequenceStep(p1, p2, step):
     first , last = p1, p2
     return list(np.arange(first, last + step, step))
+
+@coppertop
+def gather(x:function):
+    return x()
+
+@coppertop
+def gather(x:dict_keys) -> pylist:
+    return list(x)
+
+@coppertop
+def gather(x:dict_values) -> pylist:
+    return list(x)
+
+@coppertop
+def gather(x:dict_items) -> pylist:
+    return list(x)
+
+@coppertop
+def pyeval_(src:txt):
+    return lambda : eval(src)
+
+@coppertop
+def pyeval_(src:txt, ctx:pydict):
+    return lambda : eval(src, ctx)
