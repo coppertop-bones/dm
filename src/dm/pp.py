@@ -36,7 +36,7 @@ from collections import namedtuple
 from coppertop.pipe import *
 from dm.core.aggman import collect, interleave
 from bones.core.sentinels import Missing, list_iter
-from dm.core.types import txt
+from dm.core.types import txt, pyfunc, T
 
 __all__ = []
 
@@ -51,36 +51,20 @@ def formatStruct(s, name, keysFormat, valuesFormat, sep):
     return f'{name}({list(s._kvs()) >> collect >> formatKv >> interleave >> sep})'
     # return f'{name}({s >> kvs >> collect >> formatKv >> join >> sep})'
 
-
-# # faster? - can use when timing
-# @coppertop(dispatchEvenIfAllTypes=True)
-# def PP(x):
-#     print(x)
-#     return x
-#
-# @coppertop
-# def PP(x, f):
-#     print(f(x))
-#     return x
-#
-# @coppertop
-# def PPS(lines):
-#     for line in lines:
-#         print(line)
-#     return lines
-
-
 @coppertop(dispatchEvenIfAllTypes=True)
 def PP(x):
     return context.PP(x)
 
 @coppertop
-def PP(x, f):
-    return context.PPF(x, f)
+def PP(x, f:pyfunc + (T^T)):
+    f(x) >> PP
+    return x
 
 @coppertop
 def PPS(lines):
-    return context.PPS(lines)
+    for line in lines:
+        line >> PP
+    return lines
 
 @coppertop
 def PP(x, fmt:txt):
@@ -93,7 +77,7 @@ def RR(x):
     return x
 
 @coppertop
-def RR(x, f):
+def RR(x, f:pyfunc):
     print(repr(f(x)))
     return x
 
@@ -103,7 +87,7 @@ def SS(x):
     return x
 
 @coppertop
-def SS(x, f):
+def SS(x, f:pyfunc):
     print(str(f(x)))
     return x
 

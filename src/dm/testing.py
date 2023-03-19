@@ -61,9 +61,16 @@ def check(actual, fn, expected):
                 raise NotYetImplemented()
             elif isinstance(fn, jones._binary):
                 try:
-                    actual, passed, ppAct, ppExp = fn(actual, expected)
+                    if fnName == 'fitsWithin':
+                        actual, passed, ppAct, ppExp = _localFitsWithin(actual, expected)
+                    else:
+                        actual, passed, ppAct, ppExp = fn(actual, expected)
                 except Exception as ex:
-                    actual, passed, ppAct, ppExp = fn(actual, expected)
+                    # replicated so can put breakpoint here
+                    if fnName == 'fitsWithin':
+                        actual, passed, ppAct, ppExp = _localFitsWithin(actual, expected)
+                    else:
+                        actual, passed, ppAct, ppExp = fn(actual, expected)
                     raise
                 if not passed:
                     msg = f"{_getTestTitle()}\n'{fn.name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
@@ -91,8 +98,7 @@ def raises(fn0, exceptionType) -> pytuple:
     except Exception as ex:
         return ex, isinstance(ex, exceptionType), type(ex).__name__, exceptionType.__name__
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def fitsWithin(a, b):
+def _localFitsWithin(a, b):
     doesFit, tByT, distances = cacheAndUpdate(_fitsWithin(a, b), {})
     return a, doesFit, repr(a), repr(b)
 
