@@ -40,7 +40,7 @@ from bones.core.sentinels import Missing, function
 from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist,pytuple, pydict_keys, pydict_values, matrix, \
     offset
 from dm._core.structs import tvarray
-
+from dm.core.aggman import count
 
 
 # sql style
@@ -77,7 +77,7 @@ def aj(f1:dframe, f2:dframe) -> dframe:
 
 @coppertop(style=binary)
 def at(f:dframe, k:txt) -> dframe:
-    raise NotYetImplemented()
+    return f[k]
 
 @coppertop(style=binary)
 def at(f:dframe, o:offset) -> dframe:
@@ -240,8 +240,8 @@ def keyBy(f:dframe, cols:pylist) -> pylist:
 # **********************************************************************************************************************
 
 @coppertop
-def keys(f:dframe) -> pylist:
-    raise NotYetImplemented()
+def keys(f:dframe) -> pydict_keys:
+    return f._keys()
 
 
 # **********************************************************************************************************************
@@ -387,7 +387,8 @@ def reorder(f:dframe, old:txt, new:txt) -> dframe:
 
 @coppertop
 def shape(f:dframe) -> pytuple:
-    raise NotYetImplemented()
+    ks = f >> keys
+    return (f[ks >> first] >> count, ks >> count)
 
 
 # **********************************************************************************************************************

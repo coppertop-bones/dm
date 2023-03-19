@@ -397,6 +397,20 @@ t.index = index
 t.offset = offset
 
 
+def createDFrame(*args_, **kwargs):
+    t, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
+    if len(args) == 0:
+        return tvstruct(t, **kwargs)
+    elif len(args) == 1:
+        x = args[0]
+        return tvstruct(x & t, **kwargs)
+    else:
+        raise ProgrammerError()
+    constr(t, **kwargs)
+    return x
+
+
+
 seq = BTAtom.define('seq')
 map = BTAtom.define('map')
 
@@ -404,7 +418,7 @@ dtup = tup[tvarray].nameAs('dtup').setConstructor(tvarray).setOrthogonal(obj)   
 dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogonal(obj)
 dseq = seq[tvlist].nameAs('dseq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
 dmap = map[tvdict].nameAs('dmap').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
-dframe = frame[tvstruct].nameAs('dframe').setConstructor(tvstruct).setOrthogonal(obj)       # & N**BTStruct(...)
+dframe = frame[tvstruct].nameAs('dframe').setConstructor(createDFrame).setOrthogonal(obj)       # & N**BTStruct(...)
 
 __all__ += [
     'dtup', 'dstruct', 'dseq', 'dmap', 'dframe',
