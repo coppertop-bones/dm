@@ -46,12 +46,12 @@ from dm._core.structs import tvarray
 # sql style
 # f >> by_(...) >> collect_(...) >> where(...) >> orderBy(...)   - sortBy, xasc, keyBy
 
-ByRow = collections.namedtuple('ByRow', [''])
-FrameGroups = collections.namedtuple('FrameGroups', [''])
+ByRow = collections.namedtuple('ByRow', ['x'])
+FrameGroups = collections.namedtuple('FrameGroups', ['x'])
 
-DefBy = collections.namedtuple('DefBy', [''])
-DefCollect = collections.namedtuple('DefCollect', [''])
-DefWhere = collections.namedtuple('DefWhere', [''])
+DefBy = collections.namedtuple('DefBy', ['x'])
+DefCollect = collections.namedtuple('DefCollect', ['x'])
+DefWhere = collections.namedtuple('DefWhere', ['x'])
 
 DefCount = collections.namedtuple('DefCount', ['col_name'])
 DefFirst = collections.namedtuple('DefFirst', ['col_name'])
@@ -407,7 +407,7 @@ def sortBy(f:dframe, fields, directions) -> dframe:
 # take
 # **********************************************************************************************************************
 
-@coppertop
+@coppertop(style=binary)
 def take(f:dframe, fields) -> dframe:
     raise NotYetImplemented()
 
@@ -444,7 +444,7 @@ def uj(f1:dframe, f2:dframe) -> dframe:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def where(f:dframe) -> dframe:
+def where(f:dframe, includers) -> dframe:
     raise NotYetImplemented()
 
 
@@ -453,7 +453,7 @@ def where(f:dframe) -> dframe:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def where_(f:dframe) -> DefWhere:
+def where_(f:dframe, includers) -> DefWhere:
     raise NotYetImplemented()
 
 
