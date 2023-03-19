@@ -74,16 +74,18 @@ matrix_ = matrix & tvarray
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def append(l:pylist, element) -> pylist:
-    l = list(l)
-    l.append(element)
-    return l
+def append(xs:pylist, x) -> pylist:
+    return xs + [x]
 
 @coppertop(style=binary)
-def append(l:dseq&(N**T1), element:T1) -> dseq&(N**T1):
-    l = dseq(l)
-    l.append(element)
-    return l
+def append(xs:pytuple, x) -> pytuple:
+    return xs + (x,)
+
+@coppertop(style=binary)
+def append(xs:dseq&(N**T1), x:T1) -> dseq&(N**T1):
+    xs = dseq(xs)
+    xs.append(x)
+    return xs
 
 
 # **********************************************************************************************************************
@@ -91,16 +93,18 @@ def append(l:dseq&(N**T1), element:T1) -> dseq&(N**T1):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def appendTo(element, l:pylist) -> pylist:
-    l = list(l)
-    l.insert(0, element)
-    return l
+def appendTo(x, xs:pylist) -> pylist:
+    return xs + [x]
 
 @coppertop(style=binary)
-def appendTo(element, l:dseq&(N**T1)) -> dseq&(N**T1):
-    l = dseq(l)
-    l.insert(0, element)
-    return l
+def appendTo(x, xs:pytuple) -> pytuple:
+    return xs + (x,)
+
+@coppertop(style=binary)
+def appendTo(x, xs:dseq&(N**T1)) -> dseq&(N**T1):
+    xs = dseq(xs)
+    xs.append(x)
+    return xs
 
 
 # **********************************************************************************************************************
@@ -1274,16 +1278,18 @@ def override(a:dstruct, b:dstruct) -> dstruct:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def prepend(l:pylist, element) -> pylist:
-    l = list(l)
-    l.insert(0, element)
-    return l
+def prepend(xs:pylist, x) -> pylist:
+    return [x] + xs
 
 @coppertop(style=binary)
-def prepend(l:(N**T1)&dseq, element:T1) -> (N**T1)&dseq:
-    l = dseq(l)
-    l.insert(0, element)
-    return l
+def prepend(xs:pytuple, x) -> pytuple:
+    return (x,) + xs
+
+@coppertop(style=binary)
+def prepend(xs:(N**T1)&dseq, x:T1) -> (N**T1)&dseq:
+    xs = dseq(xs)
+    xs.insert(0, x)
+    return xs
 
 
 # **********************************************************************************************************************
@@ -1291,16 +1297,18 @@ def prepend(l:(N**T1)&dseq, element:T1) -> (N**T1)&dseq:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def prependTo(element, l:pylist) -> pylist:
-    l = list(l)
-    l.insert(0, element)
-    return l
+def prependTo(x, xs:pylist) -> pylist:
+    return [x] + xs
 
 @coppertop(style=binary)
-def prependTo(element:T1, l:(N**T1)&dseq) -> (N**T1)&dseq:
-    l = dseq(l)
-    l.insert(0, element)
-    return l
+def prependTo(x, xs:pytuple) -> pytuple:
+    return (x,) + xs
+
+@coppertop(style=binary)
+def prependTo(x:T1, xs:(N**T1)&dseq) -> (N**T1)&dseq:
+    xs = dseq(xs)
+    xs.insert(0, x)
+    return xs
 
 
 # **********************************************************************************************************************
@@ -1921,18 +1929,18 @@ def without(xs:pylist+pytuple+pyset, elements:pylist+pytuple+pyset) -> pylist:
     return answer
 
 @coppertop(style=binary)
-def without(xs:pylist+pytuple+pyset, element) -> pylist:
+def without(xs:pylist+pytuple+pyset, x) -> pylist:
     answer = []
-    for x in xs:
-        if x != element:
-            answer.append(x)
+    for e in xs:
+        if e != x:
+            answer.append(e)
     return answer
 
 @coppertop(style=binary)
-def without(xs:(N**T1)[dseq], element:T1, tByT) -> (N**T1)[dseq]:
+def without(xs:(N**T1)[dseq], x:T1, tByT) -> (N**T1)[dseq]:
     answer = dseq((N**tByT[T1])[dseq])
     for e in xs:
-        if e != element:
+        if e != x:
             answer.append(e)
     return answer
 
