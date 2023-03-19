@@ -115,7 +115,7 @@ def main():
     testBinary()
     testTernary()
     # testExamples()
-    print("tests commented out")
+    print(f"{__name__} - tests commented out")
 
 
 if __name__ == '__main__':

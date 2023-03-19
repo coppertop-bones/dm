@@ -51,21 +51,36 @@ def formatStruct(s, name, keysFormat, valuesFormat, sep):
     # return f'{name}({s >> kvs >> collect >> formatKv >> join >> sep})'
 
 
-@coppertop
-def PPS(lines):
-    for line in lines:
-        print(line)
-    return lines
+# # faster? - can use when timing
+# @coppertop(dispatchEvenIfAllTypes=True)
+# def PP(x):
+#     print(x)
+#     return x
+#
+# @coppertop
+# def PP(x, f):
+#     print(f(x))
+#     return x
+#
+# @coppertop
+# def PPS(lines):
+#     for line in lines:
+#         print(line)
+#     return lines
+
 
 @coppertop(dispatchEvenIfAllTypes=True)
 def PP(x):
-    print(x)
-    return x
+    return context.PP(x)
 
 @coppertop
 def PP(x, f):
-    print(f(x))
-    return x
+    return context.PPF(x, f)
+
+@coppertop
+def PPS(lines):
+    return context.PPS(lines)
+
 
 @coppertop(dispatchEvenIfAllTypes=True)
 def RR(x):
