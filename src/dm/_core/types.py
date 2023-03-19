@@ -397,11 +397,14 @@ t.index = index
 t.offset = offset
 
 
-dtup = tup['dtup'].setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvlist to tvtuple once implemented
-dstruct = struct['dstruct'].setConstructor(tvstruct).setOrthogonal(obj)
-dseq = BTAtom.define('dseq').setConstructor(tvlist).setOrthogonal(obj)      # N**T & dseq
-dmap = BTAtom.define('dmap').setConstructor(tvdict).setOrthogonal(obj)      # T1**T2 & dmap
-dframe = frame['dframe'].setConstructor(tvstruct).setOrthogonal(obj)
+seq = BTAtom.define('seq')
+map = BTAtom.define('map')
+
+dtup = tup[tvarray].nameAs('dtup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
+dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogonal(obj)
+dseq = seq[tvlist].nameAs('dseq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
+dmap = map[tvdict].nameAs('dmap').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
+dframe = frame[tvstruct].nameAs('dframe').setConstructor(tvstruct).setOrthogonal(obj)       # & N**BTStruct(...)
 
 __all__ += [
     'dtup', 'dstruct', 'dseq', 'dmap', 'dframe',
