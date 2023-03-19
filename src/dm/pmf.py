@@ -34,7 +34,7 @@ import numpy as np
 import scipy.stats
 
 from coppertop.pipe import *
-from dm.core.aggman import both, zip, values, keys, merge, select, sort
+from dm.core.aggman import both, zipAll, values, keys, merge, select, sort
 from dm.core.conv import to
 from dm.core.misc import sequence
 from dm.core.types import T, T1, T2, pylist, index, pytuple, num, bstruct, matrix, obj
@@ -144,7 +144,7 @@ def mean(pmf:PMF) -> num:
     try:
         return np.average(fs, weights=ws) >> to >> num
     except TypeError:
-        fs, ws = list([fs, ws] >> zip) >> select >> (lambda fv: not isinstance(fv[0], str)) >> zip
+        fs, ws = list([fs, ws] >> zipAll) >> select >> (lambda fv: not isinstance(fv[0], str)) >> zipAll
         return np.average(fs, weights=ws) >> to >> num
     # if pmf:
     #     answer = 0
@@ -248,7 +248,7 @@ def _rvOp(lhs, rhs, op):
 
 @coppertop
 def toXsPs(pmf:PMF) -> pytuple:
-    return tuple(zip(pmf._kvs()))
+    return tuple(zipAll(pmf._kvs()))
 
 @coppertop(style=unary)
 def percentile(pmf:PMF, percentage:num):
@@ -280,7 +280,7 @@ def _asSteps(xs:pylist, ys:pylist, align='center', width=None):
     points = []
     lastx = np.nan
     lasty = np.nan
-    for x, y in [xs, ys] >> zip:
+    for x, y in [xs, ys] >> zipAll:
         if (x - lastx) > 1e-5:
             points.append((lastx, 0))
             points.append((x, 0))
@@ -291,7 +291,7 @@ def _asSteps(xs:pylist, ys:pylist, align='center', width=None):
         lastx = x + width
         lasty = y
     points.append((lastx, lasty))
-    pxs, pys = points >> zip
+    pxs, pys = points >> zipAll
     if align == 'center':
         pxs = np.array(pxs) - width / 2.0
     elif align == 'right':
