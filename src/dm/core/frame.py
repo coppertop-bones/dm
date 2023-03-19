@@ -32,13 +32,34 @@ BONES_NS = ''
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import csv, numpy as np
+import csv, numpy as np, collections
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from bones.core.sentinels import Missing
-from dm.core.types import dframe, txt, pydict, dtup, t, N, num, matrix
+from bones.core.sentinels import Missing, function
+from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist,pytuple, pydict_keys, pydict_values, matrix, \
+    offset
 from dm._core.structs import tvarray
+
+
+
+# sql style
+# f >> by_(...) >> collect_(...) >> where(...) >> orderBy(...)   - sortBy, xasc, keyBy
+
+ByRow = collections.namedtuple('ByRow', [''])
+FrameGroups = collections.namedtuple('FrameGroups', [''])
+
+DefBy = collections.namedtuple('DefBy', [''])
+DefCollect = collections.namedtuple('DefCollect', [''])
+DefWhere = collections.namedtuple('DefWhere', [''])
+
+DefCount = collections.namedtuple('DefCount', ['col_name'])
+DefFirst = collections.namedtuple('DefFirst', ['col_name'])
+DefLast = collections.namedtuple('DefLast', ['col_name'])
+DefMean = collections.namedtuple('DefMean', ['col_name'])
+DefRange = collections.namedtuple('DefRange', ['col_name'])
+DefTotal = collections.namedtuple('DefTotal', ['col_name'])
+
 
 
 # **********************************************************************************************************************
@@ -46,7 +67,113 @@ from dm._core.structs import tvarray
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def aj(agg1:dframe, agg2:dframe):
+def aj(f1:dframe, f2:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# at
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def at(f:dframe, k:txt) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=binary)
+def at(f:dframe, o:offset) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# by
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def by(a:dframe, keys) -> FrameGroups:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# by_
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def by_(a:dframe, keys) -> DefBy:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# byRow
+# **********************************************************************************************************************
+
+@coppertop
+def byRow(f:function) -> ByRow:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# collect
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def collect(a:dframe, collectors:pylist+pytuple) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# collect_
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def collect_(a:dframe, definitions) -> DefCollect:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# count_
+# **********************************************************************************************************************
+
+@coppertop
+def count_(colName:txt) -> DefCount:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# drop
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def drop(f: dframe, n: t.count) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=binary)
+def drop(f: dframe, k:txt) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=binary)
+def drop(f: dframe, k:txt) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=binary)
+def drop(f: dframe, ks:pylist) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# first
+# **********************************************************************************************************************
+
+@coppertop
+def first(a:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# first_
+# **********************************************************************************************************************
+
+@coppertop
+def first_(colName:txt) -> DefFirst:
     raise NotYetImplemented()
 
 
@@ -54,7 +181,8 @@ def aj(agg1:dframe, agg2:dframe):
 # firstCol
 # **********************************************************************************************************************
 
-def firstCol(a:matrix&tvarray) -> matrix&tvarray:
+@coppertop
+def firstCol(a:dframe) -> dframe:
     raise NotYetImplemented()
 
 
@@ -72,25 +200,65 @@ def firstLast(f:dframe, n:t.count) -> dframe:
 
 
 # **********************************************************************************************************************
-# firstRow
+# gather
 # **********************************************************************************************************************
 
-def firstRow(a:matrix&tvarray) -> matrix&tvarray:
+@coppertop
+def gather(f:dframe) -> dframe:
     raise NotYetImplemented()
 
 
 # **********************************************************************************************************************
-# groupBy
+# hj
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def hj(f1:dframe, f2:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# ij
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def ij(f1:dframe, f2:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# keyBy
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def keyBy(f:dframe, cols:pylist) -> pylist:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# keys
 # **********************************************************************************************************************
 
 @coppertop
-def groupBy(a:dframe, keys):
-    "answers a collection of groups"
+def keys(f:dframe) -> pylist:
     raise NotYetImplemented()
 
+
+# **********************************************************************************************************************
+# last
+# **********************************************************************************************************************
+
 @coppertop
-def groupBy(a:dframe, keys, directions):
-    "answers a collection of groups"
+def last(a:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# last_
+# **********************************************************************************************************************
+
+@coppertop
+def last_(colName:txt) -> DefLast:
     raise NotYetImplemented()
 
 
@@ -98,15 +266,8 @@ def groupBy(a:dframe, keys, directions):
 # lastCol
 # **********************************************************************************************************************
 
-def lastCol(a:matrix&tvarray) -> matrix&tvarray:
-    raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# lastRow
-# **********************************************************************************************************************
-
-def lastRow(a:matrix&tvarray) -> matrix&tvarray:
+@coppertop
+def lastCol(a:dframe) -> dframe:
     raise NotYetImplemented()
 
 
@@ -115,12 +276,48 @@ def lastRow(a:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def lj(agg1:dframe, agg2:dframe):
+def lj(f1:dframe, f2:dframe) -> dframe:
     raise NotYetImplemented()
 
 
 # **********************************************************************************************************************
-# dm.frame.fromCsv
+# mean_
+# **********************************************************************************************************************
+
+@coppertop
+def mean_(colName:txt) -> DefMean:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# numCols
+# **********************************************************************************************************************
+
+@coppertop
+def numCols(f:dframe) -> t.count:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# numRows
+# **********************************************************************************************************************
+
+@coppertop
+def numRows(f:dframe) -> t.count:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# range_
+# **********************************************************************************************************************
+
+@coppertop
+def range_(colName:txt) -> DefRange:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# read in dm.frame.fromCsv
 # **********************************************************************************************************************
 
 @coppertop(module='dm.frame.csv')
@@ -159,14 +356,104 @@ def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> dframe:
 
 
 # **********************************************************************************************************************
+# rename
+# **********************************************************************************************************************
+
+@coppertop(style=ternary)
+def rename(f:dframe, old:pylist+pytuple+pydict_keys+pydict_values, new:pylist+pytuple+pydict_keys+pydict_values) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=ternary)
+def rename(f:dframe, old:txt, new:txt) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# reorder
+# **********************************************************************************************************************
+
+@coppertop(style=ternary)
+def reorder(f:dframe, old:pylist+pytuple+pydict_keys+pydict_values, new:pylist+pytuple+pydict_keys+pydict_values) -> dframe:
+    raise NotYetImplemented()
+
+@coppertop(style=ternary)
+def reorder(f:dframe, old:txt, new:txt) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# shape
+# **********************************************************************************************************************
+
+@coppertop
+def shape(f:dframe) -> pytuple:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
 # sortBy
 # **********************************************************************************************************************
 
 @coppertop
-def sortBy(x:dframe, fields):
+def sortBy(f:dframe, fields) -> dframe:
     raise NotYetImplemented()
 
 @coppertop
-def sortBy(x:dframe, fields, directions):
+def sortBy(f:dframe, fields, directions) -> dframe:
     raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# take
+# **********************************************************************************************************************
+
+@coppertop
+def take(f:dframe, fields) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# takePanel
+# **********************************************************************************************************************
+
+@coppertop
+def takePanel(f: dframe) -> matrix&tvarray:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# total_
+# **********************************************************************************************************************
+
+@coppertop
+def total_(colName:txt) -> DefTotal:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# uj
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def uj(f1:dframe, f2:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# where
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def where(f:dframe) -> dframe:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# where_
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def where_(f:dframe) -> DefWhere:
+    raise NotYetImplemented()
+
 
