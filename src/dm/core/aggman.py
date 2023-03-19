@@ -68,6 +68,39 @@ array_ = (N**num) & tvarray
 matrix_ = matrix & tvarray
 
 
+# **********************************************************************************************************************
+# append
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def append(l:pylist, element) -> pylist:
+    l = list(l)
+    l.append(element)
+    return l
+
+@coppertop(style=binary)
+def append(l:bseq&(N**T1), element:T1) -> bseq&(N**T1):
+    l = bseq(l)
+    l.append(element)
+    return l
+
+
+# **********************************************************************************************************************
+# appendTo
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def appendTo(element, l:pylist) -> pylist:
+    l = list(l)
+    l.insert(0, element)
+    return l
+
+@coppertop(style=binary)
+def appendTo(element, l:bseq&(N**T1)) -> bseq&(N**T1):
+    l = bseq(l)
+    l.insert(0, element)
+    return l
+
 
 # **********************************************************************************************************************
 # at - if the selector is N** then this means a depth access - use atAll for breadth
@@ -1211,6 +1244,40 @@ def override(a:bstruct, b:bstruct) -> bstruct:
 
 
 # **********************************************************************************************************************
+# prepend
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def prepend(l:pylist, element) -> pylist:
+    l = list(l)
+    l.insert(0, element)
+    return l
+
+@coppertop(style=binary)
+def prepend(l:(N**T1)&bseq, element:T1) -> (N**T1)&bseq:
+    l = bseq(l)
+    l.insert(0, element)
+    return l
+
+
+# **********************************************************************************************************************
+# prependTo
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def prependTo(element, l:pylist) -> pylist:
+    l = list(l)
+    l.insert(0, element)
+    return l
+
+@coppertop(style=binary)
+def prependTo(element:T1, l:(N**T1)&bseq) -> (N**T1)&bseq:
+    l = bseq(l)
+    l.insert(0, element)
+    return l
+
+
+# **********************************************************************************************************************
 # rename
 # **********************************************************************************************************************
 
@@ -1856,5 +1923,5 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def zipAll(x:pylist+pytuple):
+def zipAll(x:pylist+pytuple+pydict_keys+pydict_values+pydict_items):
     return builtins.zip(*x)
