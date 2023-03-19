@@ -34,11 +34,11 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 # manipulation of these aggregation classes:
-# txt, sym, btup, bstruct, bseq, bmap, pylist, pydict, pytup, pyset, bframe, nd, (N**num)&tvarray, matrix&tvarray
+# txt, sym, dtup, dstruct, dseq, dmap, pylist, pydict, pytup, pyset, dframe, nd, (N**num)&tvarray, matrix&tvarray
 #
 #
 # NOTES
-# bmap is order preserving (may add a fasthash that isn't)
+# dmap is order preserving (may add a fasthash that isn't)
 # decide how to handle lazy / out-of-order aggregates
 # do we need merge and underride (only difference is order of keys)
 
@@ -50,11 +50,12 @@ from coppertop.pipe import *
 
 from bones.core.errors import NotYetImplemented, ProgrammerError
 from bones.lang.metatypes import hasT, cacheAndUpdate, fitsWithin
-from bones.lang.structs import tvarray, tv
+from bones.lang.structs import tv
 from bones.core.sentinels import Void
 
 from dm.core.types import pylist, pydict, pytuple, pydict_keys, pydict_items, pydict_values, pyfunc, pyset, T, \
-    T1, T2, T3, T4, T5, T6, txt, t, index, offset, N, bstruct, btup, bseq, void, bmap, bframe, matrix, num, py
+    T1, T2, T3, T4, T5, T6, txt, t, index, offset, N, dstruct, dtup, dseq, void, dmap, dframe, matrix, num, py
+from dm._core.structs import tvarray
 
 dict_keys = type({}.keys())
 dict_values = type({}.values())
@@ -79,8 +80,8 @@ def append(l:pylist, element) -> pylist:
     return l
 
 @coppertop(style=binary)
-def append(l:bseq&(N**T1), element:T1) -> bseq&(N**T1):
-    l = bseq(l)
+def append(l:dseq&(N**T1), element:T1) -> dseq&(N**T1):
+    l = dseq(l)
     l.append(element)
     return l
 
@@ -96,8 +97,8 @@ def appendTo(element, l:pylist) -> pylist:
     return l
 
 @coppertop(style=binary)
-def appendTo(element, l:bseq&(N**T1)) -> bseq&(N**T1):
-    l = bseq(l)
+def appendTo(element, l:dseq&(N**T1)) -> dseq&(N**T1):
+    l = dseq(l)
     l.insert(0, element)
     return l
 
@@ -111,15 +112,15 @@ def appendTo(element, l:bseq&(N**T1)) -> bseq&(N**T1):
 #     return xs[selector]
 
 @coppertop(style=binary)
-def at(xs:bseq+pylist+pytuple, o:offset) -> py:
+def at(xs:dseq+pylist+pytuple, o:offset) -> py:
     return xs[o]
 
 @coppertop(style=binary)
-def at(xs:bseq+pylist+pytuple, i:index):
+def at(xs:dseq+pylist+pytuple, i:index):
     return xs[i - 1]
 
 @coppertop(style=binary)
-def at(s:bstruct+pydict+bmap, k:txt):
+def at(s:dstruct+pydict+dmap, k:txt):
     return s[k]
 
 @coppertop(style=binary)
@@ -127,7 +128,7 @@ def at(s:py, k:txt):
     return s[k]
 
 @coppertop(style=binary)
-def at(s:bstruct+pydict+bmap, ks:pylist):
+def at(s:dstruct+pydict+dmap, ks:pylist):
     for k in ks:
         s = s[k]
     return s
@@ -145,33 +146,33 @@ def at(xs:pylist, s1:offset, s2: offset):
     return xs[s1:s2]
 
 @coppertop(style=binary)
-def at(a:bframe, f:txt) -> (N**T)&tvarray:
+def at(a:dframe, f:txt) -> (N**T)&tvarray:
     return a[f]
 
 @coppertop(style=binary)
-def at(a:(N**T1)[bframe], f:txt) -> (N**N**T2)[tvarray]:
+def at(a:(N**T1)[dframe], f:txt) -> (N**N**T2)[tvarray]:
     # T2 is a column in  the struct T1
     return a[f]
 
 @coppertop(style=binary)
-def at(a:bframe, o:offset) -> bstruct:
+def at(a:dframe, o:offset) -> dstruct:
     items = [(f, a[f][o]) for f in a._keys()]
-    return bstruct(items)
+    return dstruct(items)
 
 @coppertop(style=binary)
-def at(a:bframe, i:index) -> bstruct:
+def at(a:dframe, i:index) -> dstruct:
     items = [(f, a[f][i-1]) for f in a._keys()]
-    return bstruct(items)
+    return dstruct(items)
 
 @coppertop(style=binary)
-def at(a:(N**T)[bframe], o:offset):  # -> T:
+def at(a:(N**T)[dframe], o:offset):  # -> T:
     # answers a struct if o is an offset or an array if o is a name
     raise NotYetImplemented('(a, o) -> T')
 
 @coppertop(style=binary)
-def at(a:bframe, os:pylist+pytuple) -> bframe:
+def at(a:dframe, os:pylist+pytuple) -> dframe:
     items = [(f, a[f][os]) for f in a._keys()]
-    return bstruct(items)
+    return dstruct(items)
 
 @coppertop(style=binary)
 def at(xs:(N**T)&tvarray, o:t.offset) -> T:
@@ -256,23 +257,23 @@ def atIfNonePut(m, k, default):
 # **********************************************************************************************************************
 
 @coppertop(style=ternary)
-def atPut(s:bstruct, name:txt, value) -> bstruct:
-    s = bstruct(s)
+def atPut(s:dstruct, name:txt, value) -> dstruct:
+    s = dstruct(s)
     s[name] = value
     return s
 
 @coppertop(style=ternary)
-def atPut(m:(T2**T1)[bstruct][T3], ks:(N**T1)[pylist], v:T2) -> (T2**T1)[bstruct][T3]:
+def atPut(m:(T2**T1)[dstruct][T3], ks:(N**T1)[pylist], v:T2) -> (T2**T1)[dstruct][T3]:
     for k in ks._v:
         m[k] = v
     return m
 
 @coppertop(style=ternary)
-def atPut(a:bframe, o:offset, row:bstruct) -> bframe:
+def atPut(a:dframe, o:offset, row:dstruct) -> dframe:
     raise NotYetImplemented()
 
 @coppertop(style=ternary)
-def atPut(a:bframe, f:txt, col:(N**T1)[tvarray]) -> bframe:
+def atPut(a:dframe, f:txt, col:(N**T1)[tvarray]) -> dframe:
     a[f] = col
     return a
 
@@ -283,7 +284,7 @@ def atPut(m:pydict, k:T1, v:T2) -> pydict:
     return m
 
 @coppertop(style=ternary)
-def atPut(m:bmap, k, v) -> bmap:
+def atPut(m:dmap, k, v) -> dmap:
     raise NotYetImplemented()
     m[k] = v
     return m
@@ -382,35 +383,35 @@ def both(a:pydict, f:pyfunc, b:pydict) -> pylist:
     return answer
 
 @coppertop(style=ternary)
-def both(a:(T1 ** T2)[bstruct], fn, b:(T1 ** T2)[bstruct]) -> pylist:
+def both(a:(T1 ** T2)[dstruct], fn, b:(T1 ** T2)[dstruct]) -> pylist:
     return a._kvs()  \
         >> both  \
         >> (lambda aFV, bFV: fn(aFV[0], aFV[1], bFV[0], bFV[1]))  \
         >> b._kvs()
 
 @coppertop(style=ternary)
-def both(a:bstruct, fn, b:bstruct) -> pylist:
+def both(a:dstruct, fn, b:dstruct) -> pylist:
     return a._kvs()  \
         >> both  \
         >> (lambda aFV, bFV: fn(aFV[0], aFV[1], bFV[0], bFV[1]))  \
         >> b._kvs()
 
 @coppertop(style=ternary)
-def both(a:(T1 ** T2)[bstruct][T3], fn, b:(T1 ** T2)[bstruct][T3]) -> pylist:
+def both(a:(T1 ** T2)[dstruct][T3], fn, b:(T1 ** T2)[dstruct][T3]) -> pylist:
     return a._kvs()  \
         >> both  \
         >> (lambda aFV, bFV: fn(aFV[0], aFV[1], bFV[0], bFV[1]))  \
         >> b._kvs()
 
 @coppertop(style=ternary)
-def both(a:bstruct[T], fn, b:bstruct[T]) -> pylist:
+def both(a:dstruct[T], fn, b:dstruct[T]) -> pylist:
     return a._kvs()  \
         >> both  \
         >> (lambda aFV, bFV: fn(aFV[0], aFV[1], bFV[0], bFV[1]))  \
         >> b._kvs()
 
 @coppertop(style=ternary)
-def both(a:(T1 ** T2)[bstruct][T3], fn:pyfunc, b:(T4 ** T5)[bstruct][T6]) -> pylist:
+def both(a:(T1 ** T2)[dstruct][T3], fn:pyfunc, b:(T4 ** T5)[dstruct][T6]) -> pylist:
     return a._kvs()  \
         >> both  \
         >> (lambda aFV, bFV: fn(aFV[0], aFV[1], bFV[0], bFV[1]))  \
@@ -450,25 +451,25 @@ def collect(xs:pyset, f) -> pyset:
     return set([f(x) for x in xs])
 
 @coppertop(style=binary)
-def collect(a:bmap, fn2) -> bmap:
-    answer = bmap()
+def collect(a:dmap, fn2) -> dmap:
+    answer = dmap()
     for f, v in a._kvs():
         answer[f] = fn2(f, v)
     return answer
 
 @coppertop(style=binary)
-def collect(a:bframe, fn1):
+def collect(a:dframe, fn1):
     inputsAndOutput = [x for x in a._values()] + [None]
     with np.nditer(inputsAndOutput) as it:
         for vars in it:
             vars[-1][...] = fn1(*vars[:-1])
-        return it.operands[len(inputsAndOutput) - 1].view(btup)
+        return it.operands[len(inputsAndOutput) - 1].view(dtup)
 
 @coppertop(style=binary)
 def collect(xs: pydict_items, f) -> pylist:
     return [f(k, v) for k, v in xs]
 
-def _collectHelper(xs:(N**T1)[bseq], f:T1^T2, tByT) -> dict:
+def _collectHelper(xs:(N**T1)[dseq], f:T1^T2, tByT) -> dict:
     t1 = tByT[T1]
     fn, tByT_f, hasValue = f.d.selectFn((t1,))
     t2 = fn.tRet
@@ -479,13 +480,13 @@ def _collectHelper(xs:(N**T1)[bseq], f:T1^T2, tByT) -> dict:
     return answer
 
 @coppertop(style=binary, typeHelper=_collectHelper)
-def collect(xs:(N**T1)[bseq], f:T1^T2, tByT) -> (N**T2)[bseq]:
-    return bseq((N**tByT[T2])[bseq], [f(x) for x in xs])
+def collect(xs:(N**T1)[dseq], f:T1^T2, tByT) -> (N**T2)[dseq]:
+    return dseq((N**tByT[T2])[dseq], [f(x) for x in xs])
 
 @coppertop(style=binary, typeHelper=_collectHelper)
-def collect(xs:(N**T1)[bseq, T3], f:T1^T2, tByT) -> (N**T2)[bseq, T3]:
+def collect(xs:(N**T1)[dseq, T3], f:T1^T2, tByT) -> (N**T2)[dseq, T3]:
     fxs = [f(x) for x in xs]
-    return bseq((N**tByT[T2])[bseq, tByT[T3]], fxs)
+    return dseq((N**tByT[T2])[dseq, tByT[T3]], fxs)
 
 
 # **********************************************************************************************************************
@@ -493,7 +494,7 @@ def collect(xs:(N**T1)[bseq, T3], f:T1^T2, tByT) -> (N**T2)[bseq, T3]:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def collectV(a:bmap, fn1) -> pylist:
+def collectV(a:dmap, fn1) -> pylist:
     answer = list()
     for v in a._values():
         answer.append(fn1(v))
@@ -505,7 +506,7 @@ def collectV(a:bmap, fn1) -> pylist:
 # **********************************************************************************************************************
 
 @coppertop
-def count(x:bstruct) -> t.count:
+def count(x:dstruct) -> t.count:
     return len(x._keys())
 
 @coppertop
@@ -583,7 +584,7 @@ def do(xs:pylist+pydict_keys+pydict_values+pytuple, f) -> void:
 
 @coppertop(style=binary)
 def drop(xs:(N**T)[pylist], ks:(N**T)[pylist]) -> (N**T)[pylist]:
-    raise ProgrammerError("Don't need to box pylist now we have bseq")
+    raise ProgrammerError("Don't need to box pylist now we have dseq")
     # answer = []
     # for x in xs._v:
     #     if x not in ks._v:
@@ -664,9 +665,9 @@ def drop(d:pydict, k:txt) -> pydict:
     return {k2:d[k2] for k2 in d.keys() if k2 != k}
 
 @coppertop(style=binary)
-def drop(s:bmap, keys:pylist) -> bmap:
+def drop(s:dmap, keys:pylist) -> dmap:
     # keys may be a list[str] or list[int]
-    answer = bmap(s)
+    answer = dmap(s)
     if not keys: return answer
     if type(keys[0]) is builtins.str:
         for k in keys:
@@ -678,47 +679,47 @@ def drop(s:bmap, keys:pylist) -> bmap:
     return answer
 
 @coppertop(style=binary)
-def drop(s:bmap, name:txt) -> bmap:
-    answer = bmap(s)
+def drop(s:dmap, name:txt) -> dmap:
+    answer = dmap(s)
     del answer[name]
     return answer
 
 @coppertop(style=binary)
-def drop(s:bstruct, name:txt) -> bstruct:
-    answer = bstruct(s)
+def drop(s:dstruct, name:txt) -> dstruct:
+    answer = dstruct(s)
     del answer[name]
     return answer
 
 @coppertop(style=binary)
-def drop(f:bframe, k:txt) -> bframe:
-    return bframe({k_:f[k_] for k_ in f >> keys >> drop >> k})
+def drop(f:dframe, k:txt) -> dframe:
+    return dframe({k_:f[k_] for k_ in f >> keys >> drop >> k})
 
 @coppertop(style=binary)
-def drop(f:bframe, n:t.count) -> bframe:
+def drop(f:dframe, n:t.count) -> dframe:
     if n >= 0:
-        return bframe({k:f[k][n:] for k in f._keys()})
+        return dframe({k:f[k][n:] for k in f._keys()})
     else:
         firstCol = None
         for firstCol in f._values():
             break
         s1 = firstCol.shape[0] - n
-        return bframe({k:f[k][s1:] for k in f._keys()})
+        return dframe({k:f[k][s1:] for k in f._keys()})
 
 @coppertop(style=binary)
-def drop(f:bframe, isOrKs:pylist) -> bframe:
+def drop(f:dframe, isOrKs:pylist) -> dframe:
     if not isOrKs:
         return f
     elif isinstance(isOrKs[0], str):
         # sequence( of strings
         ks = [k for k in f._keys() if k not in isOrKs]
-        return bframe({k:f[k] for k in ks})
+        return dframe({k:f[k] for k in ks})
     elif isinstance(isOrKs[0], int):
         raise NotYetImplemented()
     else:
         raise TypeError()
 
 @coppertop(style=binary)
-def drop(f:bframe, ss:pytuple) -> bframe:
+def drop(f:dframe, ss:pytuple) -> dframe:
     raise NotYetImplemented()
 
 @coppertop(style=binary)
@@ -834,7 +835,7 @@ def first(a:array_) -> num:
     return float(a[0])
 
 @coppertop
-def first(a:bframe) -> bframe:
+def first(a:dframe) -> dframe:
     # answers first row
     raise NotYetImplemented()
 
@@ -849,8 +850,8 @@ def first(xs:pydict_values+pydict_keys):
         return x
 
 @coppertop
-def first(f:bframe) -> bframe:
-    return bframe({k:f[k][[0]] for k in f._keys()})
+def first(f:dframe) -> dframe:
+    return dframe({k:f[k][[0]] for k in f._keys()})
 
 
 # **********************************************************************************************************************
@@ -858,7 +859,7 @@ def first(f:bframe) -> bframe:
 # **********************************************************************************************************************
 
 @coppertop
-def firstLast(a:bframe) -> bframe:
+def firstLast(a:dframe) -> dframe:
     # answers first row
     raise NotYetImplemented()
 
@@ -936,7 +937,7 @@ def inject(xs:pylist, seed, f2):
     return prior
 
 @coppertop(style=binary)
-def inject(s:bmap, seed, f3):
+def inject(s:dmap, seed, f3):
     prior = seed
     for f, v in s._kvs():
         prior = f3(prior, f, v)
@@ -955,11 +956,11 @@ def interleave(xs:pylist+pytuple, b) -> pylist:
     return answer
 
 @coppertop(style=binary)
-def interleave(a:(N**T1)[bseq], b: T1) -> (N**T1)[bseq]:
+def interleave(a:(N**T1)[dseq], b: T1) -> (N**T1)[dseq]:
     raise NotYetImplemented()
 
 @coppertop(style=binary)
-def interleave(a:(N**T1)[bseq], b: (N**T1)[bseq]) -> (N**T1)[bseq]:
+def interleave(a:(N**T1)[dseq], b: (N**T1)[dseq]) -> (N**T1)[dseq]:
     raise NotYetImplemented()
 
 @coppertop(style=binary)
@@ -1019,8 +1020,8 @@ def join(xs:pylist, ys:pydict_keys) -> pylist:
     return xs + list(ys)
 
 @coppertop(style=binary)
-def join(xs:(N**T1)[bseq], ys:(N**T1)[bseq], tByT) -> (N**T1)[bseq]:
-    return bseq((N**(tByT[T1]))[bseq], xs.data + ys.data)
+def join(xs:(N**T1)[dseq], ys:(N**T1)[dseq], tByT) -> (N**T1)[dseq]:
+    return dseq((N**(tByT[T1]))[dseq], xs.data + ys.data)
 
 
 # **********************************************************************************************************************
@@ -1032,20 +1033,20 @@ def joinAll(xs:N**txt) -> txt:
     return ''.join(xs)
 
 @coppertop
-def joinAll(xs:pylist+pytuple) -> txt + ((N**T1)[bseq]) + pylist + pytuple:
-    # could be a list of strings or a list of (N**T1) & bseq
+def joinAll(xs:pylist+pytuple) -> txt + ((N**T1)[dseq]) + pylist + pytuple:
+    # could be a list of strings or a list of (N**T1) & dseq
     # answer a string if no elements
     if not xs:
         return ''
     typeOfFirst = typeOf(xs[0])
     if _fitsWithin(typeOfFirst, txt):
         return ''.join(xs)
-    elif _fitsWithin(typeOfFirst, (N**T1)[bseq]):
+    elif _fitsWithin(typeOfFirst, (N**T1)[dseq]):
         elements = []
         for x in xs:
             # could check the type of each list using metatypes.fitsWithin
             elements.extend(x.data)
-        return bseq(xs[0]._t, elements)
+        return dseq(xs[0]._t, elements)
     elif _fitsWithin(typeOfFirst, pylist):
         answer = []
         for e in xs:
@@ -1067,22 +1068,22 @@ def keys(d:pydict) -> pylist:     # (T1**T2)&map -> (N**T1)&pylist
     return list(d.keys())
 
 @coppertop
-def keys(x:(T1**T2)[bmap][T3]) -> (N**T1)[pylist]:
+def keys(x:(T1**T2)[dmap][T3]) -> (N**T1)[pylist]:
     return tv(
         (N**x._t.parent.parent.indexType)[pylist],
         list(x._keys())
     )
 
 @coppertop
-def keys(m:bmap) -> pylist:
+def keys(m:dmap) -> pylist:
     return list(m.keys())
 
 @coppertop
-def keys(f:bframe) -> pylist:
+def keys(f:dframe) -> pylist:
     return list(f._keys())
 
 @coppertop
-def keys(s:(bstruct & T1)+bstruct) -> list: #(N**txt)[pydict_keys]: needs a tvdict_keys!!!
+def keys(s:(dstruct & T1)+dstruct) -> list: #(N**txt)[pydict_keys]: needs a tvdict_keys!!!
     return list(s._keys())
 
 
@@ -1095,7 +1096,7 @@ def keys_(d:pydict) -> pydict_keys:     # (T2**T1)(map) -> (N**T1)(iter)
     return d.keys()
 
 @coppertop
-def keys_(s:bmap) -> pydict_keys:
+def keys_(s:dmap) -> pydict_keys:
     return s._keys()
 
 
@@ -1104,19 +1105,19 @@ def keys_(s:bmap) -> pydict_keys:
 # **********************************************************************************************************************
 
 @coppertop
-def kvs(x:bmap) -> pydict_items:
+def kvs(x:dmap) -> pydict_items:
     return x._kvs()
 
 @coppertop
-def kvs(x:bmap) -> pydict_items:
+def kvs(x:dmap) -> pydict_items:
     return x._kvs()
 
 @coppertop
-def kvs(x:(T1**T2)[bstruct][T]) -> pydict_items:
+def kvs(x:(T1**T2)[dstruct][T]) -> pydict_items:
     return x._v._kvs()
 
 @coppertop
-def kvs(x:(T1**T2)[bstruct][T]) -> pydict_items:
+def kvs(x:(T1**T2)[dstruct][T]) -> pydict_items:
     return x._v._kvs()
 
 @coppertop
@@ -1129,8 +1130,8 @@ def kvs(x:pydict) -> pydict_items:
 # **********************************************************************************************************************
 
 @coppertop
-def last(f:bframe) -> bframe:
-    return bframe({k:f[k][[-1]] for k in f._keys()})
+def last(f:dframe) -> dframe:
+    return dframe({k:f[k][[-1]] for k in f._keys()})
 
 @coppertop
 def last(x:pylist+pytuple):
@@ -1152,7 +1153,7 @@ def merge(a:pydict, b:pydict) -> pydict:
     return answer
 
 @coppertop(style=binary)
-def merge(a:pydict, b:bstruct) -> pydict:
+def merge(a:pydict, b:dstruct) -> pydict:
     answer = dict(a)
     for k, v in b._kvs():
         if k in answer:
@@ -1162,8 +1163,8 @@ def merge(a:pydict, b:bstruct) -> pydict:
     return answer
 
 @coppertop(style=binary)
-def merge(a:bmap, b:bmap) -> bmap:
-    answer = bmap(a)
+def merge(a:dmap, b:dmap) -> dmap:
+    answer = dmap(a)
     for k, v in b._kvs():
         if k in answer:
             raise RuntimeError(f"{k} is already in a")
@@ -1172,8 +1173,8 @@ def merge(a:bmap, b:bmap) -> bmap:
     return answer
 
 @coppertop(style=binary)
-def merge(a:bstruct, b:bstruct) -> bstruct:
-    answer = bstruct(a)
+def merge(a:dstruct, b:dstruct) -> dstruct:
+    answer = dstruct(a)
     for k, v in b._kvs():
         if k in answer:
             raise RuntimeError(f"{k} is already in a")
@@ -1182,8 +1183,8 @@ def merge(a:bstruct, b:bstruct) -> bstruct:
     return answer
 
 @coppertop(style=binary)
-def merge(a:bstruct, b:pydict) -> bstruct:
-    answer = bstruct(a)
+def merge(a:dstruct, b:pydict) -> dstruct:
+    answer = dstruct(a)
     for k, v in b.keys():
         if k in answer:
             raise RuntimeError(f"{k} is already in a")
@@ -1197,7 +1198,7 @@ def merge(a:bstruct, b:pydict) -> bstruct:
 # **********************************************************************************************************************
 
 @coppertop
-def numCols(f: bframe) -> t.count:
+def numCols(f: dframe) -> t.count:
     return len(f._keys())
 
 @coppertop
@@ -1214,7 +1215,7 @@ def numCols(x:np.ndarray) -> t.count:
 # **********************************************************************************************************************
 
 @coppertop
-def numRows(f: bframe) -> t.count:
+def numRows(f: dframe) -> t.count:
     firstCol = None
     for firstCol in f._values():
         break
@@ -1234,8 +1235,8 @@ def numRows(x:np.ndarray) -> t.count:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def override(a:bstruct, b:bstruct) -> bstruct:
-    answer = bstruct(a)
+def override(a:dstruct, b:dstruct) -> dstruct:
+    answer = dstruct(a)
     for k, v in b._kvs():
         if k in answer:
             answer[k] = v
@@ -1254,8 +1255,8 @@ def prepend(l:pylist, element) -> pylist:
     return l
 
 @coppertop(style=binary)
-def prepend(l:(N**T1)&bseq, element:T1) -> (N**T1)&bseq:
-    l = bseq(l)
+def prepend(l:(N**T1)&dseq, element:T1) -> (N**T1)&dseq:
+    l = dseq(l)
     l.insert(0, element)
     return l
 
@@ -1271,8 +1272,8 @@ def prependTo(element, l:pylist) -> pylist:
     return l
 
 @coppertop(style=binary)
-def prependTo(element:T1, l:(N**T1)&bseq) -> (N**T1)&bseq:
-    l = bseq(l)
+def prependTo(element:T1, l:(N**T1)&dseq) -> (N**T1)&dseq:
+    l = dseq(l)
     l.insert(0, element)
     return l
 
@@ -1288,8 +1289,8 @@ def rename(d:pydict, old, new):
     return d
 
 @coppertop(style=ternary)
-def rename(d:bmap, old, new):
-    d = bmap(d)
+def rename(d:dmap, old, new):
+    d = dmap(d)
     d[new] = d._pop(old)
     return d
 
@@ -1299,8 +1300,8 @@ def rename(d:bmap, old, new):
 # **********************************************************************************************************************
 
 @coppertop(style=ternary)
-def replace(d:bmap, f:txt, new):
-    d = bmap(d)
+def replace(d:dmap, f:txt, new):
+    d = dmap(d)
     d[f] = new
     return d
 
@@ -1332,32 +1333,32 @@ def select(d:pydict, f2) -> pydict:
     return dict(filteredKVs)
 
 @coppertop(style=binary)
-def select(d:bmap, f2) -> bmap:
+def select(d:dmap, f2) -> dmap:
     filteredKVs = []
     for k, v in d._kvs():
         if f2(k, v): filteredKVs.append((k,v))
-    return bmap(filteredKVs)
+    return dmap(filteredKVs)
 
 @coppertop(style=binary)
-def select(pm:bstruct, f2) -> bstruct:
+def select(pm:dstruct, f2) -> dstruct:
     filteredKVs = []
     for k, v in pm._kvs():
         if f2(k, v): filteredKVs.append((k,v))
-    return bstruct(pm._t, filteredKVs)
+    return dstruct(pm._t, filteredKVs)
 
 @coppertop(style=binary)
-def select(pm:(T1**T2)[bstruct], f2) -> (T1**T2)[bstruct]:
+def select(pm:(T1**T2)[dstruct], f2) -> (T1**T2)[dstruct]:
     filteredKVs = []
     for k, v in pm._kvs():
         if f2(k, v): filteredKVs.append((k,v))
-    return bstruct(pm._t, filteredKVs)
+    return dstruct(pm._t, filteredKVs)
 
 @coppertop(style=binary)
-def select(pm:(T1**T2)[bstruct][T3], f2) -> (T1**T2)[bstruct][T3]:
+def select(pm:(T1**T2)[dstruct][T3], f2) -> (T1**T2)[dstruct][T3]:
     filteredKVs = []
     for k, v in pm._v._kvs():
         if f2(k, v): filteredKVs.append((k,v))
-    return bstruct(pm._t, filteredKVs)
+    return dstruct(pm._t, filteredKVs)
 
 @coppertop(style=binary)
 def select(xs:pylist+pydict_keys+pydict_values, f) -> pylist:
@@ -1368,17 +1369,17 @@ def select(xs:pytuple, f) -> pytuple:
     return tuple(x for x in xs if f(x))
 
 @coppertop(style=binary)
-def select(a:bframe, fn1) -> bframe:
+def select(a:dframe, fn1) -> dframe:
     fs = a._keys()
     cols = [c for c in a._values()] #a >> values >> std.collect >> partial(lambda c: c)
     # collate the offsets that fn1 answers true
     os = []
     for o in range(cols[0].shape[0]):
-        r = bstruct(builtins.zip(fs, [c[o] for c in cols]))
+        r = dstruct(builtins.zip(fs, [c[o] for c in cols]))
         if fn1(r): os.append(o)
     # create new cols from the old cols and the offsets
     newCols = [c[os] for c in cols]
-    return bframe(builtins.zip(fs, newCols))
+    return dframe(builtins.zip(fs, newCols))
 
 @coppertop(style=binary)
 def select(z:builtins.zip, f:pyfunc):
@@ -1406,7 +1407,7 @@ def shape(x:matrix&tvarray) -> pytuple:
     return x.shape
 
 @coppertop
-def shape(f:bframe) -> pytuple:
+def shape(f:dframe) -> pytuple:
     firstCol = None
     for firstCol in f._values():
         break
@@ -1451,12 +1452,12 @@ def sort(x:pydict) -> pydict:
     return dict(sorted(x.items(), key=None, reverse=False))
 
 @coppertop
-def sort(x:bstruct) -> bstruct:
-    return bstruct(sorted(x._kvs(), key=None, reverse=False))
+def sort(x:dstruct) -> dstruct:
+    return dstruct(sorted(x._kvs(), key=None, reverse=False))
 
 @coppertop
-def sort(x:bmap) -> bmap:
-    return bmap(sorted(x._kvs(), key=None, reverse=False))
+def sort(x:dmap) -> dmap:
+    return dmap(sorted(x._kvs(), key=None, reverse=False))
 
 @coppertop
 def sort(x:pylist+pyset) -> pylist:
@@ -1476,11 +1477,11 @@ def sortRev(x:pydict) -> pydict:
     return dict(sorted(x.items(), key=None, reverse=True))
 
 @coppertop
-def sortRev(x:bmap) -> bmap:
+def sortRev(x:dmap) -> dmap:
     raise NotYetImplemented()
 
 @coppertop
-def sortRev(x:bstruct) -> bstruct:
+def sortRev(x:dstruct) -> dstruct:
     raise NotYetImplemented()
 
 
@@ -1592,47 +1593,47 @@ def T(A:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def take(a:bframe, k:txt) -> bframe:
-    return bframe({k:a[k]})
+def take(a:dframe, k:txt) -> dframe:
+    return dframe({k:a[k]})
 
 @coppertop(style=binary)
-def take(a:bframe, isOrKs:pylist) -> bframe:
+def take(a:dframe, isOrKs:pylist) -> dframe:
     if not isOrKs:
-        return bframe
+        return dframe
     elif isinstance(isOrKs[0], (builtins.str, str)):
-        return bframe({k:a[k] for k in isOrKs})
+        return dframe({k:a[k] for k in isOrKs})
     elif isinstance(isOrKs[0], int):
         raise NotYetImplemented()
     else:
         raise TypeError()
 
 @coppertop(style=binary)
-def take(a:bframe, ss:pytuple) -> bframe:
+def take(a:dframe, ss:pytuple) -> dframe:
     raise NotYetImplemented()
 
 @coppertop(style=binary)
-def take(a:bframe, i:t.count) -> bframe:
+def take(a:dframe, i:t.count) -> dframe:
     if i >= 0:
-        return bframe({k:a[k][0:i] for k in a._keys()})
+        return dframe({k:a[k][0:i] for k in a._keys()})
     else:
-        return bframe({k:a[k][i:] for k in a._keys()})
+        return dframe({k:a[k][i:] for k in a._keys()})
 
 @coppertop(style=binary)
-def take(a:bframe, isOrKs:pylist) -> bframe:
+def take(a:dframe, isOrKs:pylist) -> dframe:
     if not isOrKs:
-        return bframe()
+        return dframe()
     elif isinstance(isOrKs[0], (str, txt)):
         # sequence( of strings
-        return bframe({k:a[k] for k in isOrKs})
+        return dframe({k:a[k] for k in isOrKs})
     elif isinstance(isOrKs[0], (int, offset)):
         # sequence( of offets
-        return bframe({k:at(a[k], isOrKs) for k in a._keys()})
+        return dframe({k:at(a[k], isOrKs) for k in a._keys()})
     else:
         raise TypeError()
 
 @coppertop(style=binary)
-def take(a:bframe, ss:slice) -> bframe:
-    return bframe({k:a[k][ss] for k in a._keys()})
+def take(a:dframe, ss:slice) -> dframe:
+    return dframe({k:a[k][ss] for k in a._keys()})
 
 @coppertop(style=binary)
 def take(d:pydict, ks:pylist) -> pydict:
@@ -1643,7 +1644,7 @@ def take(d:pydict, k:txt) -> pydict:
     return {k:d[k]}
 
 @coppertop(style=binary)
-def take(d:bstruct, k:txt) -> bstruct:
+def take(d:dstruct, k:txt) -> dstruct:
     return d[k]
 
 @coppertop(style=binary)
@@ -1725,7 +1726,7 @@ def takeDiag(m: matrix & tvarray) -> array_:
 # **********************************************************************************************************************
 
 @coppertop
-def takePanel(f:bframe) -> matrix&tvarray:
+def takePanel(f:dframe) -> matrix&tvarray:
     return (matrix&tvarray)(np.hstack(f >> values))
 
 
@@ -1735,8 +1736,8 @@ def takePanel(f:bframe) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeRemain(f:bframe, n:t.count):
-    t, r = bframe(), bframe()
+def takeRemain(f:dframe, n:t.count):
+    t, r = dframe(), dframe()
     for k, v in f._kvs():
         t[k] = v[:n]
         r[k] = v[n:]
@@ -1807,8 +1808,8 @@ def toDiag(m: array_) -> matrix & tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def underride(a:bstruct, b:bstruct) -> bstruct:
-    answer = bstruct(a)
+def underride(a:dstruct, b:dstruct) -> dstruct:
+    answer = dstruct(a)
     for k, v in b._kvs():
         if k not in answer:
             answer[k] = v
@@ -1816,8 +1817,8 @@ def underride(a:bstruct, b:bstruct) -> bstruct:
     return answer
 
 @coppertop(style=binary)
-def underride(a:bstruct, b:pydict) -> bstruct:
-    answer = bstruct(a)
+def underride(a:dstruct, b:pydict) -> dstruct:
+    answer = dstruct(a)
     for k, v in b.items():
         if k not in answer:
             answer[k] = v
@@ -1839,7 +1840,7 @@ def underride(a:pydict, b:pydict) -> pydict:
 # **********************************************************************************************************************
 
 @coppertop
-def values(x:(T1**T2)[bstruct][T3]) -> (N**T2)[pylist]:
+def values(x:(T1**T2)[dstruct][T3]) -> (N**T2)[pylist]:
     return tv(
         (N**x._t.parent.parent.mappedType)[pylist],
         list(x._values())
@@ -1854,19 +1855,19 @@ def values_(x:pydict) -> pydict_values:
     return x.values()
 
 @coppertop
-def values(x:bmap) -> pytuple:
+def values(x:dmap) -> pytuple:
     return tuple(x._values())
 
 @coppertop
-def values_(x:bmap) -> pydict_values:
+def values_(x:dmap) -> pydict_values:
     return x._values()
 
 @coppertop
-def values(a:bframe) -> pytuple:
+def values(a:dframe) -> pytuple:
     return tuple(a._values())
 
 @coppertop
-def values_(a:bframe) -> pydict_values:
+def values_(a:dframe) -> pydict_values:
     return a._values()
 
 
@@ -1892,8 +1893,8 @@ def without(xs:pylist+pytuple+pyset, element) -> pylist:
     return answer
 
 @coppertop(style=binary)
-def without(xs:(N**T1)[bseq], element:T1, tByT) -> (N**T1)[bseq]:
-    answer = bseq((N**tByT[T1])[bseq])
+def without(xs:(N**T1)[dseq], element:T1, tByT) -> (N**T1)[dseq]:
+    answer = dseq((N**tByT[T1])[dseq])
     for e in xs:
         if e != element:
             answer.append(e)

@@ -37,9 +37,9 @@ from coppertop.pipe import *
 from dm.core.aggman import both, zipAll, values, keys, merge, select, sort
 from dm.core.conv import to
 from dm.core.misc import sequence
-from dm.core.types import T, T1, T2, pylist, index, pytuple, num, bstruct, matrix, obj
+from dm.core.types import T, T1, T2, pylist, index, pytuple, num, dstruct, matrix, obj
 from bones.lang.metatypes import BTAtom
-from bones.lang.structs import tvarray
+from dm._core.structs import tvarray
 
 
 
@@ -47,27 +47,27 @@ from bones.lang.structs import tvarray
 # and tags. For example:
 
 # numkeys = BTAtom('numkeys')
-# structWithNKs = S(T)[bstruct] + (S(T) & numkeys)[bstruct] + numkeys & (num**num)[bmap]
+# structWithNKs = S(T)[dstruct] + (S(T) & numkeys)[dstruct] + numkeys & (num**num)[dmap]
 # PMF = structWithNKs['PMF']
 # L = structWithNKs['L']
 
 # for the moment we won't add typing
 
 numkeys = BTAtom.ensure('numkeys')
-structWithNKs = bstruct & numkeys
+structWithNKs = dstruct & numkeys
 
 PMF = structWithNKs['PMF'].setPP('PMF')
 L = structWithNKs['L'].setPP('L')
 CMF = structWithNKs['CMF'].setPP('CMF')
 
 def _makePmf(*args, **kwargs):
-    answer = bstruct(*args, **kwargs)
+    answer = dstruct(*args, **kwargs)
     if answer:
         _normaliseInPlaceBstruct(answer)
     return answer | PMF
 
 
-structWithNKs.setConstructor(bstruct)
+structWithNKs.setConstructor(dstruct)
 PMF.setConstructor(_makePmf)
 L.setConstructor(structWithNKs)
 CMF.setConstructor(structWithNKs)
@@ -92,7 +92,7 @@ def keys(x: structWithNKs[T]) -> pylist:
 
 @coppertop
 def normalise(swnk:structWithNKs) -> PMF:
-    dup = bstruct(swnk)
+    dup = dstruct(swnk)
     return _normaliseInPlaceBstruct(dup) | PMF
 
 def _normaliseInPlaceBstruct(swnk):
@@ -186,8 +186,8 @@ def toCmf(pmf:PMF) -> CMF:
     return answer
 
 @coppertop(style=binary)
-def merge(a:structWithNKs[T1], b:bstruct&T2, tByT) -> structWithNKs[T1]:
-    answer = bstruct(tByT[T1], a)
+def merge(a:structWithNKs[T1], b:dstruct&T2, tByT) -> structWithNKs[T1]:
+    answer = dstruct(tByT[T1], a)
     answer._update(b._kvs())
     return answer
 
@@ -266,11 +266,11 @@ def percentile(cmf:CMF, percentage:num):
 
 
 @coppertop
-def toSteps(s:PMF+bstruct) -> pytuple:
+def toSteps(s:PMF+dstruct) -> pytuple:
     return _asSteps(s >> keys, s >> values)
 
 @coppertop
-def toSteps(s:PMF+bstruct, kwargs) -> pytuple:
+def toSteps(s:PMF+dstruct, kwargs) -> pytuple:
     return _asSteps(s >> keys, s >> values, **kwargs)
 
 def _asSteps(xs:pylist, ys:pylist, align='center', width=None):

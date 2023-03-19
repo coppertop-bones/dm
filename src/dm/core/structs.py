@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2017-2021 David Briant. All rights reserved.
+#                             Copyright (c) 2021-2022 David Briant. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 # following conditions are met:
@@ -27,44 +27,5 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
 
-import sys
-if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
-
-
-import numpy as np, csv, pandas as pd, polars as pl
-
-from coppertop.pipe import *
-from dm.core.types import dframe, void, pydict
-from dm.core.aggman import array_
-from dm.core.conv import to
-from bones.core.sentinels import Void
-
-
-
-pandaframe = pd.DataFrame
-polarframe = pl.DataFrame
-
-
-# **********************************************************************************************************************
-# to
-# **********************************************************************************************************************
-
-@coppertop(style=binary)
-def to(bf:dframe, t:pandaframe) -> pandaframe:
-    df = pd.DataFrame()
-    for f, d in bf._kvs():
-        df[f] = d >> to >> array_
-    return df
-
-@coppertop(style=binary)
-def to(f:polarframe, t:pandaframe) -> pandaframe:
-    return f.to_pandas()
-
-@coppertop(style=binary)
-def to(f:pandaframe, t:polarframe) -> polarframe:
-    return pl.from_pandas(f)
-
-
-
+from dm._core.structs import *

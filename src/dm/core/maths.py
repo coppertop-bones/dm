@@ -41,7 +41,7 @@ import builtins, numpy as np, math
 from bones.core.errors import NotYetImplemented
 from coppertop.pipe import *
 from dm.core.types import T1, T2, pylist, N, num, matrix, t, pyset, pytuple
-from bones.lang.structs import tvarray
+from dm._core.structs import tvarray
 
 import itertools, scipy
 

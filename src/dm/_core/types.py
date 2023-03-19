@@ -39,7 +39,7 @@ from bones.core.sentinels import Missing
 from bones.lang.metatypes import BTAtom, BType, weaken
 from bones.lang.types import *
 import bones.lang.types
-from bones.lang.structs import tvarray, tv
+from dm._core.structs import tvtuple, tvstruct, tvarray, tvlist, tvdict
 from bones.lang.utils import Constructors
 
 
@@ -383,9 +383,9 @@ def create2DTvArray(*args_, **kwargs):
         raise TypeError('x has more than 2 dimensions')
     return answer | t
 
-((N**num)&tvarray).setConstructor(create1DTvArray)
-(vec&tvarray).setConstructor(create1DTvArray)
-(matrix&tvarray).setConstructor(create2DTvArray)
+((N**num)&tvarray).setConstructor(create1DTvArray).setOrthogonal(obj)
+(vec&tvarray).setConstructor(create1DTvArray).setOrthogonal(obj)
+(matrix&tvarray).setConstructor(create2DTvArray).setOrthogonal(obj)
 
 
 # could make +, -, / and * be type aware by having index, offset, count, etc being familial as well as orthogonal
@@ -397,6 +397,15 @@ t.index = index
 t.offset = offset
 
 
+dtup = tup['dtup'].setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvlist to tvtuple once implemented
+dstruct = struct['dstruct'].setConstructor(tvstruct).setOrthogonal(obj)
+dseq = BTAtom.define('dseq').setConstructor(tvlist).setOrthogonal(obj)      # N**T & dseq
+dmap = BTAtom.define('dmap').setConstructor(tvdict).setOrthogonal(obj)      # T1**T2 & dmap
+dframe = frame['dframe'].setConstructor(tvstruct).setOrthogonal(obj)
+
+__all__ += [
+    'dtup', 'dstruct', 'dseq', 'dmap', 'dframe',
+]
 
 def _init():
     # easiest way to keep namespace a little cleaner
@@ -424,6 +433,8 @@ def _init():
         dict_values: pydict_values,
         function: pyfunc,
     })
+
+
 
 
 

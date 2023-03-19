@@ -32,7 +32,7 @@ import time, numpy as np
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
-from bones.lang.structs import tvarray
+from dm._core.structs import tvarray
 from dm.core.types import N, Nn, Nm, num, matrix, count, bool, N1, missing, T1, T2
 from dm.linalg.types import colvec, Cholesky, QR, SVD
 from dm.linalg.core import solve

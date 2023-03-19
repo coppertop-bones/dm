@@ -36,7 +36,7 @@ import os, os.path, json, itertools, builtins, numpy as np, polars as pl
 
 from io import TextIOWrapper
 from coppertop.pipe import *
-from dm.core.types import txt, pylist, bframe, bmap, pytuple, pyfunc, btup, pydict, t as bt
+from dm.core.types import txt, pylist, dframe, dmap, pytuple, pyfunc, dtup, pydict, t as bt
 from dm.core.text import strip
 from dm.core.aggman import collect
 from bones.core.errors import NotYetImplemented
@@ -63,7 +63,7 @@ stderr = OStreamWrapper(lambda : sys.stderr)
 # **********************************************************************************************************************
 
 @coppertop
-def chunkBy(a:bframe, keys):
+def chunkBy(a:dframe, keys):
     "answers a range of range of row"
     raise NotYetImplemented()
 
@@ -120,10 +120,10 @@ def readJson(pfn:txt):
 def readJson(f:TextIOWrapper):
     return json.load(f)
 
-@coppertop(style=binary, module='bmap')
-def ksJoinVs(ks, vs) -> bmap:
-    return zip(ks, vs, strict=True) >> to >> bmap
-bmap.ksJoinVs = ksJoinVs
+@coppertop(style=binary, module='dmap')
+def ksJoinVs(ks, vs) -> dmap:
+    return zip(ks, vs, strict=True) >> to >> dmap
+dmap.ksJoinVs = ksJoinVs
 
 @coppertop(style=binary, module='pydict')
 def ksJoinVs(ks, vs) -> pydict:
@@ -231,11 +231,11 @@ def fromto(x, s1, s2):
     return x[s1:s2]
 
 @coppertop(style=binary)
-def where(s:bmap, bools) -> bmap:
-    assert isinstance(s, bmap)
-    answer = bmap(s)
+def where(s:dmap, bools) -> dmap:
+    assert isinstance(s, dmap)
+    answer = dmap(s)
     for f, v in s._kvs():
-        answer[f] = v[bools].view(btup)
+        answer[f] = v[bools].view(dtup)
     return answer
 
 @coppertop
@@ -251,8 +251,8 @@ def eachAsArgs(listOfArgs, f):
     return [f(*args) for args in listOfArgs]
 
 @coppertop(style=binary)
-def subset(a:bmap, f2:pyfunc) -> pytuple:
-    A, B = bmap(), bmap()
+def subset(a:dmap, f2:pyfunc) -> pytuple:
+    A, B = dmap(), dmap()
     for k, v in a._kvs():
         if f2(k, v):
             A[k] = v

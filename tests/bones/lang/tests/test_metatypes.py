@@ -30,7 +30,7 @@ from dm.core.aggman import collect, joinAll, sortUsing
 from dm.core.conv import to
 from dm.core.misc import box
 
-from dm.core.types import index, count, offset, num, txt, N, null, T, T1, bstruct
+from dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruct
 
 
 
@@ -100,7 +100,7 @@ def testBTFn():
 
 
 def testStructCreation():
-    label = BTAtom.ensure('label').setConstructor(bstruct)
+    label = BTAtom.ensure('label').setConstructor(dstruct)
     title = label(text='My cool Tufte-compliant scatter graph')
     title._keys() == ['text']
 

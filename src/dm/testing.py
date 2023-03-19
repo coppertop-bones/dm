@@ -36,8 +36,8 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins
 from bones import jones
 from coppertop.pipe import *
-from dm.core.types import bmap, T1, T2, T3, T4, T5, T6, bool, pydict, bstruct, matrix, txt, pytuple
-from bones.lang.structs import tvarray
+from dm.core.types import dmap, T1, T2, T3, T4, T5, T6, bool, pydict, dstruct, matrix, txt, pytuple
+from dm._core.structs import tvarray
 from bones.core.errors import NotYetImplemented
 from bones.lang.metatypes import fitsWithin as _fitsWithin, cacheAndUpdate
 
@@ -151,34 +151,34 @@ def sameKeys(a:pydict, b:pydict) -> pytuple:
     return a, a.keys() == b.keys(), repr(a), repr(b)
 
 @coppertop(style=binary)
-def sameNames(a:bmap, b:bmap) -> pytuple:
+def sameNames(a:dmap, b:dmap) -> pytuple:
     return a, a._keys() == b._keys(), repr(a), repr(b)
 
-# some adhoc are defined like this (num ** account)[bstruct]["positions"]
+# some adhoc are defined like this (num ** account)[dstruct]["positions"]
 @coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T4 ** T2)[bstruct][T5]) -> pytuple:
+def sameNames(a:(T1 ** T2)[dstruct][T3], b:(T4 ** T2)[dstruct][T5]) -> pytuple:
     return a, a._keys() == b._keys(), repr(a), repr(b)
 
 
 @coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[bstruct][T3], b:(T5 ** T4)[bstruct][T6]) -> pytuple:
+def sameNames(a:(T1 ** T2)[dstruct][T3], b:(T5 ** T4)[dstruct][T6]) -> pytuple:
     assert a._keys() != b._keys()
     return a, False, repr(a), repr(b)
 
-# many structs should be typed (BTStruct)[bstruct] and possibly (BTStruct)[bstruct][T]   e.g. xy in pixels and xy in data
+# many structs should be typed (BTStruct)[dstruct] and possibly (BTStruct)[dstruct][T]   e.g. xy in pixels and xy in data
 
 # if we can figure how to divide up the dispatch space (or even indicate it) this would be cool
-# the total space below is T1[BTStruct][bstruct] * T2[BTStruct][bstruct] with
-# T1[BTStruct][bstruct] * T1[BTStruct][bstruct] as a subspace / set
+# the total space below is T1[BTStruct][dstruct] * T2[BTStruct][dstruct] with
+# T1[BTStruct][dstruct] * T1[BTStruct][dstruct] as a subspace / set
 # can dispatch to the total space and then to the specific subset - with one as default
 # @coppertop(style=binary)
-# def sameNames(a:T1[BTStruct][bstruct], b:T2[BTStruct][bstruct]) -> bool:
+# def sameNames(a:T1[BTStruct][dstruct], b:T2[BTStruct][dstruct]) -> bool:
 #     assert a._keys() != b._keys()
 #     return False
 #
-# #@coppertop(style=binary, memberOf=(T1[BTStruct][bstruct]) * (T2[BTStruct][bstruct])))
+# #@coppertop(style=binary, memberOf=(T1[BTStruct][dstruct]) * (T2[BTStruct][dstruct])))
 # @coppertop(style=binary)
-# def sameNames(a:T1[BTStruct][bstruct], b:T1[BTStruct][bstruct]) -> bool:
+# def sameNames(a:T1[BTStruct][dstruct], b:T1[BTStruct][dstruct]) -> bool:
 #     assert a._keys() == b._keys()
 #     return True
 

@@ -13,15 +13,15 @@ from coppertop.pipe import *
 from bones.core.utils import assertRaises
 from dm.testing import check, equals
 from dm.core.aggman import collect
-from dm.core.types import txt, index, N, py, bseq, pylist
+from dm.core.types import txt, index, N, py, dseq, pylist
 
 
 def test_anon():
     f = makeFn(index^index, lambda x: x + 1)
-    fxs = bseq((N ** index)[bseq], [1, 2, 3]) >> collect >> f
-    fxs >> check >> typeOf >> (N ** index)[bseq]
+    fxs = dseq((N ** index)[dseq], [1, 2, 3]) >> collect >> f
+    fxs >> check >> typeOf >> (N ** index)[dseq]
     with assertRaises(TypeError):
-        bseq((N ** index)[bseq], [1, 2, 3]) >> collect >> makeFn(txt ^ txt, lambda x: x + 1)
+        dseq((N ** index)[dseq], [1, 2, 3]) >> collect >> makeFn(txt ^ txt, lambda x: x + 1)
 
 
 def test_partial():

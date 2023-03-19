@@ -16,7 +16,7 @@ from bones.core.context import context
 from bones.core.errors import ProgrammerError
 from bones.core.utils import assertRaises
 from coppertop._scopes import _CoWProxy, _CoWScope
-from dm.testing import check, equals, bstruct
+from dm.testing import check, equals, dstruct
 from dm.pp import PP
 
 
@@ -237,14 +237,14 @@ def test_detect_parent_cycle():
 def test_append():
     _ = _CoWScope()
 
-    _.a = bstruct()
+    _.a = dstruct()
     _.a = []
     _.b = _.a
     _.a.append(1)
     assert len(_.a) == 1
     assert len(_.b) == 0
 
-    _.pad = bstruct()
+    _.pad = dstruct()
     _.pad.a = []
     _.c = _.pad.a
     _.pad.a.append(1)

@@ -27,7 +27,7 @@ from dm.testing import check, equals, fitsWithin, doesNotFitWithin
 from dm.core.misc import _v
 from dm.core.conv import to
 from dm.core.aggman import drop
-from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, btup, bseq, obj
+from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq, obj
 from dm.linalg.types import square, right
 
 oldWeakenings = bones.lang.metatypes._weakenings
@@ -76,7 +76,7 @@ weaken(named, aliased)
 #
 # explicit - e,g, ccy, fx, anything explicit in a residual results in no match
 #
-# orthogonal - e.g. listOfLists, btup, ascii, txt (typically classes / structs / values / etc) only one orthogonal type
+# orthogonal - e.g. listOfLists, dtup, ascii, txt (typically classes / structs / values / etc) only one orthogonal type
 #     may exist in the residual and common. Currently classes are the only orthogonal type I can think of - maybe null set,
 #     void, missing, are too. But what about void&num?
 
@@ -186,7 +186,7 @@ def testExclusive():
     (txt & square) >> check >> fitsWithin >> txt
     tv(tmatrix & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
     tv(tmatrix & lol & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
-    tv(tmatrix & btup & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
+    tv(tmatrix & dtup & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
 
 
 def testGeneric():
@@ -280,7 +280,7 @@ def testAddAndSubtract():
 
 def testDrop():
     card = txt['card']
-    cards = (N ** card)[bseq].setPP('deck').setConstructor(bseq)
+    cards = (N ** card)[dseq].setPP('deck').setConstructor(dseq)
     Gr = 'Green'
     Mu = 'Mustard'
     Or = 'Orchid'

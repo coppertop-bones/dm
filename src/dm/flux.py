@@ -35,7 +35,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from dm.core.types import pylist, T1, N, bseq
+from dm.core.types import pylist, T1, N, dseq
 
 
 
@@ -48,8 +48,8 @@ def add(xs:pylist, x) -> pylist:
     return xs + [x]         # this is immutable
 
 @coppertop(style=binary)
-def add(xs:(N**T1)[bseq], x:T1) -> (N**T1)[bseq]:
-    xs = bseq(xs)
+def add(xs:(N**T1)[dseq], x:T1) -> (N**T1)[dseq]:
+    xs = dseq(xs)
     xs.append(x)
     return xs
 

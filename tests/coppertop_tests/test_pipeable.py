@@ -18,7 +18,8 @@ import dm.core, dm.testing
 from groot import check, equals, fitsWithin, collect
 from coppertop_tests.take1 import _take
 from coppertop_tests.take2 import _take
-from dm.core.types import index, pylist, litint, btup
+from dm.core.types import index, pylist, litint
+from dm.core.structs import tvarray
 
 mat = BTAtom.ensure("mat2")
 vec = BTAtom.ensure("vec2")
@@ -31,8 +32,8 @@ def mmul(A:mat, B:vec) -> vec:
 
 
 def test_mmul():
-    a = btup(mat, [[1, 2], [3, 4]])
-    b = btup(vec, [1, 2])
+    a = tvarray(mat, [[1, 2], [3, 4]])
+    b = tvarray(vec, [1, 2])
     res = a >> mmul >> b
     res >> check >> typeOf >> vec
 

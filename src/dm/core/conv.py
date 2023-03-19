@@ -39,12 +39,12 @@ from _strptime import _strptime
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.core.errors import NotYetImplemented
-from bones.lang.structs import tvarray
+from dm._core.structs import tvarray
 from bones.lang.metatypes import BType
 from dm.core.aggman import values, collect
 from dm.core.datetime import toCTimeFormat
-from dm.core.types import bframe, bmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
-    num, npfloat, btup, bseq, matrix, t
+from dm.core.types import dframe, dmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
+    num, npfloat, dtup, dseq, matrix, t
 
 
 array_ = (N**num)&tvarray
@@ -58,7 +58,7 @@ _defaultDateFmt = toCTimeFormat('YYYY.MM.DD')
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def to(x:pydict+pylist, t:bmap) -> bmap:
+def to(x:pydict+pylist, t:dmap) -> dmap:
     return t(x)
 
 @coppertop(style=binary)
@@ -79,7 +79,7 @@ def to(x, t:pylist) -> pylist:
     return list(x)
 
 @coppertop(style=binary)
-def to(x:bmap, t:pydict) -> pydict:
+def to(x:dmap, t:pydict) -> pydict:
     return dict(x.items())
 
 @coppertop(style=binary)

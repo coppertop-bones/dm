@@ -97,16 +97,16 @@ def testTemplates2():
     account = txt['account']
     weaken(txt, account)
 
-    bstruct = txt['tvstruct2']
+    dstruct = txt['tvstruct2']
     pylist = txt['pylist2']
-    positions = (num ** account)[bstruct]['positions']
+    positions = (num ** account)[dstruct]['positions']
 
     t1 = positions
     t2 = (N**account)[pylist]
     t3 = index
 
     tByT = {}
-    r1, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[bstruct][T3]), tByT)
+    r1, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3]), tByT)
     r2, tByT, distances = cacheAndUpdate(_fitsWithin(t2, (N**T1)[pylist]), tByT)
     r3, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2), tByT)
 
@@ -116,7 +116,7 @@ def testTemplates2():
     tByT = {}
     r4, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2), tByT)
     r5, tByT, distances = cacheAndUpdate(_fitsWithin(t2, (N**T1)[pylist]), tByT)
-    r6, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[bstruct][T3]), tByT)
+    r6, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3]), tByT)
 
     assert r4 and r5 and r6
 
@@ -126,7 +126,7 @@ def testTemplates2():
     tByT = {}
     r9, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2, tByT), tByT)
     r8, tByT, distances = cacheAndUpdate(_fitsWithin(t2, T1, tByT), tByT)
-    r7, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[bstruct][T3], tByT), tByT)
+    r7, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3], tByT), tByT)
 
     assert r7
     assert r8

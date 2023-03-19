@@ -37,8 +37,8 @@ import csv, numpy as np
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing
-from dm.core.types import bframe, txt, pydict, btup, t, N, num, matrix
-from bones.lang.structs import tvarray
+from dm.core.types import dframe, txt, pydict, dtup, t, N, num, matrix
+from dm._core.structs import tvarray
 
 
 # **********************************************************************************************************************
@@ -46,7 +46,7 @@ from bones.lang.structs import tvarray
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def aj(agg1:bframe, agg2:bframe):
+def aj(agg1:dframe, agg2:dframe):
     raise NotYetImplemented()
 
 
@@ -63,12 +63,12 @@ def firstCol(a:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def firstLast(f:bframe) -> bframe:
-    return bframe({k:f[k][[0,-1]] for k in f._keys()})
+def firstLast(f:dframe) -> dframe:
+    return dframe({k:f[k][[0,-1]] for k in f._keys()})
 
 @coppertop
-def firstLast(f:bframe, n:t.count) -> bframe:
-    return bframe({k:(N**num)[tvarray](np.append(f[k][:n], f[k][-n:])) for k in f._keys()})
+def firstLast(f:dframe, n:t.count) -> dframe:
+    return dframe({k:(N**num)[tvarray](np.append(f[k][:n], f[k][-n:])) for k in f._keys()})
 
 
 # **********************************************************************************************************************
@@ -84,12 +84,12 @@ def firstRow(a:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def groupBy(a:bframe, keys):
+def groupBy(a:dframe, keys):
     "answers a collection of groups"
     raise NotYetImplemented()
 
 @coppertop
-def groupBy(a:bframe, keys, directions):
+def groupBy(a:dframe, keys, directions):
     "answers a collection of groups"
     raise NotYetImplemented()
 
@@ -115,7 +115,7 @@ def lastRow(a:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def lj(agg1:bframe, agg2:bframe):
+def lj(agg1:dframe, agg2:dframe):
     raise NotYetImplemented()
 
 
@@ -124,7 +124,7 @@ def lj(agg1:bframe, agg2:bframe):
 # **********************************************************************************************************************
 
 @coppertop(module='dm.frame.csv')
-def read(pfn:txt, renames:pydict, conversions:pydict) -> bframe:
+def read(pfn:txt, renames:pydict, conversions:pydict) -> dframe:
     with open(pfn, mode='r') as f:
         r = csv.DictReader(f)
         d = {}
@@ -133,15 +133,15 @@ def read(pfn:txt, renames:pydict, conversions:pydict) -> bframe:
         for cells in r:
             for k, v in cells.items():
                 d[k].append(v)
-        a = bframe()
+        a = dframe()
         for k in d.keys():
             newk = renames.get(k, k)
-            fn = conversions.get(newk, lambda l: btup(l, Missing))     ## we could insist the conversions return btup s
+            fn = conversions.get(newk, lambda l: dtup(l, Missing))     ## we could insist the conversions return dtup s
             a[newk] = fn(d[k])
     return a
 
 @coppertop(module='dm.frame.csv')
-def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> bframe:
+def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> dframe:
     with open(pfn, mode='r') as f:
         r = csv.DictReader(f)
         d = {}
@@ -150,10 +150,10 @@ def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> bframe:
         for cells in r:
             for k, v in cells.items():
                 d[k].append(v)
-        a = bframe()
+        a = dframe()
         for k in d.keys():
             newk = renames.get(k, k)
-            fn = conversions.get(newk, lambda l: btup(l, Missing))     ## we could insist the conversions return btup s
+            fn = conversions.get(newk, lambda l: dtup(l, Missing))     ## we could insist the conversions return dtup s
             a[newk] = fn(d[k])
     return a
 
@@ -163,10 +163,10 @@ def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> bframe:
 # **********************************************************************************************************************
 
 @coppertop
-def sortBy(x:bframe, fields):
+def sortBy(x:dframe, fields):
     raise NotYetImplemented()
 
 @coppertop
-def sortBy(x:bframe, fields, directions):
+def sortBy(x:dframe, fields, directions):
     raise NotYetImplemented()
 

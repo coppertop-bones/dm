@@ -32,13 +32,12 @@ BONES_NS = ''
 import numpy as np, scipy.stats
 
 from coppertop.pipe import *
-from bones.lang.structs import tvarray
-from dm.core.types import N, num, matrix, pytuple, pydict
+from dm._core.structs import tvarray
+from dm.core.types import N, num, matrix, pytuple, pydict, dstruct
 from dm.core.aggman import takeRowRemain, hjoin, numRows
-from bones.lang.structs import bstruct
 
 
-OLSResult = bstruct['OLSResult'].setConstructor(bstruct)
+OLSResult = dstruct['OLSResult'].setConstructor(dstruct)
 
 array_ = (N**num)&tvarray
 matrix_ = matrix&tvarray
