@@ -41,7 +41,7 @@ from bones.core.errors import NotYetImplemented
 from bones.lang.metatypes import BTAtom as _BTAtom
 from dm.core.aggman import inject
 from bones.lang.structs import tv
-from dm.core.types import T, pylist, txt, pydict
+from dm.core.types import T, pylist, txt, pydict, pyfunc, T1, T2
 
 
 _SBT = _BTAtom.define('ShouldBeTyped')      # temporary type to allow"  'DE000762534' >> box | tISIN - i.e. make the box then type it
@@ -122,3 +122,14 @@ def pyeval_(src:txt):
 @coppertop
 def pyeval_(src:txt, ctx:pydict):
     return lambda : eval(src, ctx)
+
+@coppertop(style=binary)
+def asideDo(x:T1, fn:T1^T2) -> T1:
+    fn(x)
+    return x
+
+@coppertop(style=binary)
+def asideDo(x:pylist, fn:pyfunc) -> pylist:
+    fn(x)
+    return x
+

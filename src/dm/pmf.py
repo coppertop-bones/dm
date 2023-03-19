@@ -39,7 +39,8 @@ from dm.core.conv import to
 from dm.core.misc import sequence
 from dm.core.types import T, T1, T2, pylist, index, pytuple, num, dstruct, matrix, obj
 from bones.lang.metatypes import BTAtom
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
+from dm.pp import formatStruct
 
 
 
@@ -72,7 +73,21 @@ PMF.setConstructor(_makePmf)
 L.setConstructor(structWithNKs)
 CMF.setConstructor(structWithNKs)
 
+formatPmf = formatStruct(_, 'PMF', '.3f', '.3f', ', ')
+formatL = formatStruct(_, 'L', '.3f', '.3f', ', ')
+formatCmf = formatStruct(_, 'CMF', '.3f', '.3f', ', ')
 
+@coppertop
+def PP(x:L) -> L:
+    return PP(x, formatL)
+
+@coppertop
+def PP(x:PMF):
+    return PP(x, formatPmf)
+
+@coppertop
+def PP(x:CMF):
+    return PP(x, formatCmf)
 
 
 @coppertop

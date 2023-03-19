@@ -36,6 +36,7 @@ from collections import namedtuple
 from coppertop.pipe import *
 from dm.core.aggman import collect, interleave
 from bones.core.sentinels import Missing, list_iter
+from dm.core.types import txt
 
 __all__ = []
 
@@ -81,6 +82,10 @@ def PP(x, f):
 def PPS(lines):
     return context.PPS(lines)
 
+@coppertop
+def PP(x, fmt:txt):
+    x >> format(_, fmt) >> PP
+    return x
 
 @coppertop(dispatchEvenIfAllTypes=True)
 def RR(x):
