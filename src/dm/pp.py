@@ -55,6 +55,10 @@ def formatStruct(s, name, keysFormat, valuesFormat, sep):
 def PP(x):
     return context.PP(x)
 
+@coppertop(dispatchEvenIfAllTypes=True)
+def PPE(x):
+    return context.PPE(x)
+
 @coppertop
 def PP(x, f:pyfunc + (T^T)):
     f(x) >> PP

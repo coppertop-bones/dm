@@ -33,15 +33,13 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-import numpy as np, csv, datetime, builtins
+import numpy as np, datetime, builtins
 from _strptime import _strptime
 
 from coppertop.pipe import *
-from bones.core.sentinels import Missing
 from bones.core.errors import NotYetImplemented
 from dm._core.structs import tvarray
 from bones.lang.metatypes import BType
-from dm.core.aggman import values, collect
 from dm.core.datetime import toCTimeFormat
 from dm.core.types import dframe, dmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
     num, npfloat, dtup, dseq, matrix, t

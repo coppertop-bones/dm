@@ -108,3 +108,4 @@ def pca(panel:matrix&tvarray):
     u, s, vh = dm.linalg.np.svd(panel)
     vor, e, sfv, thetas, sorts = dm.linalg.orientEigenvectors(vh.T, s)
     return vor, s
+
