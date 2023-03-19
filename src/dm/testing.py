@@ -36,10 +36,10 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins
 from bones import jones
 from coppertop.pipe import *
-from dm.core.maths import closeTo
 from dm.core.types import bmap, T1, T2, T3, T4, T5, T6, bool, pydict, bstruct, matrix, txt, pytuple
 from bones.lang.structs import tvarray
 from bones.core.errors import NotYetImplemented
+from bones.lang.metatypes import fitsWithin as _fitsWithin, cacheAndUpdate
 
 _EPS = 7.105427357601E-15      # i.e. double precision
 
@@ -49,23 +49,38 @@ _EPS = 7.105427357601E-15      # i.e. double precision
 def check(actual, fn, expected):
     fnName = fn.name if hasattr(fn, 'name') else (fn.d.name if isinstance(fn, jones._fn) else '')
     with context(showFullType=False):
+        # OPEN add isinstance
         if fn is builtins.type or fnName == 'typeOf':
             res = fn(actual)
-            assert res == expected, f'Expected type <{expected}> but got type <{fn(actual)}>'
+            if res is not expected:
+                msg = f"{_getTestTitle()}\n'{fn.name}' failed the following\nactual:   {fn(actual)}\nexpected: {expected}"
+                # assert res == expected, f'Expected type <{expected}> but got type <{fn(actual)}>'
+                raise AssertionError(msg)
         else:
             if isinstance(fn, jones._unary):
                 raise NotYetImplemented()
             elif isinstance(fn, jones._binary):
-                actual, passes, ppAct, ppExp = fn(actual, expected)
-                assert passes, f"\n'{fn}\' failed the following:\nactual:   {ppAct}\nexpected: {ppExp}"
+                try:
+                    actual, passed, ppAct, ppExp = fn(actual, expected)
+                except Exception as ex:
+                    actual, passed, ppAct, ppExp = fn(actual, expected)
+                    raise
+                if not passed:
+                    msg = f"{_getTestTitle()}\n'{fn.name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+                    raise AssertionError(msg)
             elif isinstance(fn, jones._ternary):
-                return actual >> _finishCheckWithTernary(_, fn, expected, _)
+                return actual >> _finishCheckWhenTernary(_, fn, expected, _)
     return actual
 
+def _getTestTitle():
+    return f'\ntestcase: {context.testcase}' if context.testcase else ''
+
 @coppertop(style=binary)
-def _finishCheckWithTernary(actual, ternary, arg2, expected):
-    actual, passes, ppAct, ppExp = actual >> ternary >> arg2 >> expected
-    assert passes, f"\n'{ternary.name} >> {arg2.name}' failed the following:\nactual:   {ppAct}\nexpected: {ppExp}"
+def _finishCheckWhenTernary(actual, ternary, arg2, expected):
+    actual, passed, ppAct, ppExp = actual >> ternary >> arg2 >> expected
+    if not passed:
+        msg = f"{_getTestTitle()}\n'{ternary.name} >> {arg2.name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+        raise AssertionError(msg)
     return actual
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
@@ -75,6 +90,27 @@ def raises(fn0, exceptionType) -> pytuple:
         return actual, False, repr(actual), exceptionType.__name__
     except Exception as ex:
         return ex, isinstance(ex, exceptionType), type(ex).__name__, exceptionType.__name__
+
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def fitsWithin(a, b):
+    doesFit, tByT, distances = cacheAndUpdate(_fitsWithin(a, b), {})
+    return a, doesFit, repr(a), repr(b)
+
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def doesNotFitWithin(a, b):
+    doesFit, tByT, distances = cacheAndUpdate(_fitsWithin(a, b), {})
+    return a, not doesFit, repr(a), repr(b)
+
+@coppertop(style=binary)
+def closeTo(a, b):
+    return closeTo(a, b, _EPS)
+
+@coppertop(style=binary)
+def closeTo(a, b, tol):
+    if abs(a) < tol:
+        return a, abs(b) < tol, repr(a), repr(b)
+    else:
+        return a, abs(a - b) / abs(a) < tol, repr(a), repr(b)
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def equals(a, b) -> pytuple:

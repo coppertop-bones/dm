@@ -38,7 +38,7 @@ import builtins, numpy as np
 from coppertop.pipe import *
 from bones.core.sentinels import Missing, dict_keys, dict_values, dict_items, function
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import cacheAndUpdate, fitsWithin as _fitsWithin, BTAtom as _BTAtom
+from bones.lang.metatypes import BTAtom as _BTAtom
 from dm.core.aggman import inject
 from bones.lang.structs import tv
 from dm.core.types import T, pylist, txt, pydict
@@ -76,16 +76,6 @@ def _t(x):
 @coppertop
 def _v(x):
     return x._v
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def fitsWithin(a, b):
-    doesFit, dummy, distances = cacheAndUpdate(_fitsWithin(a, b), {})
-    return doesFit
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def doesNotFitWithin(a, b):
-    does = a >> fitsWithin >> b
-    return does >> not_
 
 @coppertop(style=nullary)
 def sequence(p1, p2):

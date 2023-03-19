@@ -33,7 +33,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-_EPS = 7.105427357601E-15      # i.e. double precision
+EPS = 7.105427357601E-15      # i.e. double precision
 
 
 import builtins, numpy as np, math
@@ -91,24 +91,6 @@ def nCombinationsR(n, k):
 # **********************************************************************************************************************
 # comparison
 # **********************************************************************************************************************
-
-@coppertop(style=nullary)
-def EPS():
-    return _EPS
-
-@coppertop(style=binary)
-def closeTo(a, b):
-    if abs(a) < _EPS:
-        return abs(b) < _EPS
-    else:
-        return abs(a - b) / abs(a) < _EPS
-
-@coppertop(style=binary)
-def closeTo(a, b, tolerance):
-    if abs(a) < tolerance:
-        return abs(b) < tolerance
-    else:
-        return abs(a - b) / abs(a) < tolerance
 
 @coppertop
 def within(x, a, b):
