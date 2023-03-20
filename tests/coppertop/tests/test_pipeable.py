@@ -16,8 +16,8 @@ from bones.core.errors import NotYetImplemented
 from bones.lang.metatypes import BTAtom
 import dm.core, dm.testing
 from groot import check, equals, fitsWithin, collect
-from coppertop_tests.take1 import _take
-from coppertop_tests.take2 import _take
+from coppertop.tests.take1 import _take
+from coppertop.tests.take2 import _take
 from dm.core.types import index, pylist, litint
 from dm.core.structs import tvarray
 

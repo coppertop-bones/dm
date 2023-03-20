@@ -403,6 +403,7 @@ def createDFrame(*args_, **kwargs):
         return tvstruct(t, **kwargs)
     elif len(args) == 1:
         x = args[0]
+        assert x.keys() == kwargs.keys()
         return tvstruct(x & t, **kwargs)
     else:
         raise ProgrammerError()

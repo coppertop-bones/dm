@@ -18,7 +18,7 @@ from dm.core.types import txt, index, num, bool, T1, litint, pylist
 from bones.lang.metatypes import BTAtom
 from bones.lang.structs import tv
 
-from coppertop_tests.int_adders import addOne, eachAddOne, eachAddTwo
+from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo
 
 
 A = BTAtom.ensure("A")
