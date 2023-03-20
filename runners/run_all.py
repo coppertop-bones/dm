@@ -14,7 +14,6 @@ from bones.core.context import context
 
 
 def main():
-
     # groot_test - must be run before other modules load up the groot namespace
     import coppertop.tests.test_groot
     coppertop.tests.test_groot.main()
@@ -34,10 +33,20 @@ def main():
     bones.tests.run_all.main()
 
 
+def addendum():
+    # bones tests
+    import bones.tests.run_all
+    bones.tests.run_all.addendum()
+
+
 if __name__ == '__main__':
     t1 = time.perf_counter_ns()
-    with context(PP=lambda x: x, EE=lambda x: x):
+    # with context(EE=lambda x: x, PP=lambda x: x):
+    # with context(EE=lambda x: x):
+    # with context(PP=lambda x: x):
+    with context():
         main()
+        addendum()
     t2 = time.perf_counter_ns()
 
     from bones.lang import metatypes

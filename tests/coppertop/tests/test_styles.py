@@ -11,7 +11,7 @@ from coppertop.pipe import CoppertopError
 from bones.core.utils import assertRaises
 from dm.testing import check, equals
 from bones import jones
-from dm.pp import PPE
+from dm.pp import NB
 
 
 def prettyArgs(*args):
@@ -116,7 +116,7 @@ def main():
     testBinary()
     testTernary()
     # testExamples()
-    f"{__name__} - tests commented out" >> PPE
+    f"{__name__} - tests commented out" >> NB
 
 
 if __name__ == '__main__':

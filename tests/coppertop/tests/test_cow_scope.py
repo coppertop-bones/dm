@@ -16,7 +16,8 @@ from bones.core.context import context
 from bones.core.errors import ProgrammerError
 from bones.core.utils import assertRaises
 from coppertop._scopes import _CoWProxy, _CoWScope
-from dm.testing import check, equals, dstruct
+from dm.testing import check, equals
+from dm.core.types import dstruct
 from dm.pp import PP
 
 

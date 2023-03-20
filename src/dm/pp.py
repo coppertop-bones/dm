@@ -56,8 +56,12 @@ def PP(x):
     return context.PP(x)
 
 @coppertop(dispatchEvenIfAllTypes=True)
-def PPE(x):
-    return context.PPE(x)
+def NB(x):
+    return context.NB(x)
+
+@coppertop(dispatchEvenIfAllTypes=True)
+def EE(x):
+    return context.EE(x)
 
 @coppertop
 def PP(x, f:pyfunc + (T^T)):

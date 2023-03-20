@@ -33,54 +33,61 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-import builtins
 from bones import jones
 from coppertop.pipe import *
-from dm.core.types import dmap, T1, T2, T3, T4, T5, T6, bool, pydict, dstruct, matrix, txt, pytuple
+from dm.core.types import bool, matrix, pytuple
 from dm._core.structs import tvarray
+from dm.core.maths import EPS
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import fitsWithin as _fitsWithin, cacheAndUpdate
-
-_EPS = 7.105427357601E-15      # i.e. double precision
+from bones.core.sentinels import function
 
 
+# OPEN: allow nullary >> unary etc
+
+_PARTIAL_FN_CLASS = (jones._pnullary, jones._punary, jones._pbinary, jones._pternary)
+_ANY_FUNCTION_CLASS = (function, jones._fn)
 
 @coppertop(style=ternary)
 def check(actual, fn, expected):
-    fnName = fn.name if hasattr(fn, 'name') else (fn.d.name if isinstance(fn, jones._fn) else '')
+    fnName = fn.name if hasattr(fn, 'name') else (fn.d.name if isinstance(fn, jones._fn) else fn.__name__)
     with context(showFullType=False):
-        # OPEN add isinstance
-        if fn is builtins.type or fnName == 'typeOf':
+        isPartial = isinstance(fn, _PARTIAL_FN_CLASS)
+        isPyFuncWithSoleArg = False
+        expectedIsFn = isinstance(expected, _ANY_FUNCTION_CLASS)
+        # could check that the partial isn't piping
+        if (fnName in ('type', 'typeOf')) or (isPartial and fn.o_tbc == 1 and not expectedIsFn) or isPyFuncWithSoleArg:
+            # fn is an F1
             res = fn(actual)
-            if res is not expected:
-                msg = f"{_getTestTitle()}\n'{fn.name}' failed the following\nactual:   {fn(actual)}\nexpected: {expected}"
-                # assert res == expected, f'Expected type <{expected}> but got type <{fn(actual)}>'
-                raise AssertionError(msg)
+            passed, ppAct, ppExp = res == expected, repr(res), repr(expected)
+        elif not isPartial and isinstance(fn, jones._ternary):
+            # needs 3 arguments - pipe in the first 2 and the third will be piped later
+            return actual >> _finishCheckWhenTernary(_, fn, expected, _)
         else:
-            if isinstance(fn, jones._unary):
-                raise NotYetImplemented()
-            elif isinstance(fn, jones._binary):
-                try:
-                    if fnName == 'fitsWithin':
-                        actual, passed, ppAct, ppExp = _localFitsWithin(actual, expected)
-                    else:
-                        actual, passed, ppAct, ppExp = fn(actual, expected)
-                except Exception as ex:
-                    # replicated so can put breakpoint here
-                    if fnName == 'fitsWithin':
-                        actual, passed, ppAct, ppExp = _localFitsWithin(actual, expected)
-                    else:
-                        actual, passed, ppAct, ppExp = fn(actual, expected)
-                    raise
-                if not passed:
-                    msg = f"{_getTestTitle()}\n'{fn.name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
-                    raise AssertionError(msg)
-            elif isinstance(fn, jones._ternary):
-                return actual >> _finishCheckWhenTernary(_, fn, expected, _)
+            if expectedIsFn:
+                # assume fn is an F1, and expected is an F2
+                # e.g. res >> check >> errorMsg >> startsWith >> 'cannot constrain {littxt} <:'
+                return actual >> _finishCheckWhenF2(_, fn(actual), expected, _)
+            else:
+                if fn in (raises, ):
+                    actual, passed, ppAct, ppExp = fn(actual, expected)
+                else:
+                    passed, ppAct, ppExp = fn(actual, expected), repr(actual), repr(expected)
+        if not passed:
+            msg = f"{_getTestTitle()}\n'{fnName}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+            raise AssertionError(msg)
     return actual
 
 def _getTestTitle():
     return f'\ntestcase: {context.testcase}' if context.testcase else ''
+
+@coppertop(style=binary)
+def _finishCheckWhenF2(rootActual, actual, f2, expected):
+    passed, ppAct, ppExp = f2(actual, expected), repr(actual), repr(expected)
+    if not passed:
+        f2Name = f2.name if hasattr(f2, 'name') else (f2.d.name if isinstance(f2, jones._fn) else f2.__name__)
+        msg = f"{_getTestTitle()}\n'{f2Name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+        raise AssertionError(msg)
+    return rootActual
 
 @coppertop(style=binary)
 def _finishCheckWhenTernary(actual, ternary, arg2, expected):
@@ -90,6 +97,11 @@ def _finishCheckWhenTernary(actual, ternary, arg2, expected):
         raise AssertionError(msg)
     return actual
 
+
+# **********************************************************************************************************************
+# raises known by check and required to return a tuple (act, pass, PP1, PP2)
+# **********************************************************************************************************************
+
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def raises(fn0, exceptionType) -> pytuple:
     try:
@@ -98,96 +110,49 @@ def raises(fn0, exceptionType) -> pytuple:
     except Exception as ex:
         return ex, isinstance(ex, exceptionType), type(ex).__name__, exceptionType.__name__
 
-def _localFitsWithin(a, b):
-    doesFit, tByT, distances = cacheAndUpdate(_fitsWithin(a, b), {})
-    return a, doesFit, repr(a), repr(b)
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def doesNotFitWithin(a, b):
-    doesFit, tByT, distances = cacheAndUpdate(_fitsWithin(a, b), {})
-    return a, not doesFit, repr(a), repr(b)
-
-@coppertop(style=binary)
-def closeTo(a, b):
-    return closeTo(a, b, _EPS)
-
-@coppertop(style=binary)
-def closeTo(a, b, tol):
-    if abs(a) < tol:
-        return a, abs(b) < tol, repr(a), repr(b)
-    else:
-        return a, abs(a - b) / abs(a) < tol, repr(a), repr(b)
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equals(a, b) -> pytuple:
-    return a, a == b, repr(a), repr(b)
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equals(a:matrix&tvarray, b:matrix&tvarray) -> pytuple:
-    return a, bool((a == b).all()), repr(a), repr(b)
-
-@coppertop(style=binary)
-def different(a, b) -> pytuple:
-    return a, a != b, repr(a), repr(b)
-
-@coppertop(style=binary)
-def different(a:matrix&tvarray, b:matrix&tvarray) -> pytuple:
-    return a, bool((a != b).any()), repr(a), repr(b)
+# **********************************************************************************************************************
+# same is a ternary which is required by check to return a tuple (act, pass, PP1, PP2)
+# **********************************************************************************************************************
 
 @coppertop(style=ternary)
-def same(a, fn1, b):
+def same(a, fn1, b) -> pytuple:
     actual, expected = fn1(a), fn1(b)
     return actual, actual == expected, repr(actual), repr(expected)
 
-@coppertop(style=binary)
-def lenAs(a, b):
-    return a, len(a) == len(b), repr(a), repr(b)
-
-@coppertop(style=binary)
-def sameShape(a, b):
-    return a, a.shape == b.shape, repr(a), repr(b)
-
 
 # **********************************************************************************************************************
-# sameNames
+# some binary comparison fns
 # **********************************************************************************************************************
 
-@coppertop(style=binary)
-def sameKeys(a:pydict, b:pydict) -> pytuple:
-    return a, a.keys() == b.keys(), repr(a), repr(b)
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def doesNotFitWithin(a, b) -> bool:
+    return not fitsWithin(a, b)
 
 @coppertop(style=binary)
-def sameNames(a:dmap, b:dmap) -> pytuple:
-    return a, a._keys() == b._keys(), repr(a), repr(b)
-
-# some adhoc are defined like this (num ** account)[dstruct]["positions"]
-@coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[dstruct][T3], b:(T4 ** T2)[dstruct][T5]) -> pytuple:
-    return a, a._keys() == b._keys(), repr(a), repr(b)
-
+def closeTo(a, b) -> bool:
+    return closeTo(a, b, EPS)
 
 @coppertop(style=binary)
-def sameNames(a:(T1 ** T2)[dstruct][T3], b:(T5 ** T4)[dstruct][T6]) -> pytuple:
-    assert a._keys() != b._keys()
-    return a, False, repr(a), repr(b)
+def closeTo(a, b, tol) -> bool:
+    if abs(a) < tol:
+        return abs(b) < tol
+    else:
+        return abs(a - b) / abs(a) < tol
 
-# many structs should be typed (BTStruct)[dstruct] and possibly (BTStruct)[dstruct][T]   e.g. xy in pixels and xy in data
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def equals(a, b) -> bool:
+    return a == b
 
-# if we can figure how to divide up the dispatch space (or even indicate it) this would be cool
-# the total space below is T1[BTStruct][dstruct] * T2[BTStruct][dstruct] with
-# T1[BTStruct][dstruct] * T1[BTStruct][dstruct] as a subspace / set
-# can dispatch to the total space and then to the specific subset - with one as default
-# @coppertop(style=binary)
-# def sameNames(a:T1[BTStruct][dstruct], b:T2[BTStruct][dstruct]) -> bool:
-#     assert a._keys() != b._keys()
-#     return False
-#
-# #@coppertop(style=binary, memberOf=(T1[BTStruct][dstruct]) * (T2[BTStruct][dstruct])))
-# @coppertop(style=binary)
-# def sameNames(a:T1[BTStruct][dstruct], b:T1[BTStruct][dstruct]) -> bool:
-#     assert a._keys() == b._keys()
-#     return True
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+    return bool((a == b).all())
 
-# any should really be unhandles or alt or others or not default
+@coppertop(style=binary)
+def different(a, b) -> bool:
+    return a != b
 
+@coppertop(style=binary)
+def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+    return bool((a != b).any())
 
