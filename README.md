@@ -1,6 +1,8 @@
 # dm
 
-Jupyter notebooks and other examples using coppertop, bones and dm. 
+Includes:
+- the dm core library for coppertop and bones
+- Jupyter notebooks and Python code examples using coppertop, bones and dm
 
 Use this - https://nbviewer.jupyter.org - if github doesn't render properly. 
 

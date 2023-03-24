@@ -20,3 +20,6 @@ from . import maths
 from . import misc
 from . import text
 from . import types
+
+import dm
+dm.__version__ = "2023.03.21"
