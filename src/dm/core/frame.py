@@ -21,8 +21,8 @@ import csv, numpy as np, collections
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing, function
-from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist,pytuple, pydict_keys, pydict_values, matrix, \
-    offset
+from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist, pytuple, pydict_keys, pydict_values, matrix, \
+    offset, pyfunc
 from dm._core.structs import tvarray
 from dm.core.aggman import count
 
@@ -288,6 +288,15 @@ def numCols(f:dframe) -> t.count:
 
 @coppertop
 def numRows(f:dframe) -> t.count:
+    raise NotYetImplemented()
+
+
+# **********************************************************************************************************************
+# pivot
+# **********************************************************************************************************************
+
+@coppertop
+def pivot(f:dframe, index:txt+pylist, value:txt+pylist, agg:pyfunc+pylist, titles:txt+pylist) -> dframe:
     raise NotYetImplemented()
 
 

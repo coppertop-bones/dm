@@ -117,3 +117,9 @@ def asideDo(x:py, fn:pyfunc) -> py:
     fn(x)
     return x
 
+@coppertop(style=ternary)
+def withCtx(arg1, ctx:pydict, fn):
+    with context(ctx):
+        return arg1 >> fn
+
+
