@@ -13,6 +13,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
+import dm.tests.test_structs
 import dm.tests.test_ols
 import dm.tests.test_pmf
 import dm.tests.test_linealg
@@ -24,6 +25,7 @@ import dm.tests.test_testing
 
 
 def main():
+    dm.tests.test_structs.main()
     dm.tests.test_ols.main()
     dm.tests.test_pmf.main()
     dm.tests.test_linealg.main()
