@@ -250,17 +250,17 @@ def toXsPs(pmf:PMF) -> pytuple:
     return tuple(zipAll(pmf._kvs()))
 
 @coppertop(style=unary)
-def percentile(pmf:PMF, percentage:num):
+def quantile(pmf:PMF, x:num):
     total = 0
     for k, v in pmf._kvs():
         total += v
-        if total >= percentage:
+        if total >= x:
             return k
 
 @coppertop(style=unary)
-def percentile(cmf:CMF, percentage:num):
+def quantile(cmf:CMF, x:num):
     for k, v in cmf._kvs():
-        if v >= percentage:
+        if v >= x:
             return k
 
 

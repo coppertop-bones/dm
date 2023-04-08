@@ -31,6 +31,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins, numpy as np
 
 from coppertop.pipe import *
+from bones import jones
 
 from bones.core.errors import NotYetImplemented, ProgrammerError
 from bones.lang.metatypes import hasT, cacheAndUpdate, fitsWithin
@@ -459,7 +460,14 @@ def collect(xs: pydict_items, f) -> pylist:
 
 def _collectHelper(xs:(N**T1)[dseq], f:T1^T2, tByT) -> dict:
     t1 = tByT[T1]
-    fn, tByT_f, hasValue = f.d.selectFn((t1,))
+    if isinstance(f, (jones._pfn)):
+        if f.num_tbc != 1: raise Exception()
+        tArgs = [typeOf(arg) for arg in f.args]
+        tArgs[f.o_tbc[0]] = t1
+        tArgs = tuple(tArgs)
+    else:
+        tArgs = (t1,)
+    fn, tByT_f, hasValue = f.d.selectFn(tArgs)
     t2 = fn.tRet
     if hasT(t2):
         raise NotYetImplemented()
@@ -1930,7 +1938,7 @@ def without(xs:(N**T1)[dseq], x:T1, tByT) -> (N**T1)[dseq]:
 
 
 # **********************************************************************************************************************
-# XTX
+# XTX - OPEN: move to linalg
 # **********************************************************************************************************************
 
 @coppertop
@@ -1948,7 +1956,7 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 
 
 # **********************************************************************************************************************
-# zipAll
+# zipAll - can't be same name as Python as different interface, i.e. does not take *args
 # **********************************************************************************************************************
 
 @coppertop

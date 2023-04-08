@@ -404,6 +404,26 @@ dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogo
 dseq = seq[tvlist].nameAs('dseq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
 dmap = map[tvdict].nameAs('dmap').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
 dframe = frame[tvstruct].nameAs('dframe').setConstructor(createDFrame).setOrthogonal(obj)       # & N**BTStruct(...)
+# dm.tup = tup[tvarray].nameAs('dm.tup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
+# dm.adhoc = struct[tvstruct].nameAs('dm.adhoc').setConstructor(tvstruct).setOrthogonal(obj)
+# dm.seq = seq[tvlist].nameAs('dm.seq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
+# dm.map = map[tvdict].nameAs('dm.map').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
+# dm.frame = frame[tvstruct].nameAs('dm.frame').setConstructor(createDFrame).setOrthogonal(obj)       # & N**BTStruct(...)
+
+
+# in python we need a super type for dynamic programming
+# in bones we wouldn't as we woulc know the structures type
+#
+# we have more than one implementation for the struct - with a common functional interface
+# so full type is struct&tvstruct&S(....)
+# then
+# def join(struct[T1], struct[T2]) -> struct[T1 and T2] + err:
+#
+# adhoc(S(fred=pyint), fred=1)
+# " " ~ " "
+#
+# class fred(object):
+#     def __
 
 __all__ += [
     'dtup', 'dstruct', 'dseq', 'dmap', 'dframe',

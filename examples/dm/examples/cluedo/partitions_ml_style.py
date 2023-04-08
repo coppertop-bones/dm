@@ -1,10 +1,8 @@
 
 
 # partitions :: [Int] -> [[[Int]]]
-def partitions(sizes):
-    '''Ordered partitions of sizes.'''
+def partitionsML(xs, sizes):
     n = sum(sizes)
-    xs = enumFromTo(1)(n)
 
     def go(xs, n, sizes):
         return [
@@ -37,12 +35,6 @@ def choose(xs):
 def cons(x):
     '''Construction of a list from x as head, and xs as tail.'''
     return lambda xs: [x] + xs
-
-
-# enumFromTo :: Int -> Int -> [Int]
-def enumFromTo(m):
-    '''Integer enumeration from m to n.'''
-    return lambda n: list(range(m, 1 + n))
 
 
 # first :: (a -> b) -> ((a, c) -> (b, c))

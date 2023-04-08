@@ -18,6 +18,7 @@ from dm.examples.cluedo.cards import *
 from dm.examples.cluedo.core import one
 from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, cluedo_bag, processSuggestions
 from dm.examples.cluedo.reports import rep1
+from dm.examples.cluedo.utils import PP
 
 
 @coppertop
