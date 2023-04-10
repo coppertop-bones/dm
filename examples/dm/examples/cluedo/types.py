@@ -13,6 +13,11 @@
 
 from enum import IntEnum
 
+from bones.lang.metatypes import BTAtom, S
+from dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq
+from bones.core.sentinels import Missing
+
+
 __all__ = [
     'TBI',
     'Gr', 'Mu', 'Or', 'Pe', 'Pl', 'Sc',
@@ -20,6 +25,7 @@ __all__ = [
     'Ki', 'Ba', 'Co', 'Bi', 'Li', 'St', 'Ha', 'Lo', 'Di',
     'people', 'weapons', 'rooms',
     'Card',
+    'one',
 ]
 
 ppLongNames = [
@@ -98,3 +104,54 @@ St = Card.St
 people = [Gr, Mu, Or, Pe, Pl, Sc]
 weapons = [Ca, Da, Le, Re, Ro, Wr]
 rooms = [Ba, Bi, Co, Di, Ha, Ki, Li, Lo, St]
+
+
+card = BTAtom.ensure('card')
+handId = BTAtom.ensure('handId')
+ndmap = BTAtom.ensure('ndmap')
+pad_element = S(has=txt, suggestions=count, like=count)
+cluedo_pad = ((card*handId)**pad_element)[ndmap] & BTAtom.ensure('cluedo_pad')
+cluedo_pad = pydict #& BTAtom.ensure('cluedo_pad') once we have tvmap we can do this
+cluedo_bag = (dstruct & BTAtom.ensure('_cluedo_bag')).nameAs('cluedo_bag')
+
+tPair = BTAtom.ensure('pair')
+display_table = (N**txt)[dseq][BTAtom.ensure('table')].setCoercer(dseq)
+
+
+YES = 'X'
+NO = '-'
+MAYBE = '?'
+
+class HasOne(object):
+    def __init__(self, handId=Missing):
+        self.handId = handId
+    def __rsub__(self, handId):     # handId / has
+        assert self.handId == Missing, 'Already noted a handId'
+        return HasOne(handId)
+one = HasOne()
+
+
+#SHOULDDO these are currently ficticious and need implementing
+possibleHand = (N**txt)[pyset]['possibleHand']
+cell = S(
+    state=txt,
+    suggestions=pylist,
+    prior=num,
+    posterior=num
+)
+handTracker = S(
+    ys=(N**txt)[pyset],
+    ns=(N**txt)[pyset],
+    ms=(N**txt)[pyset],
+    combs=N**possibleHand,      # this is a shame - {{1,2},{1,3}} -> TypeError: unhashable type: 'set'
+    prior=(N**txt)**(num),
+    posterior=(N**txt)**(num),
+)
+_cluedo_bag = S(
+    handId=txt,
+    hand=(N**txt)[pylist],
+    sizeByHandId=(txt**index)[pydict],
+    pad=(txt**(txt**cell))[ndmap],
+    trackerByHandId=(txt**handTracker)[pydict],
+    otherHandIds=(N**txt)[pylist],
+)

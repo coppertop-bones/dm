@@ -19,12 +19,14 @@ from dm.core.conv import to
 from dm.core.text import pad as pad_
 from dm.core.types import txt, N, pylist, pydict, dseq, dstruct
 
-from .core import cluedo_pad, YES, NO, MAYBE
-from .utils import display_table, hjoin
-from .cards import Card, people, weapons, rooms, TBI
+from dm.examples.cluedo.utils import hjoin
+from dm.examples.cluedo.types import Card, people, weapons, rooms, TBI, cluedo_pad, YES, NO, MAYBE, display_table, \
+    cluedo_bag
 
 
-# coercers - # OPEN: can these be sensibly defaulted in metatypes or templated?
+BONES_NS = GROOT_NS
+
+# coercers - # OPEN: can these b§e sensibly defaulted in metatypes or templated?
 (Card^txt).setCoercer(makeFn)
 (N**Card)[dseq].setCoercer(dseq)
 
@@ -37,7 +39,7 @@ def ppCell(cell, stat, cfg):
     return f'{txtSuggest} {txtState} {txtLike}' >> pad_(_, dict(center=cfg.cellWidth))
 
 def derefIfCow(maybeCow):
-    return maybeCow._traget if isinstance(maybeCow, _CoWProxy) else maybeCow
+    return maybeCow._target if isinstance(maybeCow, _CoWProxy) else maybeCow
 
 @coppertop
 def ppCardSummary(card, player, pad, stats, cfg, cHands):
@@ -97,6 +99,11 @@ def rep1(pad:cluedo_pad, handId:Card) -> display_table:
     a = (tTitle >> join >> (tNames >> hjoin >> tSummary >> hjoin >> tHands)) | display_table
     return a
 
+
+@coppertop
+def PP(bag:cluedo_bag) -> cluedo_bag:
+    bag.pad >> rep1(_, bag.handId) >> PP
+    return bag
 
 @coppertop
 def ppFnOfCard(fn) -> display_table:

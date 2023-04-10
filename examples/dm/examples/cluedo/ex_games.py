@@ -14,17 +14,11 @@
 import datetime
 
 from coppertop.pipe import *
-from dm.examples.cluedo.cards import *
-from dm.examples.cluedo.core import one
-from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, cluedo_bag, processSuggestions
-from dm.examples.cluedo.reports import rep1
-from dm.examples.cluedo.utils import PP
+from dm.examples.cluedo.types import *
+from dm.examples.cluedo.types import one
+from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, processSuggestions
+from dm.examples.cluedo.reports import PP
 
-
-@coppertop
-def PP(bag:cluedo_bag) -> cluedo_bag:
-    bag.pad >> rep1(_, bag.handId) >> PP
-    return bag
 
 
 def game1():

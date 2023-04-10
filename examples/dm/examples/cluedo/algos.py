@@ -14,19 +14,15 @@
 from coppertop.pipe import *
 from bones.core.errors import ProgrammerError, UnhappyWomble
 from bones.core.sentinels import Missing, Void
-from bones.lang.metatypes import S, BTAtom
 
-from dm.core.types import void, txt, pylist, pydict, index, N, pyset, num, dstruct
+from dm.core.types import void, pylist, pydict, dstruct
 import dm.pmf, dm.pp
 from groot import *
 from groot import collect, keys, join, drop, do, select, count, without, PP, combinations, atPut, to, \
     joinAll, asideDo, soleElement, minus, countIf, intersects
 
-
-from dm.examples.cluedo.core import cluedo_bag, YES, NO, MAYBE, HasOne
-
-from .cards import people, weapons, rooms, Card, TBI
-from .utils import pair
+from dm.examples.cluedo.types import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne
+from dm.examples.cluedo.utils import pair
 
 
 
@@ -35,34 +31,6 @@ from .utils import pair
 #  - the hand to be inferred TBI,
 #  - the hand of each opponent
 # we track suggestions and responses as lists in each hand (i.e. without aggregating them)
-
-
-ndmap = BTAtom('ndmap')
-
-#SHOULDDO these are currently ficticious and need implementing
-possibleHand = (N**txt)[pyset]['possibleHand']
-cell = S(
-    state=txt,
-    suggestions=pylist,
-    prior=num,
-    posterior=num
-)
-handTracker = S(
-    ys=(N**txt)[pyset],
-    ns=(N**txt)[pyset],
-    ms=(N**txt)[pyset],
-    combs=N**possibleHand,      # this is a shame - {{1,2},{1,3}} -> TypeError: unhashable type: 'set'
-    prior=(N**txt)**(num),
-    posterior=(N**txt)**(num),
-)
-_cluedo_bag = S(
-    handId=txt,
-    hand=(N**txt)[pylist],
-    sizeByHandId=(txt**index)[pydict],
-    pad=(txt**(txt**cell))[ndmap],
-    trackerByHandId=(txt**handTracker)[pydict],
-    otherHandIds=(N**txt)[pylist],
-)
 
 
 
@@ -364,4 +332,4 @@ def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag
         otherHandIds=otherHandIds,
     )
 
-_cluedo_bag.setConstructor(createBag)
+cluedo_bag.setConstructor(createBag)
