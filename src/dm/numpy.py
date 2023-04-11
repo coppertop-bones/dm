@@ -11,7 +11,8 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
+# don't really want to encourage raw ndarrays as they don't have the typing we'd like, but here's some helpers for
+# when I'm being lazy
 
 import sys
 
@@ -19,7 +20,10 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 import numpy as np
 from coppertop.pipe import *
-from dm.core.types import t
+from dm.core.types import t, pytuple
+
+MODULE_NS = GROOT
+
 
 
 # **********************************************************************************************************************
@@ -50,6 +54,38 @@ def diff(a:np.ndarray):
 # **********************************************************************************************************************
 
 @coppertop
-def shape(a:np.ndarray):
+def shape(a:np.ndarray) -> pytuple:
     return a.shape
 
+
+# **********************************************************************************************************************
+# sum
+# **********************************************************************************************************************
+
+@coppertop
+def sum(x: np.ndarray):
+    return np.sum(x)
+
+
+# **********************************************************************************************************************
+# take
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def take(x: np.ndarray, n: t.count) -> np.ndarray:
+    if n > 0:
+        return x[:n]
+    else:
+        return x[n:]
+
+
+# **********************************************************************************************************************
+# takeRows
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def takeRows(x: np.ndarray, n: t.count) -> np.ndarray:
+    if n > 0:
+        return x[:n, :]
+    else:
+        return x[n:, :]

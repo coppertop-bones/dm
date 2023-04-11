@@ -13,7 +13,7 @@
 
 from __future__ import annotations
 
-BONES_NS = ''
+MODULE_NS = ''
 
 import sys
 

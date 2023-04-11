@@ -18,7 +18,7 @@
 #       Implementation of the theory of consistently oriented eigenvectors
 # **********************************************************************************************************************
 
-BONES_NS = 'dm.linalg'
+MODULE_NS = 'dm.linalg'
 
 import numpy as np
 

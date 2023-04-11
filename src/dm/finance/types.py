@@ -9,7 +9,7 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-BONES_NS = 'dm'
+MODULE_NS = 'dm'
 
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)

@@ -11,7 +11,7 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
+MODULE_NS = ''
 
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
@@ -122,4 +122,6 @@ def withCtx(arg1, ctx:pydict, fn):
     with context(ctx):
         return arg1 >> fn
 
-
+@coppertop
+def unpack(f:pyfunc) -> pyfunc:
+    return lambda args: f(*args)

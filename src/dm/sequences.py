@@ -14,7 +14,7 @@
 # https://kotlinlang.org/docs/sequences.html#construct
 
 
-BONES_NS = ''
+MODULE_NS = ''
 
 import sys, types
 

@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -24,6 +22,8 @@ from dm.core.types import dframe, void, pydict
 from dm.core.aggman import array_
 from dm.core.conv import to
 from bones.core.sentinels import Void
+
+MODULE_NS = ''
 
 
 

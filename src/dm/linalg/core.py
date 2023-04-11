@@ -11,7 +11,7 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = 'dm.linalg'
+MODULE_NS = 'dm.linalg'
 
 import scipy.linalg, numpy as np, numpy.linalg
 

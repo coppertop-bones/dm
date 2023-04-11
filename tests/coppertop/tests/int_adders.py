@@ -8,7 +8,7 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-BONES_NS = 'tests.adders'
+MODULE_NS = 'tests.adders'
 
 from coppertop.pipe import *
 from dm.core.types import index, pylist

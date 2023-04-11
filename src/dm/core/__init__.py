@@ -18,6 +18,7 @@ from . import datetime
 from . import frame
 from . import maths
 from . import misc
+from . import stats
 from . import text
 from . import types
 

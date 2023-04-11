@@ -11,7 +11,7 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = 'dm.plot'
+MODULE_NS = 'dm.plot'
 
 import plotnine, numpy as np, statsmodels.api as sm, seaborn as sns
 

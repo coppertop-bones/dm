@@ -39,7 +39,7 @@
 # a folder is an fs object
 
 
-BONES_NS = 'fs'
+MODULE_NS = 'fs'
 
 
 from coppertop.pipe import *

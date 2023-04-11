@@ -11,23 +11,24 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
-
-
-EPS = 7.105427357601E-15      # i.e. double precision
-
 
 import builtins, numpy as np, math
 
 from bones.core.errors import NotYetImplemented
 from coppertop.pipe import *
-from dm.core.types import T1, T2, pylist, N, num, matrix, t, pyset, pytuple
+from dm.core.types import T1, T2, pylist, N, num, matrix, t, pyset, pytuple, T
 from dm._core.structs import tvarray
+from dm.core.aggman import count
 
 import itertools, scipy
+
+MODULE_NS = GROOT
+
+
+
+EPS = 7.105427357601E-15      # i.e. double precision
 
 array_ = (N**num)&tvarray
 matrix_ = matrix&tvarray
@@ -71,6 +72,51 @@ def combinationsR(xs, k):
 def nCombinationsR(n, k):
     return scipy.special.comb(n, k, exact=True)
 
+@coppertop
+def nPartitions(sizes:pylist) -> t.count:
+    num = 1
+    n = sum(sizes)
+    for k in sizes:
+        num *= n >> nCombinations >> k
+        n -= k
+    return num | t.count
+
+@coppertop(style=binary)
+def allPartitionsInto(xs:pylist, sizes:pylist+pytuple) -> pylist: #N**N**T:
+    if sum(sizes) != xs >> count: raise ValueError(f'sum(sizes) != count(xs), {sum(sizes)} != {xs >> count}')
+    return _partitions(xs, sizes)
+
+@coppertop(style=binary)
+def allPartitionsInto(xs, sizes:pylist+pytuple) -> pylist: #N**N**T:
+    if sum(sizes) != xs >> count: raise ValueError(f'sum(sizes) != count(xs), {sum(sizes)} != {xs >> count}')
+    return _partitions(list(xs), sizes)
+
+def _partitions(xs:N**T, sizes:N**t.count) -> pylist: #N**N**T:
+    if sizes:
+        answer = []
+        for comb, rest in _combRest(xs, sizes[0]):
+            for e in _partitions(rest, sizes[1:]):
+                answer.append(comb + e)
+        return answer
+    else:
+        return [[]]
+
+def _combRest(xs:N**T1, m:t.count) -> pylist: #N**( (N**T1)*(N**T1) ):
+    '''answer [m items chosen from n items, the rest]'''
+    if m == 0:
+        return [([], xs)]
+    elif m == len(xs):
+        return [(xs, [])]
+    else:
+        firstOne, remainder = xs[0:1], xs[1:]
+        firstPart = [ (firstOne + x, y) for x, y in _combRest(remainder, m - 1)]
+        secondPart = [ (x, firstOne + y) for x, y in _combRest(remainder, m)]
+        return firstPart + secondPart
+
+# %%timeit
+# x = list(range(13)) >> allPartitionsInto >> [5,4,4]
+# 115 ms ± 3.49 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
 
 # **********************************************************************************************************************
 # comparison
@@ -94,63 +140,9 @@ def log(v:array_) -> array_:
 def sqrt(x):
     return np.sqrt(x)   # answers a nan rather than throwing
 
-
-# **********************************************************************************************************************
-# stats
-# **********************************************************************************************************************
-
-@coppertop
-def cov(A:matrix&tvarray) -> matrix&tvarray:
-    return (matrix&tvarray)(np.cov(A))
-
-@coppertop
-def max(x:matrix&tvarray):
-    return np.max(x)
-
-@coppertop
-def max(x):
-    return builtins.max(x)
-
-@coppertop
-def mean(ndOrPy):
-    return np.mean(ndOrPy)
-
-@coppertop
-def min(x:matrix&tvarray):
-    return np.min(x)
-
-@coppertop
-def min(x):
-    return builtins.min(x)
-
 @coppertop
 def product(x:pylist+pyset+pytuple) -> num + t.count:
     return math.product(x)
-
-@coppertop
-def std(ndOrPy):
-    return np.std(ndOrPy, 0)
-
-@coppertop
-def std(ndOrPy, dof):
-    return np.std(ndOrPy, dof)
-
-
-# **********************************************************************************************************************
-# sum - is okay as same interface as Python
-# **********************************************************************************************************************
-
-@coppertop
-def sum(x):
-    return builtins.sum(x)
-
-@coppertop
-def sum(x:(N**T1)[pylist][T2]) -> num:
-    return builtins.sum(x._v)
-
-@coppertop
-def sum(x:(N**T1)[pylist]) -> num:
-    return builtins.sum(x._v)
 
 
 # **********************************************************************************************************************

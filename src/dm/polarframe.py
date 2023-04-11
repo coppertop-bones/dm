@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -21,6 +19,8 @@ from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset, matrix
 from dm._core.structs import tvarray
+
+MODULE_NS = GROOT
 
 
 

@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-BONES_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -25,6 +23,8 @@ from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist, pytuple,
     offset, pyfunc
 from dm._core.structs import tvarray
 from dm.core.aggman import count
+
+MODULE_NS = GROOT
 
 
 # sql style
