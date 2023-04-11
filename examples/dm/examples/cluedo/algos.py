@@ -21,7 +21,7 @@ from groot import *
 from groot import collect, keys, join, drop, do, select, count, without, PP, combinations, atPut, to, \
     joinAll, asideDo, soleElement, minus, countIf, intersects
 
-from dm.examples.cluedo.types import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne
+from dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne
 from dm.examples.cluedo.utils import pair
 
 
@@ -63,6 +63,10 @@ def figureKnown(bag:cluedo_bag, events) -> cluedo_bag:
             hId, c = ev
             ensureDefinitely(c, hId, YES)
             _.handIds >> drop >> hId >> do >> ensureDefinitely(c, _, NO)        # mark other hands as definite NOs
+
+        elif isinstance(ev, int) and type(ev) is not Card:
+            # a tag to create a pad - ignore for now
+            continue
 
         # the player indicated they don't have a match with the suggestion - thus we know three NOs
         else:

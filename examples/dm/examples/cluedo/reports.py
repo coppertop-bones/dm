@@ -20,11 +20,11 @@ from dm.core.text import pad as pad_
 from dm.core.types import txt, N, pylist, pydict, dseq, dstruct
 
 from dm.examples.cluedo.utils import hjoin
-from dm.examples.cluedo.types import Card, people, weapons, rooms, TBI, cluedo_pad, YES, NO, MAYBE, display_table, \
+from dm.examples.cluedo.core import Card, people, weapons, rooms, TBI, cluedo_pad, YES, NO, MAYBE, display_table, \
     cluedo_bag
 
 
-BONES_NS = GROOT_NS
+MODULE_NS = GROOT
 
 # coercers - # OPEN: can these b§e sensibly defaulted in metatypes or templated?
 (Card^txt).setCoercer(makeFn)

@@ -32,7 +32,7 @@ def partitions2(es, sizes: pylist) -> pylist:
 def _partitions2(es: pylist, n: index, sizes: pylist) -> pylist:
     if not sizes: return [[]]
     return es >> _combRest2(_, n, sizes >> first) \
-        >> collect >> (unpackArgs(lambda x, y:
+        >> collect >> (unpack(lambda x, y:
             _partitions2(y, n - (sizes >> first), sizes >> drop >> 1)
                 >> collect >> (lambda partitions:
                     x >> prependTo >> partitions
@@ -47,14 +47,9 @@ def _combRest2(es: pylist, n: index, m: index) -> pylist:
     if m == 0: return [([], es)]
     if m == n: return [(es, [])]
     return \
-        (es >> drop >> 1 >> _combRest2(_, n - 1, m - 1) >> collect >> unpackArgs(lambda x, y: (es >> take >> 1 >> join >> x, y))) \
+        (es >> drop >> 1 >> _combRest2(_, n - 1, m - 1) >> collect >> unpack(lambda x, y: (es >> take >> 1 >> join >> x, y))) \
         >> join >> \
-        (es >> drop >> 1 >> _combRest2(_, n - 1, m) >> collect >> unpackArgs(lambda x, y: (x, es >> take >> 1 >> join >> y)))
-
-@coppertop
-def unpackArgs(f):
-    return lambda args: f(*args)
-
+        (es >> drop >> 1 >> _combRest2(_, n - 1, m) >> collect >> unpack(lambda x, y: (x, es >> take >> 1 >> join >> y)))
 
 
 #%timeit range(13) >> partitions3 >> [5,4,4] >> count >> PP
@@ -69,7 +64,7 @@ def partitions3(xs, sizes: pylist) -> pylist:
 def _partitions3(xs: pylist, n: index, sizes: pylist) -> pylist:
     if not sizes: return [[]]
     return _combRest3(xs, n, sizes[0]) \
-        >> collect >> (unpackArgs(lambda comb, rest:
+        >> collect >> (unpack(lambda comb, rest:
             _partitions3(rest, n - sizes[0], sizes[1:])
                 >> collect >> (lambda partitions:
                     [comb] + partitions

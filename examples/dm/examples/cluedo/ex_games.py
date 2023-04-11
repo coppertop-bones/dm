@@ -14,8 +14,8 @@
 import datetime
 
 from coppertop.pipe import *
-from dm.examples.cluedo.types import *
-from dm.examples.cluedo.types import one
+from dm.examples.cluedo.core import *
+from dm.examples.cluedo.core import one
 from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, processSuggestions
 from dm.examples.cluedo.reports import PP
 
