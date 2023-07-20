@@ -131,3 +131,5 @@ dmypy.json
 .DS_Store
 
 pypi/coppertop-bones-dm/dm
+
+house/pypi/coppertop-bones-dm/

@@ -333,37 +333,6 @@ def createPossibilities(ps, ws, rs, handSizes, handKnowns):
                 partitionsTime += t4 - t2
                 oTBI += 1
 
-    # oTBI = 0
-    # for p in pRemain:
-    #     for w in wRemain:
-    #         for r in rRemain:
-    #             srow1, srow2 = oTBI * nEachSet, (oTBI + 1) * nEachSet
-    #             ocol = 0
-    #             remain = []
-    #             if p:
-    #                 answer[srow1:srow2, ocol] = p
-    #                 ocol += 1
-    #                 remain = remain >> join >> (pRemain >> without >> p)
-    #             if w:
-    #                 answer[srow1:srow2, ocol] = w
-    #                 ocol += 1
-    #                 remain = remain >> join >> (wRemain >> without >> w)
-    #             if r:
-    #                 answer[srow1:srow2, ocol] = r
-    #                 ocol += 1
-    #                 remain = remain >> join >> (rRemain >> without >> r)
-    #             t2 = time.perf_counter_ns()
-    #             res = remain >> allPartitionsInto >> sizes
-    #             t3 = time.perf_counter_ns()
-    #             answer[srow1:srow2, ocol:] = res
-    #             t4 = time.perf_counter_ns()
-    #             partitionsTimes.append(t3 - t2)
-    #             assignTimes.append(t4 - t3)
-    #             f'{(time.perf_counter_ns() - t1) * NS_TO_S:>7.1f} tbi: {oTBI + 1:>4} of {nTBI}  ' + \
-    #             f'partition: {np.average(partitionsTimes) * NS_TO_S:>3.3f} ' + \
-    #             f'assign: {np.average(assignTimes) * NS_TO_S:>3.3f}'>> PP
-    #             partitionsTime += t4 - t2
-    #             oTBI += 1
     return answer, slices
 
 

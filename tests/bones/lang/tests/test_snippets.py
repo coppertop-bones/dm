@@ -86,11 +86,13 @@ def test_overload_fail(**ctx):
     ''' >> dropFirstNL
 
     if context.analyse:
+        context.testcase = 'overload fail - static'
         res = src >> withCtx >> ctx >> pace(k,_) >> evalPyInComments
         res \
             >> check >> errorMsg >> startsWith >> 'cannot constrain {littxt} <:' \
             >> check >> (lambda x: [e[1] for e in x.types]) >> drop >> 2 >> equals >> res.commentTypes
     else:
+        context.testcase = 'overload fail - dynamic'
         src >> withCtx >> ctx >> check >> pace_(k, _) >> raises >> TypeError
 
 

@@ -11,51 +11,58 @@
 from .core import *
 
 
+@coppertop(style=binary)
+def forcase(any, testcase):
+    context.testcase = testcase
+    return any
+
+@coppertop
+def setcase(testcase):
+    context.testcase = testcase
+    return None
+
+
 def test():
-    context.testcase = 'frame - missing comma'
     '''
         ([]
             s0: (0.95;0.2) <:probs>                 // missing comma
             s1: (0.05;0.8) <:probs>
         )
-    ''' >> group_ >> check >> raises >> GroupError
+    ''' >> forcase >> 'frame - missing comma' >> group_ >> check >> raises >> GroupError
 
-    context.testcase = 'frame'
     '''
         ([]
             s0: (0.95;0.2) <:probs>,
             s1: (0.05;0.8) <:probs>
         )
-    ''' >> group >> bb >> check >> equals >> '([] (l; l) t {:s0}, (l; l) t {:s1})'
+    ''' >> forcase >> 'frame' >> group >> bb >> check >> equals >> '([] (l; l) t {:s0}, (l; l) t {:s1})'
 
-    context.testcase = 'keyed frame - missing comma'
     '''
         (
             [G:`gA`gB`gC`gA`gB`gC L:`l0`l0`l0`l1`l1`l1]   // missing comma, should be `gC, L:`l0
             P: (0.10;0.40;0.99;0.90;0.60;0.01)<:probs>
         )
-    ''' >> group_ >> check >> raises >> GroupError
+    ''' >> forcase >> 'keyed frame - missing comma' >> group_ >> check >> raises >> GroupError
 
-    context.testcase = 'example frame no keys'
     '''
         (
             [G:`gA`gB`gC`gA`gB`gC, L:`l0`l0`l0`l1`l1`l1] 
             P: (0.10;0.40;0.99;0.90;0.60;0.01)<:probs>
         )
-    ''' >> group >> bb >> check >> equals >> '([l {:G}, l {:L}] (l; l; l; l; l; l) t {:P})'
+    ''' >> forcase >> 'example frame no keys' >> group >> bb >> check >> equals >> '([l {:G}, l {:L}] (l; l; l; l; l; l) t {:P})'
 
-    context.testcase = "frame"
     '''
         ([]
             s0: (0.95;0.2) <:probs>,
             s1: (0.05;0.8) <:probs>
         )
-    ''' >> group >> bb >> check >> equals >> '([] (l; l) t {:s0}, (l; l) t {:s1})'
+    ''' >> forcase >> 'frame' >> group >> bb >> check >> equals >> '([] (l; l) t {:s0}, (l; l) t {:s1})'
 
-    context.testcase = "keyed frame"
     '''
         ([int: `i0`i1]
             s0: (0.95;0.2) <:probs>,
             s1: (0.05;0.8) <:probs>
         )
-    ''' >> group >> bb >> check >> equals >> '([l {:int}] (l; l) t {:s0}, (l; l) t {:s1})'
+    ''' >> forcase >> 'keyed frame' >> group >> bb >> check >> equals >> '([l {:int}] (l; l) t {:s0}, (l; l) t {:s1})'
+
+
