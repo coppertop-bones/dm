@@ -28,16 +28,13 @@ from bones.core.sentinels import function
 
 # OPEN: allow nullary >> unary etc
 
-_PARTIAL_FN_CLASS = (jones._pnullary, jones._punary, jones._pbinary, jones._pternary)
-_ANY_FUNCTION_CLASS = (function, jones._fn)
-
 @coppertop(style=ternary)
 def check(actual, fn, expected):
     fnName = fn.name if hasattr(fn, 'name') else (fn.d.name if isinstance(fn, jones._fn) else fn.__name__)
     with context(showFullType=False):
-        isPartial = isinstance(fn, _PARTIAL_FN_CLASS)
+        isPartial = isinstance(fn, jones._pfn)
         isPyFuncWithSoleArg = False
-        expectedIsFn = isinstance(expected, _ANY_FUNCTION_CLASS)
+        expectedIsFn = isinstance(expected, (function, jones._fn, jones._pfn))
         # could check that the partial isn't piping
         if (fnName in ('type', 'typeOf')) or (isPartial and fn.o_tbc == 1 and not expectedIsFn) or isPyFuncWithSoleArg:
             # fn is an F1
