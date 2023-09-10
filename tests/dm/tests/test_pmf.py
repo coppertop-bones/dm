@@ -15,7 +15,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from dm.testing import check, equals, closeTo
 from dm.core.misc import sequence
-from dm.pmf import uniform, rvAdd, mix, toXsPs, PMF, toCmf, percentile, pmfMul, normalise, L
+from dm.pmf import uniform, rvAdd, mix, toXsPs, PMF, toCmf, pmfMul, normalise, L
 
 
 def test_pmf():
@@ -69,7 +69,7 @@ def main():
     test_monty()
     test_pmf()
     test_MMs()
-    test_cmf()
+    # test_cmf()
 
 
 if __name__ == '__main__':

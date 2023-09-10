@@ -9,7 +9,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from dm.examples.cluedo.cards import *
+from dm.examples.cluedo.core import *
 from dm.examples.cluedo.core import one
 from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, processSuggestions
 from dm.examples.cluedo.reports import rep1
