@@ -21,14 +21,13 @@ from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo
 
 
 # test that functions can be patched in a module more than once
-@coppertop(module='tests.adders')
+@coppertop
 def addTwo(x:txt) -> txt:
     return x + 'Three'
 
-with context(halt=True):
-    @coppertop(module='tests.adders')
-    def addTwo(x:txt) -> txt:
-        return x + 'Two'
+@coppertop
+def addTwo(x:txt) -> txt:
+    return x + 'Two'
 
 
 # test that functions can be redefined in "main"

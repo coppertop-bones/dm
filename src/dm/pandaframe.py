@@ -23,9 +23,6 @@ from dm.core.aggman import array_
 from dm.core.conv import to
 from bones.core.sentinels import Void
 
-MODULE_NS = ''
-
-
 
 pandaframe = pd.DataFrame
 polarframe = pl.DataFrame

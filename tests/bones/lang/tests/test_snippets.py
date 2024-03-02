@@ -20,9 +20,10 @@ import bones.lang.ctx
 from bones.lang.lex import LINE_COMMENT, BREAKOUT
 from bones.lang.execute import TCInterpreter
 from bones.lang.infer import InferenceLogger
+from bones.lang.tests._utils import dropFirstNL
 
 import dm.pp, dm.testing
-from groot import PP, check, equals, startsWith, underride, withCtx, raises, drop
+from dm.core import PP, check, equals, startsWith, underride, withCtx, raises, drop
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
 
 bones.lang.ctx.PYCHARM = True
@@ -468,11 +469,6 @@ def test_current(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
     # 1/0
 
-
-
-@coppertop
-def dropFirstNL(s):
-    return s[1:] if s[0:1] == '\n' else s
 
 
 # TODO

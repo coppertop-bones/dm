@@ -11,18 +11,16 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import math
 
 from coppertop.pipe import *
 
 
-@coppertop(module='dm.stats')
+@coppertop
 def logisticCDF(x, mu, s):
     return 1 / (1 + math.exp(-1 * (x - mu) / s))
 
-@coppertop(module='dm.stats')
+@coppertop
 def logisticCDFInv(p, mu, s):
     return mu + -s * math.log(1 / p - 1)
 

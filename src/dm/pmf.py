@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import operator, random
 import numpy as np
 import scipy.stats
@@ -24,7 +22,7 @@ from dm.core.misc import sequence
 from dm.core.types import T, T1, T2, pylist, index, pytuple, num, dstruct, matrix, obj
 from bones.lang.metatypes import BTAtom
 from dm.core.structs import tvarray
-from dm.pp import formatStruct
+from dm.pp import formatStruct, PP
 
 
 

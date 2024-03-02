@@ -30,7 +30,7 @@ matrix_ = matrix[tvarray]
 
 
 
-@coppertop(style=nullary, module='dm.linalg.algos.underdetermined')
+@coppertop(style=nullary)
 def search(
             fTarget     : Nn**N1**num,
             xInitial    : Nm**N1**num,

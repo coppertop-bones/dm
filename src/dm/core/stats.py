@@ -20,8 +20,6 @@ from coppertop.pipe import *
 from dm.core.types import T1, T2, pylist, N, num, matrix
 from dm._core.structs import tvarray
 
-MODULE_NS = GROOT
-
 
 
 array_ = (N**num)&tvarray

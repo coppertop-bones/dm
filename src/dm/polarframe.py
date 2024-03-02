@@ -20,8 +20,6 @@ from bones.core.errors import NotYetImplemented
 from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset, matrix
 from dm._core.structs import tvarray
 
-MODULE_NS = GROOT
-
 
 
 # **********************************************************************************************************************
@@ -159,10 +157,10 @@ def numRows(df:pl.DataFrame) -> t.count:
 
 
 # **********************************************************************************************************************
-# read
+# read - move to dm.polars.csv
 # **********************************************************************************************************************
 
-@coppertop(module='dm.polars.csv')
+@coppertop
 def read(path:txt) -> pl.DataFrame:
     return pl.read_csv(path, parse_dates=True)
 

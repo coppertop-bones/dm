@@ -22,8 +22,6 @@ import numpy as np
 from coppertop.pipe import *
 from dm.core.types import t, pytuple
 
-MODULE_NS = GROOT
-
 
 
 # **********************************************************************************************************************

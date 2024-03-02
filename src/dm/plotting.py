@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = 'dm.plot'
-
 import plotnine, numpy as np, statsmodels.api as sm, seaborn as sns
 
 from coppertop.pipe import *
@@ -43,11 +41,11 @@ def qq(res:array_) -> void:
     sm.qqplot(res / np.std(res) >> to >> np.ndarray, line ='45')
     return Void
 
-@coppertop(module='seaborn')
+@coppertop
 def correlogram(pdf:pandaframe) -> void:
     return _correlogram(pdf)
 
-@coppertop(module='seaborn')
+@coppertop
 def correlogram(pdf:pandaframe, kwargs:pydict) -> void:
     return _correlogram(pdf, **kwargs)
 

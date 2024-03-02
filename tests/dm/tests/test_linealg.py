@@ -9,7 +9,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from groot import to, shape
+from dm.core import to, shape
 from bones.core.utils import assertRaises
 from dm.core.types import matrix
 from dm._core.structs import tvarray

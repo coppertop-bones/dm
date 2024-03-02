@@ -11,16 +11,16 @@
 #
 # **********************************************************************************************************************
 
-from . import aggman
-from . import conv
-from . import contextual_scope
-from . import datetime
-from . import frame
-from . import maths
-from . import misc
-from . import stats
-from . import text
-from . import types
+from _.dm.core.aggman import *
+from _.dm.core.conv import *
+from _.dm.core.contextual_scope import *
+from _.dm.core.datetime import *
+from _.dm.core.frame import *
+from _.dm.core.maths import *
+from _.dm.core.misc import *
+from _.dm.core.stats import *
+from _.dm.core.text import *
+from _.dm.core.types import *
 
 import dm
 dm.__version__ = "2023.03.21"

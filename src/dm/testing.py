@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -122,8 +120,32 @@ def closeTo(a, b, tol) -> bool:
         return abs(a - b) / abs(a) < tol
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def startsWith(a, b) -> bool:
+    return a.startswith(b)
+
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+def endsWith(a, b) -> bool:
+    return a.endswith(b)
+
+@coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def equals(a, b) -> bool:
     return a == b
+
+@coppertop(style=binary)
+def gt(a, b) -> bool:
+    return a > b
+
+@coppertop(style=binary)
+def ge(a, b) -> bool:
+    return a >= b
+
+@coppertop(style=binary)
+def lt(a, b) -> bool:
+    return a < b
+
+@coppertop(style=binary)
+def le(a, b) -> bool:
+    return a <= b
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
@@ -136,4 +158,5 @@ def different(a, b) -> bool:
 @coppertop(style=binary)
 def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
     return bool((a != b).any())
+
 

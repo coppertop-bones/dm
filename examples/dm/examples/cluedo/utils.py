@@ -15,11 +15,9 @@ from coppertop.pipe import *
 from dm.core.types import txt, pydict, dseq, dstruct
 from dm.core.aggman import count, collect
 from dm.pp import PP
-from groot import pad, max
+from dm.core import pad, max
 
 from dm.examples.cluedo.core import display_table, tPair
-
-MODULE_NS = GROOT
 
 
 
@@ -64,7 +62,7 @@ def add(rows:display_table, row:txt) -> display_table:
 def cardIds(cards):
     return [c.value for c in cards]
 
-@coppertop(style=binary, module=GROOT)
+@coppertop(style=binary)
 def to(p:tPair, t:pydict) -> pydict:
     return dict(zip(p.a, p.b))
 

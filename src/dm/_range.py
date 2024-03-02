@@ -13,8 +13,6 @@
 
 from __future__ import annotations
 
-MODULE_NS = ''
-
 import sys
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)

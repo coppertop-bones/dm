@@ -15,7 +15,7 @@
 from coppertop.pipe import *
 from dm.core.types import pylist, index
 from dm.testing import check, equals
-from groot import first, count, drop, collect, prependTo, join, joinAll, take, sum
+from dm.core import first, count, drop, collect, prependTo, join, joinAll, take, sum
 
 
 #%timeit range(13) >> partitions2 >> [5,4,4] >> count >> PP

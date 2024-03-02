@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import numpy as np, scipy.stats
 
 from coppertop.pipe import *
@@ -81,11 +79,11 @@ matrix_ = matrix&tvarray
 # sources
 # https://en.wikipedia.org/wiki/Mean_squared_error#In_regression
 
-@coppertop(style=nullary, module='dm.stats')
+@coppertop(style=nullary)
 def ols(Y:matrix&tvarray, X:matrix&tvarray) -> OLSResult:
     return _ols(Y, X, {})
 
-@coppertop(style=nullary, module='dm.stats')
+@coppertop(style=nullary)
 def ols(Y: matrix & tvarray, X: matrix & tvarray, options:pydict) -> OLSResult:
     return _ols(Y, X, options)
 
@@ -164,11 +162,11 @@ def residuals(res:OLSResult, Y:matrix&tvarray, X:matrix&tvarray) -> array_:
     return array_((Y - X @ res.betaHat).reshape(Y.shape[0]))
 
 
-@coppertop(module='dm.stats')
+@coppertop
 def predictedR2(Y: matrix & tvarray, X: matrix & tvarray) -> pytuple:
     return _predictedR2(Y, X, {})
 
-@coppertop(module='dm.stats')
+@coppertop
 def predictedR2(Y: matrix & tvarray, X: matrix & tvarray, options) -> pytuple:
     return _predictedR2(Y, X, options)
 

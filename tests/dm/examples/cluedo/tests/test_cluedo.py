@@ -15,7 +15,7 @@ from dm.examples.cluedo.algos import createBag, figureKnown, processResponses, p
 from dm.examples.cluedo.reports import rep1
 from dm.examples.cluedo.core import cluedo_bag
 import dm.pp
-from groot import PP
+from _ import PP
 
 
 @coppertop

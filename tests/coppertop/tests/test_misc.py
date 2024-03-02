@@ -15,8 +15,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
-import dm.core, dm.testing, dm.pp
-from groot import check, equals, PP, collect, interleave
+from dm.testing import check, equals
+from dm.core import collect, interleave
+from dm.pp import PP
 from dm.core.types import txt, index, num, bool, T1, litint, pylist
 from bones.lang.metatypes import BTAtom
 from bones.lang.structs import tv

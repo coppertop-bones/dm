@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -104,12 +102,12 @@ def readJson(pfn:txt):
 def readJson(f:TextIOWrapper):
     return json.load(f)
 
-@coppertop(style=binary, module='dmap')
+@coppertop(style=binary)
 def ksJoinVs(ks, vs) -> dmap:
     return zip(ks, vs, strict=True) >> to >> dmap
 dmap.ksJoinVs = ksJoinVs
 
-@coppertop(style=binary, module='pydict')
+@coppertop(style=binary)
 def ksJoinVs(ks, vs) -> pydict:
     return zip(ks, vs, strict=True) >> to >> pydict
 pydict.ksJoinVs = ksJoinVs

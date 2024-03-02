@@ -11,7 +11,7 @@
 from coppertop.pipe import *
 from coppertop.pipe import CoppertopError
 from bones.core.utils import assertRaises
-from dm.testing import check, equals
+from dm.testing import check, equals, startsWith, endsWith
 from bones import jones
 from dm.pp import NB
 
@@ -73,11 +73,11 @@ def testNullary():
 
     with assertRaises(SyntaxError) as e:
         nullary_1(_)(1, 2)
-    e.exceptionValue.args[0] >> check >> equals >> 'Wrong number of args to partial fn scratch.nullary_1 - %l expected, %l given'    # was 'nullary_1 - wrong number of args - got 2 needed 1'
+    e.exceptionValue.args[0] >> check >> endsWith >> 'nullary_1 - %l expected, %l given'
 
     with assertRaises(SyntaxError) as e:
         2 >> nullary_2(1, _)
-    e.exceptionValue.args[0] >> check >> equals >> 'Arguments cannot by piped into nullary style fn scratch.nullary_2' # was 'syntax not of form nullary()'
+    e.exceptionValue.args[0] >> check >> startsWith >> 'Arguments cannot by piped into nullary style fn '
 
 
 def testUnary():
@@ -87,11 +87,11 @@ def testUnary():
 
     with assertRaises(SyntaxError) as e:
         unary_1(_)(1, 2)
-    e.exceptionValue.args[0] >> check >> equals >> 'Wrong number of args to partial fn scratch.unary_1 - %l expected, %l given' # was 'unary_1 - wrong number of args - got 2 needed 1'
+    e.exceptionValue.args[0] >> check >> startsWith >> 'Wrong number of args to partial fn '
 
     with assertRaises(SyntaxError) as e:
         2 >> unary_3(1, _, _)
-    e.exceptionValue.args[0] >> check >> equals >> 'Trying to pipe an argument into unary style partial fn scratch.unary_3 that needs a total of 2 more arguments'  # was'Fn "unary_3" is a unary and expects to have 1 args piped but the partial being piped has 2 free. E.g. `[1,2,3] >> take(_, 1)` should be `[1,2,3] >> take >> 1`'
+    e.exceptionValue.args[0] >> check >> endsWith >> 'unary_3 that needs a total of 2 more arguments'  # was'Fn "unary_3" is a unary and expects to have 1 args piped but the partial being piped has 2 free. E.g. `[1,2,3] >> take(_, 1)` should be `[1,2,3] >> take >> 1`'
 
     str(nullary_1(1) >> unary_1) >> check >> equals >> 'unary_1(nullary_1(1))'
 

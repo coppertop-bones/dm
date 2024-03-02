@@ -14,8 +14,6 @@
 # https://kotlinlang.org/docs/sequences.html#construct
 
 
-MODULE_NS = ''
-
 import sys, types
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)

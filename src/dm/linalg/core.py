@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = 'dm.linalg'
-
 import scipy.linalg, numpy as np, numpy.linalg
 
 from coppertop.pipe import *
@@ -21,7 +19,7 @@ from dm.core.types import matrix, N, num, T
 from dm.linalg.types import orth, right, upper, lower, Cholesky, QR, SVD, left
 import dm.linalg.orient
 
-from groot import dm
+from dm.core import dm
 
 
 array_ = (N**num)[tvarray]
@@ -31,24 +29,24 @@ matrix_ = matrix[tvarray]
 # NB a 1x1 matrix is assumed to be a scalar, e.g. https://®®en.wikipedia.org/wiki/Dot_product#Algebraic_definition
 
 
-@coppertop(module='dm.linalg.np')
+@coppertop
 def inv(A:matrix_) -> matrix_:
     return np.linalg.inv(A)
 
-@coppertop(module='dm.linalg.np')
+@coppertop
 def qr(A:matrix_) -> QR:
     Q, R = np.linalg.qr(A)            # via householder?
     q = matrix_(Q) | +orth
     r = matrix_(R) | +right
     return QR(q, r)
 
-@coppertop(module='dm.linalg.np')
+@coppertop
 def cholesky(A:matrix_) -> matrix_&Cholesky:
     # use np since in scipy.linalg.cho_factor "The returned matrix also contains random data in the entries not
     # used by the Cholesky decomposition. If you need to zero these entries, use the function cholesky instead."
     return matrix_(np.linalg.cholesky(A)) | +Cholesky
 
-@coppertop(module='dm.linalg.np')
+@coppertop
 def svd(A:matrix_) -> SVD:
     u, s, vT = np.linalg.svd(A)
     return SVD(matrix_(u), array_(s), matrix_(vT))

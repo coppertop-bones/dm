@@ -24,8 +24,6 @@ from dm.examples.cluedo.core import Card, people, weapons, rooms, TBI, cluedo_pa
     cluedo_bag
 
 
-MODULE_NS = GROOT
-
 # coercers - # OPEN: can these b§e sensibly defaulted in metatypes or templated?
 (Card^txt).setCoercer(makeFn)
 (N**Card)[dseq].setCoercer(dseq)

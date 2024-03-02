@@ -8,8 +8,6 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-MODULE_NS = 'tests.adders'
-
 from coppertop.pipe import *
 from dm.core.types import index, pylist
 
@@ -33,6 +31,8 @@ def eachAddOne(xs:pylist) -> pylist:
 @coppertop
 def addTwo(x:index) -> index:
     return x + 2
+
+from _ import addTwo
 
 @coppertop
 def eachAddTwo(xs:pylist) -> pylist:

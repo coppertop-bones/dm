@@ -18,8 +18,6 @@
 #       Implementation of the theory of consistently oriented eigenvectors
 # **********************************************************************************************************************
 
-MODULE_NS = 'dm.linalg'
-
 import numpy as np
 
 from coppertop.pipe import *

@@ -10,14 +10,15 @@
 
 from glob import glob
 import os.path
-
+from bones.lang import lex
 from .core import group, PP
 
 
 def test_canon():
-    home = os.path.expanduser('~/arwen/bones/canon')
+    # home = os.path.expanduser('~/arwen/bones/canon')
+    home = os.path.abspath(os.path.join(lex.__file__, '../../../../canon'))
     pfns = glob('**/*.b', root_dir=home, recursive=True)
-    assert pfns, "didn't find bones files in tour path"
+    assert pfns, f"didn't find bones files in tour path {home}"
     for pfn in pfns:
         ppPfn = os.path.join('bones/canon', pfn)
         if 'exclude' in pfn:
@@ -25,8 +26,7 @@ def test_canon():
         else:
             f'{ppPfn}' >> PP
             with open(os.path.join(home, pfn)) as f:
-                f.read() >> group
-
+                    f.read() >> group
 
 def main():
     test_canon()

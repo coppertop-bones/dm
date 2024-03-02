@@ -39,12 +39,9 @@
 # a folder is an fs object
 
 
-MODULE_NS = 'fs'
-
-
 from coppertop.pipe import *
 import dm.pp
-from groot import drop, startsWith
+from dm.core import drop, startsWith
 import glob, os, shutil, datetime, sys, pathlib, stat
 from dm.core.types import txt, bool
 from bones.core.sentinels import Missing

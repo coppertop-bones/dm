@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -70,14 +68,6 @@ def format(kwargs:pydict, f:txt) -> txt:
 @coppertop(style=ternary)
 def replace(haystack:txt, needle:txt, alt:txt) -> txt:
     return haystack.replace(needle, alt)
-
-@coppertop(module='unicode')
-def decode(b, encoding):
-    return b.decode(encoding)
-
-@coppertop(module='unicode')
-def encode(s, encoding):
-    return s.encode(encoding)
 
 @coppertop(style=binary)
 def endsWith(s1:txt, s2:txt) -> bool:

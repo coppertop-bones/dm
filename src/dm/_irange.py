@@ -14,8 +14,6 @@
 
 # see https://kotlinlang.org/docs/sequences.html#sequence
 
-MODULE_NS = ''
-
 from coppertop.pipe import *
 from dm.core.types import bool, index
 

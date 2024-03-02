@@ -17,9 +17,6 @@ from bones.core.context import context
 
 
 def main():
-    # groot_test - must be run before other modules load up the groot namespace
-    import coppertop.tests.test_groot
-    coppertop.tests.test_groot.main()
 
     # coppertop tests
     import coppertop.tests.run_all

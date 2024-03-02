@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = 'dm.linalg'
-
 import numpy as np
 from coppertop.pipe import *
 from bones.lang.metatypes import BTAtom, BTStruct
@@ -44,17 +42,17 @@ array_ = (N**num) & tvarray
 
 
 QR = BTStruct(qT=matrix, r=matrix&right)
-@coppertop(style=nullary, module='pvt')
+@coppertop(style=nullary, local=True)
 def _makeQR(ts, q:matrix_, r:matrix_):
     return dstruct(QR&dstruct, q=q, r=r)
-@coppertop(style=nullary, module='pvt')
+@coppertop(style=nullary, local=True)
 def _makeQR(ts, qr:pytuple):
     return dstruct(QR&dstruct, q=matrix_(qr[0]), r=matrix_(qr[1]))
 QR.setConstructor(_makeQR)
 
 
 SVD = BTStruct(u=matrix, s=N**num, vt=matrix)
-@coppertop(style=nullary, module='pvt')
+@coppertop(style=nullary, local=True)
 def _makeSVD(ts, u:matrix_, s:array_, vT:matrix_) -> SVD&dstruct:
     return dstruct(SVD&dstruct, u=u, s=s, vT=vT)
 SVD.setConstructor(_makeSVD)

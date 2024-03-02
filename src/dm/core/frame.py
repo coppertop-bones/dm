@@ -24,8 +24,6 @@ from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist, pytuple,
 from dm._core.structs import tvarray
 from dm.core.aggman import count
 
-MODULE_NS = GROOT
-
 
 # sql style
 # f >> by_(...) >> collect_(...) >> where(...) >> orderBy(...)   - sortBy, xasc, keyBy
@@ -307,45 +305,6 @@ def pivot(f:dframe, index:txt+pylist, value:txt+pylist, agg:pyfunc+pylist, title
 @coppertop
 def range_(colName:txt) -> DefRange:
     raise NotYetImplemented()
-
-
-# **********************************************************************************************************************
-# read in dm.frame.fromCsv
-# **********************************************************************************************************************
-
-@coppertop(module='dm.frame.csv')
-def read(pfn:txt, renames:pydict, conversions:pydict) -> dframe:
-    with open(pfn, mode='r') as f:
-        r = csv.DictReader(f)
-        d = {}
-        for name in r.fieldnames:
-            d[name] = list()
-        for cells in r:
-            for k, v in cells.items():
-                d[k].append(v)
-        a = dframe()
-        for k in d.keys():
-            newk = renames.get(k, k)
-            fn = conversions.get(newk, lambda l: dtup(l, Missing))     ## we could insist the conversions return dtup s
-            a[newk] = fn(d[k])
-    return a
-
-@coppertop(module='dm.frame.csv')
-def read(pfn:txt, renames:pydict, conversions:pydict, cachePath) -> dframe:
-    with open(pfn, mode='r') as f:
-        r = csv.DictReader(f)
-        d = {}
-        for name in r.fieldnames:
-            d[name] = list()
-        for cells in r:
-            for k, v in cells.items():
-                d[k].append(v)
-        a = dframe()
-        for k in d.keys():
-            newk = renames.get(k, k)
-            fn = conversions.get(newk, lambda l: dtup(l, Missing))     ## we could insist the conversions return dtup s
-            a[newk] = fn(d[k])
-    return a
 
 
 # **********************************************************************************************************************

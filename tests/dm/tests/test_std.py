@@ -11,7 +11,8 @@
 import operator
 from coppertop.pipe import *
 from dm.core.types import offset, index, N, count, dseq
-from groot import inject, collect, check, equals, drop, at, typeOf
+from dm.core import inject, collect, drop, at
+from dm.testing import check, equals
 from dm.wip import eachAsArgs
 
 def test_inject():

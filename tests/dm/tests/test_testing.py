@@ -8,8 +8,8 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-import dm.core, dm.testing
-from groot import check, same, count, raises, pyeval_, equals
+from dm.core import count, pyeval_
+from dm.testing import check, same, equals, raises
 
 
 def test_testing():

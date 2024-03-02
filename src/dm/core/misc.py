@@ -11,8 +11,6 @@
 #
 # **********************************************************************************************************************
 
-MODULE_NS = ''
-
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -46,12 +44,12 @@ def getAttr(x, name):
 def compose(x, fs):
     return fs >> inject(_, x, _) >> (lambda x, f: f(x))
 
-def not_(b):
+def _not_(b):
     return False if b else True
-Not = coppertop(name='Not')(not_)
-not_ = coppertop(name='not_')(not_)
+Not = coppertop(name='Not')(_not_)
+not_ = coppertop(name='not_')(_not_)
 
-repr = coppertop(name='repr', dispatchEvenIfAllTypes=True)(builtins.repr)
+repr = coppertop(dispatchEvenIfAllTypes=True)(builtins.repr)
 
 @coppertop
 def _t(x):

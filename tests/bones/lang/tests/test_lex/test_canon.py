@@ -15,9 +15,10 @@ from dm.pp import PP
 
 
 def test_canon():
-    home = os.path.expanduser('~/arwen/bones/canon')
+    # home = os.path.expanduser('~/arwen/bones/canon')
+    home = os.path.abspath(os.path.join(lex.__file__, '../../../../canon'))
     pfns = glob('**/*.b', root_dir=home, recursive=True)
-    assert pfns, "didn't find bones files in tour path"
+    assert pfns, f"didn't find bones files in tour path {home}"
     for pfn in pfns:
         os.path.join('bones/canon', pfn) >> PP
         with open(os.path.join(home, pfn)) as f:

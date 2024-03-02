@@ -24,8 +24,6 @@ from dm.core.aggman import count
 
 import itertools, scipy
 
-MODULE_NS = GROOT
-
 
 
 EPS = 7.105427357601E-15      # i.e. double precision
