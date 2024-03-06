@@ -18,7 +18,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from bones import jones
 from coppertop.pipe import *
 from dm.core.types import bool, matrix, pytuple
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.maths import EPS
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import function

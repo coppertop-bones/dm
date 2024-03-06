@@ -7,12 +7,12 @@
 
 from coppertop.pipe import *
 from dm.testing import check, equals
-from dm.core.aggman import append, prepend, prependTo, appendTo, join, drop, at, keys, sort
+from dm.core.aggman import append, prepend, prependTo, appendTo, join, drop, at, keys, sort, kvs
 from dm.core.misc import _v, box
 from dm.core.conv import to
 from dm.pp import PP
 
-from dm.core.types import N, num, index, txt, litint, pydict, pylist, dtup, dstruct, dseq, dmap, dframe
+from dm.core.types import N, num, index, txt, litint, pydict, pylist, dtup, dstruct, dseq, dmap, dframe, T1
 # def to(xs:N**T, t:N**(T)) -> N**(T):
 
 
@@ -53,12 +53,24 @@ def test_dseq():
     fred = 0 >> prependTo >> fred
     fred = fred >> join >> dseq((N**litint)[dseq], [4, 5])
     fred >> _v >> check >> equals >> [0, 1, 2, 3, 4, 5]
-    repr(fred) >> PP
-    str(fred) >> PP
 
 
 def test_dmap():
-    dmap()
+    DF2 = dmap['DF2'].setConstructor(dmap)
+
+    @coppertop
+    def kvs(x: dmap[T1]) -> pylist:
+        return list(x.items())
+
+    @coppertop
+    def values(x: dmap[T1]) -> pylist:
+        return list(x.values())
+
+    @coppertop
+    def keys(x: dmap[T1]) -> pylist:
+        return list(x.keys())
+
+    DF2()
     # we can either specify a bones type or infer types on construction - need to write an inference function and
     # decide on mapping from python types to bones types, e.g. is a pyint a litint or an index, we can stop at pylist
     # etc so we end up with strongly typed outer with dynamic inner. obviously calling from python to bones is always
@@ -74,6 +86,12 @@ def test_dmap():
     dmap((txt**litint)[dmap], a=1, b=2, c=3) >> drop >> ['a', 'b'] >> to >> pydict >> check >> equals >> dict(c=3)
     [dict(a=1)] >> at >> 0 >> at >> "a" >> check >> equals >> 1
     dict(b=1, a=2) >> keys >> to >> pylist >> sort
+    df = DF2(a=1, b=2)
+    df >> keys >> check >> equals >> ['a', 'b']
+    df >> kvs >> check >> equals >> [('a', 1), ('b', 2)]
+    dm = dmap(a=1, b=2)
+    dm >> keys >> check >> equals >> ['a', 'b']
+    dm >> kvs >> to >> pylist >> check >> equals >> [('a', 1), ('b', 2)]
 
 
 def test_me():
@@ -122,7 +140,7 @@ def test_nd_():
 def main():
     test_dtup()
     test_dstruct()
-    # test_dseq()
+    test_dseq()
     test_dmap()
     test_me()
     test_nd_()

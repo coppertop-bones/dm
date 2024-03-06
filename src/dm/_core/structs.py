@@ -25,7 +25,7 @@ from bones.lang.metatypes import BType, fitsWithin, cacheAndUpdate
 from bones.lang.utils import Constructors
 
 
-__all__ = ['tvtuple', 'tvstruct', 'tvarray', 'tvlist', 'tvdict']
+__all__ = ['tvtuple', 'tvstruct', 'tvarray', 'tvseq', 'tvmap']
 
 class tvtuple(object):
     def __init__(self):
@@ -121,6 +121,7 @@ class tvstruct(object):
             if f == '_values': return super().__getattribute__('_pub').values
             if f == '_update': return super().__getattribute__('_pub').update
             if f == '_get': return super().__getattribute__('_pub').get
+            if f == '_pop': return super().__getattribute__('_pub').pop
             # if names have been added e.g. by self['_10y'] allow access as long as not double entered
             pub = super().__getattribute__('_pub').get(f, Missing)
             pvt = super().__getattribute__('_pvt').get(f, Missing)
@@ -303,34 +304,34 @@ class tvarray(nd_):
         return f'{self._t}({np.array2string(self)})'
 
 
-class tvlist(UserList):
+class tvseq(UserList):
     def __init__(self, *args_):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         if len(args) == 1:
             arg = args[0]
-            if isinstance(arg, tvlist):
-                # tvlist(tvlist)
+            if isinstance(arg, tvseq):
+                # tvseq(tvseq)
                 super().__init__(arg._v)
                 self._t = arg._t
             elif isinstance(arg, BType):
-                # tvlist(<BType>)
+                # tvseq(<BType>)
                 super().__init__()
                 self._t = arg
             else:
-                raise TypeError("Can't create tvlist without type information")
+                raise TypeError("Can't create tvseq without type information")
         elif len(args) == 2:
-            # tvlist(t, iterable)
+            # tvseq(t, iterable)
             arg1, arg2 = args
             super().__init__(arg2)
             self._t = arg1
         elif len(args) == 3:
-            # tvlist(dseq, t, iterable)
+            # tvseq(dseq, t, iterable)
             arg1, arg2, arg3 = args
             assert isinstance(arg1, Constructors)
             super().__init__(arg3)
             self._t = arg2
         else:
-            raise TypeError("Invalid arguments to tvlist constructor")
+            raise TypeError("Invalid arguments to tvseq constructor")
 
     @property
     def _v(self):
@@ -343,7 +344,7 @@ class tvlist(UserList):
     def __repr__(self):
         itemStrings = (f"{str(e)}" for e in self.data)
         t = self._t
-        if type(t) is abc.ABCMeta or t is tvlist:
+        if type(t) is abc.ABCMeta or t is tvseq:
             name = self._t.__name__
         else:
             name = str(self._t)
@@ -351,7 +352,7 @@ class tvlist(UserList):
         return rep
 
     def __eq__(self, other):
-        if isinstance(other, tvlist):
+        if isinstance(other, tvseq):
             return self._t == other._t and self.data == other.data
         else:
             return False
@@ -363,29 +364,29 @@ class tvlist(UserList):
             return self.data[i]
 
 
-class tvdict(UserDict):
+class tvmap(UserDict):
     __slots__ = ['_t', 'data']
 
     def __new__(cls, *args_, **kwargs):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         if len(args) == 0:
             if not kwargs:
-                # tvdict()
+                # tvmap()
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
             else:
-                # tvdict(a=1, b=2)
+                # tvmap(a=1, b=2)
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
                 instance.update(kwargs)
-                raise PathNotTested()
+                # raise PathNotTested()
         elif len(args) == 1:
             arg1 = args[0]
             if not kwargs:
                 if isinstance(arg1, BType):
-                    # tvdict(t)
+                    # tvmap(t)
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = arg1
@@ -398,7 +399,7 @@ class tvdict(UserDict):
                     instance.update(arg1)
             else:
                 if isinstance(arg1, BType):
-                    # tvdict(t, a=1, b=2)
+                    # tvmap(t, a=1, b=2)
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = arg1

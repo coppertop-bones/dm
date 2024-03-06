@@ -11,6 +11,9 @@
 #
 # **********************************************************************************************************************
 
+# Defines structs, types and enums
+
+
 from enum import IntEnum
 
 from bones.lang.metatypes import BTAtom, S

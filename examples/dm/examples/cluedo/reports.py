@@ -13,7 +13,7 @@
 
 from coppertop.pipe import *
 from coppertop._scopes import _CoWProxy
-from dm.core.aggman import keys, collect, count, first, values, join, joinAll, without, interleave
+from dm.core.aggman import keys, collect, count, first, values, join, joinAll, without, interleave, values_
 from dm.flux import append
 from dm.core.conv import to
 from dm.core.text import pad as pad_
@@ -52,7 +52,7 @@ def ppCardSummary(card, player, pad, stats, cfg, cHands):
 def rep1(pad:cluedo_pad, handId:Card) -> display_table:
     cfg = dstruct(nameWidth=17, cellWidth=12, hasWidth=2, noCountWidth=5, suggestCountWidth=3, likeWidth=7)
 
-    handIds = (pad >> values >> first >> keys >> to >> pylist | (N ** Card)[dseq]) >> without >> TBI
+    handIds = (pad >> values_ >> first >> keys >> to >> pylist | (N ** Card)[dseq]) >> without >> TBI
 
     titlesPadding = ' ' * (cfg.nameWidth + cfg.hasWidth + cfg.noCountWidth + cfg.suggestCountWidth + cfg.likeWidth)
     tTitle = [titlesPadding + (
@@ -120,7 +120,7 @@ def ppFnOfCard(fn, sep) -> display_table:
 @coppertop
 def genStats(pad:pydict, handId) -> dstruct:
     stats = dstruct()
-    handIds = pad >> values >> first >> keys
+    handIds = pad >> values_ >> first >> keys
     for c in pad >> keys:
         noCount = 0
         sumMaybeSuggests = 0

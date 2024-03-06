@@ -18,7 +18,7 @@ from dm.pandaframe import pandaframe
 from dm.p9 import P9
 from dm.core.aggman import atCol
 from dm.core.types import matrix, N, num, void, pydict
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from bones.core.sentinels import Void
 from dm.core.conv import to
 

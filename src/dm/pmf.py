@@ -11,117 +11,173 @@
 #
 # **********************************************************************************************************************
 
-import operator, random
-import numpy as np
-import scipy.stats
+# data structures and functions to implement the examples and exercises in Allen Downey's Think Bayes
+#
+# Using https://en.wikipedia.org/wiki/Continuous_or_discrete_variable for inspiration
+# DF is a discrete function x:num->y:num where each x can be mapped to a natural number and has these subtypes
+# L is a likelihood function
+# PMF is a discrete random variable, i.e. a probability mass function
+# CMF is a cumulative mass function
+#
+# DF is implemented as {fn: f64**f64[tvmap], attr:txt**T[tvmap]} where the attr hold attributes such as a name
+#     in C or bones we might use a variable length struct
+
+import operator, random, numpy as np, enum, scipy.stats, collections.abc
 
 from coppertop.pipe import *
-from dm.core.aggman import both, zipAll, values, keys, merge, select, sort
+from bones.core.errors import NotYetImplemented
+from dm.core.aggman import both, zipAll, values, keys, select, sort, kvs, collect, interleave, dropSlots, join
 from dm.core.conv import to
 from dm.core.misc import sequence
-from dm.core.types import T, T1, T2, pylist, index, pytuple, num, dstruct, matrix, obj
-from bones.lang.metatypes import BTAtom
+from dm.core.types import pylist, index, pytuple, num, dstruct, matrix, dmap, py
 from dm.core.structs import tvarray
-from dm.pp import formatStruct, PP
+from dm.pp import PP
 
 
+# **********************************************************************************************************************
+# types and construction
+# **********************************************************************************************************************
 
-# Ideally PMF should be somewhat typeable in bones. This can't work for numerical pmf but can for categorical pmfs
-# and tags. For example:
+def _makeDF(ts, *args, **kwargs):
+    assert len(args) == 1
+    arg = args[0]
+    if isinstance(arg, dict):
+        for k, v in arg.items():
+            assert isinstance(k, (int, float))
+            assert isinstance(v, (int, float))
+        return dstruct(fn_=dmap(arg), **kwargs) | DF
+    elif isinstance(arg, list):
+        for k, v in arg:
+            if not isinstance(k, (int, float)): raise TypeError(f'k must be an int or float but got {k} which is a {type(k)}')
+            if not isinstance(v, (int, float)): raise TypeError(f'v must be an int or float but got {v} which is a {type(v)}')
+        return dstruct(fn_=dmap(arg), **kwargs) | DF
+    elif fitsWithin(typeOf(arg), DF):
+        assert len(kwargs) == 0
+        answer = dstruct(arg) | DF
+        answer.fn_ = dmap(answer.fn_)
+        return answer
+    else:
+        raise NotYetImplemented()
 
-# numkeys = BTAtom('numkeys')
-# structWithNKs = S(T)[dstruct] + (S(T) & numkeys)[dstruct] + numkeys & (num**num)[dmap]
-# PMF = structWithNKs['PMF']
-# L = structWithNKs['L']
-
-# for the moment we won't add typing
-
-numkeys = BTAtom.ensure('numkeys')
-structWithNKs = dstruct & numkeys
-
-PMF = structWithNKs['PMF'].setPP('PMF')
-L = structWithNKs['L'].setPP('L')
-CMF = structWithNKs['CMF'].setPP('CMF')
-
-def _makePmf(*args, **kwargs):
-    answer = dstruct(*args, **kwargs)
-    if answer:
-        _normaliseInPlaceBstruct(answer)
+def _makePmf(ts, *args, **kwargs):
+    answer = _makeDF(ts, *args, **kwargs)
+    if answer: answer = _normaliseInPlace(answer)
     return answer | PMF
 
+def _makeCmf(ts, *args, **kwargs):
+    # OPEN: check 0 < all values <= 1 and last v == 1
+    answer = _makeDF(ts, *args, **kwargs)
+    return answer | CMF
 
-structWithNKs.setConstructor(dstruct)
-PMF.setConstructor(_makePmf)
-L.setConstructor(structWithNKs)
-CMF.setConstructor(structWithNKs)
+DF = dstruct['DF'].setConstructor(_makeDF)
+DF.__doc__ = 'Discrete Function - {fn_: f64**f64[tvmap]} * {...} i.e. a fn and zero or more custom fields'
+DF.__module__ = __name__
 
-formatPmf = formatStruct(_, 'PMF', '.3f', '.3f', ', ')
-formatL = formatStruct(_, 'L', '.3f', '.3f', ', ')
-formatCmf = formatStruct(_, 'CMF', '.3f', '.3f', ', ')
+PMF = DF['PMF'].setPP('PMF').setConstructor(_makePmf)
+PMF.__doc__ = 'PMF - subtype of DF whose fn_ values form a probability measure'
+PMF.__module__ = __name__
+
+L = DF['L'].setPP('L').setConstructor(lambda ts, *args, **kwargs: _makeDF(ts, *args, **kwargs) | L)
+L.__doc__ = 'Likelihood - subtype of DF'
+L.__module__ = __name__
+
+CMF = DF['CMF'].setPP('CMF').setConstructor(_makeCmf)
+CMF.__doc__ = 'CMF - subtype of DF whose fn_ values are a cumulative mass function'
+CMF.__module__ = __name__
+
 
 @coppertop
-def PP(x:L) -> L:
-    return PP(x, formatL)
+def formatDF(df, name, keysFormat, valuesFormat, sep):
+    def formatKv(kv):
+        k, v = kv
+        k = k if isinstance(k, (str, enum.Enum)) else format(k, keysFormat)
+        v = v if isinstance(v, (str, enum.Enum)) else format(v, valuesFormat)
+        return f'{k}: {v}'
+    fnStrs = list(df.fn_ >> kvs) >> collect >> formatKv
+    attributeStrs = list(df >> dropSlots >> ['fn_', 'cmf_'] >> kvs) >> collect >> formatKv
+    return f'{name}({fnStrs >> join >> attributeStrs >> interleave >> sep})'
+
+
+formatPmf = formatDF(_, 'DF', '.3f', '.3f', ', ')
+formatDf = formatDF(_, 'PMF', '.3f', '.3f', ', ')
+formatL = formatDF(_, 'L', '.3f', '.3f', ', ')
+formatCmf = formatDF(_, 'CMF', '.3f', '.3f', ', ')
+
+@coppertop
+def PP(x:DF) -> DF:
+    return PP(x, formatDf)
 
 @coppertop
 def PP(x:PMF):
     return PP(x, formatPmf)
 
 @coppertop
+def PP(x:L) -> L:
+    return PP(x, formatL)
+
+@coppertop
 def PP(x:CMF):
     return PP(x, formatCmf)
 
-
 @coppertop
-def kvs(x: structWithNKs[T]) -> pylist:
-    return list(x._kvs())
+def normalise(df:DF) -> PMF:
+    return _normaliseInPlace(PMF(df)) | PMF
 
-@coppertop
-def values(x: structWithNKs[T]) -> pylist:
-    return list(x._values())
-
-@coppertop
-def keys(x: structWithNKs[T]) -> pylist:
-    return list(x._keys())
-
-
-
-
-@coppertop
-def normalise(swnk:structWithNKs) -> PMF:
-    dup = dstruct(swnk)
-    return _normaliseInPlaceBstruct(dup) | PMF
-
-def _normaliseInPlaceBstruct(swnk):
+def _normaliseInPlace(df):
     # mutable - asssumes non-numeric values are tags and all numeric values are part of swnk
     total = 0
-    for k, v in swnk._kvs():
+    for k, v in df.fn_.items():
         if isinstance(v, (float, int)):
             total += v
     factor = 1.0 / total
-    for k, v in swnk._kvs():
+    for k, v in df.fn_.items():
         if isinstance(v, (float, int)):
-            swnk[k] = v * factor
-    return swnk
+            df.fn_[k] = v * factor
+    return df
 
+@coppertop(style=binary)
+def to(xs:pylist, t:PMF, kde:scipy.stats.kde.gaussian_kde) -> PMF:
+    fn = PMF()
+    fn._kde = kde
+    for x in xs:
+        fn[x] = kde.evaluate(x)[0]
+    return PMF(fn)
+
+@coppertop(style=binary)
+def to(pmf:PMF, t:CMF) -> CMF:
+    answer = DF(pmf) | CMF
+    running = 0.0
+    df = {}
+    for k, v in pmf.fn_.items():
+        running += v
+        df[k] = running
+    answer.fn_ = df
+    answer.cmf_ = np.array(list(df.items()))
+    #answer._cmf[:, 1] = np.cumsum(answer._cmf[:, 1])
+    return answer
+
+
+# **********************************************************************************************************************
+# the useful stuff
+# **********************************************************************************************************************
 
 @coppertop
 def uniform(nOrXs:pylist) -> PMF:
     '''Makes a uniform PMF. xs can be sequence of values or [length]'''
     # if a single int it is a count else there must be many xs
-    answer = PMF()
+    fn = {}
     if len(nOrXs) == 1:
         if isinstance(nOrXs[0], int):
             n = nOrXs[0]
             p = 1.0 / n
             for x in sequence(0, n-1):
-                answer[float(x)] = p
-            return answer
-    p = 1.0 / len(nOrXs)
-    for x in nOrXs:
-        answer[float(x)] = p
-    return answer
-
+                fn[float(x)] = p
+            return PMF(fn)
+    else:
+        p = 1.0 / len(nOrXs)
+        for x in nOrXs:
+            fn[float(x)] = p
+        return PMF(fn)
 
 @coppertop
 def mix(args:pylist) -> PMF:
@@ -129,10 +185,9 @@ def mix(args:pylist) -> PMF:
     t = {}
     for arg in args:
         beta, pmf = arg if isinstance(arg, (tuple, list)) else (1.0, arg)
-        for x, p in pmf._kvs():
+        for x, p in pmf.fn_.items():
             t[x] = t.setdefault(x, 0) + beta * p
     return PMF(t >> sort)
-
 
 @coppertop
 def mean(pmf:PMF) -> num:
@@ -143,50 +198,10 @@ def mean(pmf:PMF) -> num:
     except TypeError:
         fs, ws = list([fs, ws] >> zipAll) >> select >> (lambda fv: not isinstance(fv[0], str)) >> zipAll
         return np.average(fs, weights=ws) >> to >> num
-    # if pmf:
-    #     answer = 0
-    #     for x, p in pmf >> kvs:
-    #         answer += x * p
-    #     return answer
-    # else:
-    #     return np.nan
-
 
 @coppertop
 def gaussian_kde(data) -> scipy.stats.kde.gaussian_kde:
     return scipy.stats.gaussian_kde(data)
-
-
-@coppertop(style=binary)
-def to(xs:pylist, t:PMF, kde:scipy.stats.kde.gaussian_kde) -> PMF:
-    answer = PMF()
-    answer._kde = kde
-    for x in xs:
-        answer[x] = kde.evaluate(x)[0]
-    return _normaliseInPlaceBstruct(answer)
-
-@coppertop
-def toCmf(pmf:PMF) -> CMF:
-    running = 0.0
-    answer = CMF()
-    answer2 = dict()
-    for k, v in pmf._kvs():
-        if isinstance(v, (float, int)):
-            running += v
-            answer[k] = running
-        else:
-            answer2[k] = v
-    cmf = np.array(list(answer._kvs()))
-#    cmf[:, 1] = np.cumsum(cmf[:, 1])
-    answer = answer >> merge >> answer2
-    answer['_cmf'] = cmf
-    return answer
-
-@coppertop(style=binary)
-def merge(a:structWithNKs[T1], b:dstruct&T2, tByT) -> structWithNKs[T1]:
-    answer = dstruct(tByT[T1], a)
-    answer._update(b._kvs())
-    return answer
 
 @coppertop(style=binary)
 def sample(cmf:CMF, n:index) -> matrix[tvarray]:
@@ -203,10 +218,10 @@ def sample(kde:scipy.stats.kde.gaussian_kde, n:index) -> matrix[tvarray]:
     return kde.resample(n).flatten()
 
 @coppertop(style=binary)
-def pmfMul(lhs:structWithNKs[T1], rhs:structWithNKs[T2]) -> structWithNKs:
+def pmfMul(lhs:DF, rhs:DF) -> DF:
     # lhs kvs both {(x.k, x.v*(y.v)} (rhs kvs) normalise <:pmf>
-    return structWithNKs(
-        lhs >> both >> (lambda kLhs, vLhs, kRhs, vRhs: (kLhs, vLhs * vRhs)) >> rhs
+    return DF(
+        lhs.fn_ >> both >> (lambda kLhs, vLhs, kRhs, vRhs: (kLhs, vLhs * vRhs)) >> rhs.fn_
     )
 
 @coppertop(style=binary)
@@ -231,8 +246,8 @@ def rvMax(lhs:PMF, rhs:PMF) -> PMF:
 
 def _rvOp(lhs, rhs, op):
     xps = {}
-    for x1, p1 in lhs._kvs():
-        for x2, p2 in rhs._kvs():
+    for x1, p1 in lhs.fn_.items():
+        for x2, p2 in rhs.fn_.items():
             x = op(x1, x2)
             xps[x] = xps.setdefault(x, 0.0) + p1 * p2
     return PMF(
@@ -242,38 +257,41 @@ def _rvOp(lhs, rhs, op):
         )
     )
 
-
 @coppertop
 def toXsPs(pmf:PMF) -> pytuple:
-    return tuple(zipAll(pmf._kvs()))
+    return tuple(zip(*pmf.fn_.items()))
 
 @coppertop(style=unary)
 def quantile(pmf:PMF, x:num):
     total = 0
-    for k, v in pmf._kvs():
+    for k, v in pmf.fn_.items():
         total += v
         if total >= x:
             return k
 
 @coppertop(style=unary)
 def quantile(cmf:CMF, x:num):
-    for k, v in cmf._kvs():
+    for k, v in cmf.fn_.items():
         if v >= x:
             return k
 
 
+# **********************************************************************************************************************
+# plotting functions
+# **********************************************************************************************************************
+
 @coppertop
-def toSteps(s:PMF+dstruct) -> pytuple:
+def toSteps(s:PMF) -> pytuple:
     return _asSteps(s >> keys, s >> values)
 
 @coppertop
-def toSteps(s:PMF+dstruct, kwargs) -> pytuple:
+def toSteps(s:PMF, kwargs) -> pytuple:
     return _asSteps(s >> keys, s >> values, **kwargs)
 
 def _asSteps(xs:pylist, ys:pylist, align='center', width=None):
     #xMin, xMax = min(xs), max(xs)
     if width is None:
-        width = np.diff(xs).min()
+        width = np.diff(list(xs)).min()
     points = []
     lastx = np.nan
     lasty = np.nan
@@ -294,3 +312,30 @@ def _asSteps(xs:pylist, ys:pylist, align='center', width=None):
     elif align == 'right':
         pxs = np.array(pxs) - width
     return pxs, np.array(pys)
+
+
+# **********************************************************************************************************************
+# aggman functions
+# **********************************************************************************************************************
+
+@coppertop
+def keys(a:DF) -> collections.abc.KeysView:
+    return a.fn_.keys()
+
+@coppertop
+def values(a:DF) -> collections.abc.ValuesView:
+    return a.fn_.values()
+
+@coppertop(style=binary)
+def at(df:DF, k:py):
+    return df.fn_[k]
+
+@coppertop(style=ternary)
+def atOr(df:DF, k:py, default:py):
+    return df.fn_.get(k, default)
+
+# @coppertop(style=binary)
+# def merge(a:DF[T1], b:dstruct&T2, tByT) -> DF[T1]:
+#     answer = dstruct(tByT[T1], a)
+#     answer._update(b.items())
+#     return answer

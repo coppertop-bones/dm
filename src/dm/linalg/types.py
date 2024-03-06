@@ -15,7 +15,7 @@ import numpy as np
 from coppertop.pipe import *
 from bones.lang.metatypes import BTAtom, BTStruct
 from dm.core.types import matrix, N, num, pytuple, dstruct
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 
 
 # NB a 1x1 matrix is assumed to be a scalar, e.g. https://®®en.wikipedia.org/wiki/Dot_product#Algebraic_definition

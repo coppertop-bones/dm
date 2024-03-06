@@ -14,7 +14,7 @@
 import scipy.linalg, numpy as np, numpy.linalg
 
 from coppertop.pipe import *
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.types import matrix, N, num, T
 from dm.linalg.types import orth, right, upper, lower, Cholesky, QR, SVD, left
 import dm.linalg.orient

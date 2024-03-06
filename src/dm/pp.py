@@ -13,12 +13,14 @@
 
 from copy import copy as _copy
 import numpy as np
+from enum import Enum
 
 from collections import namedtuple
 from coppertop.pipe import *
 from dm.core.aggman import collect, interleave
 from bones.core.sentinels import Missing, list_iter
 from dm.core.types import txt, pyfunc, T
+from _ import kvs
 
 __all__ = []
 
@@ -26,11 +28,11 @@ __all__ = []
 @coppertop
 def formatStruct(s, name, keysFormat, valuesFormat, sep):
     def formatKv(kv):
-        k,v = kv
-        k = k if isinstance(k, str) else format(k, keysFormat)
-        v = v if isinstance(v, str) else format(v, valuesFormat)
-        return f'{k}={v}'
-    return f'{name}({list(s._kvs()) >> collect >> formatKv >> interleave >> sep})'
+        k, v = kv
+        k = k if isinstance(k, (str, Enum)) else format(k, keysFormat)
+        v = v if isinstance(v, (str, Enum)) else format(v, valuesFormat)
+        return f'{k}: {v}'
+    return f'{name}({list(s >> kvs) >> collect >> formatKv >> interleave >> sep})'
     # return f'{name}({s >> kvs >> collect >> formatKv >> join >> sep})'
 
 @coppertop(dispatchEvenIfAllTypes=True)
@@ -94,8 +96,10 @@ def JJ(x):
 
 @coppertop(dispatchEvenIfAllTypes=True)
 def HH(x):
-    if hasattr(x, '_doc'):
+    if hasattr(x, '_doc') and x._doc:
         print(x._doc)
+    elif hasattr(x, '_t'):
+        help(x._t)
     else:
         help(x)
     return x
@@ -103,6 +107,13 @@ def HH(x):
 @coppertop(dispatchEvenIfAllTypes=True)
 def TT(x):
     print(typeOf(x))
+    return x
+
+@coppertop(dispatchEvenIfAllTypes=True)
+def TTV(x):
+    '''Verbosely prints the type to stdout'''
+    with context(showFullType=True):
+        print(typeOf(x))
     return x
 
 @coppertop
@@ -115,9 +126,7 @@ def LL(x):
         print(len(x))
     return x
 
-
 Titles = namedtuple('Titles', ['title', 'subTitles'])  # aka heading def
-
 
 @coppertop
 def formatAsTable(listOfRows):

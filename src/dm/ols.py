@@ -14,7 +14,7 @@
 import numpy as np, scipy.stats
 
 from coppertop.pipe import *
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.types import N, num, matrix, pytuple, pydict, dstruct
 from dm.core.aggman import takeRowRemain, hjoin, numRows
 

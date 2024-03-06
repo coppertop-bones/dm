@@ -18,8 +18,8 @@ from dm.core.types import pylist, num
 from dm.examples.cluedo.core import *
 from dm.examples.cluedo.core import HasOne, NS_TO_S
 from dm.examples.cluedo.utils import cardIds
-from dm.core import PP, without, count, collect, inject, minus, sort, zipAll, unpack, nPartitions, join, sum, \
-    allPartitionsInto
+from dm.core import without, count, collect, inject, minus, sort, zipAll, unpack, nPartitions, join, sum, allPartitionsInto
+from dm.pp import PP
 
 
 

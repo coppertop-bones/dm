@@ -11,7 +11,7 @@
 import numpy as np
 from coppertop.pipe import *
 from dm.testing import check, equals
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.types import bool, matrix
 from dm.ols import ols, tStats
 

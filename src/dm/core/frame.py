@@ -21,7 +21,7 @@ from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing, function
 from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist, pytuple, pydict_keys, pydict_values, matrix, \
     offset, pyfunc
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.aggman import count
 
 

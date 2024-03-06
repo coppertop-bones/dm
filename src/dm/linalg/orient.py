@@ -22,7 +22,7 @@ import numpy as np
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.core.types import num, count, offset, matrix, N
 from dm.core.aggman import toDiag
 

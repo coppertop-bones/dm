@@ -16,7 +16,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 # manipulation of these aggregation classes:
-# txt, sym, dtup, dstruct, dseq, dmap, pylist, pydict, pytup, pyset, dframe, nd, (N**num)&tvarray, matrix&tvarray
+# txt, sym, dtup, dstruct, dseq, dmap, dframe, pylist, pydict, pytup, pyset, nd, (N**num)&tvarray, matrix&tvarray
 #
 #
 # NOTES
@@ -26,7 +26,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 
-import builtins, numpy as np
+import builtins, numpy as np, collections.abc
 
 from coppertop.pipe import *
 from bones import jones
@@ -38,7 +38,7 @@ from bones.core.sentinels import Void
 
 from dm.core.types import pylist, pydict, pytuple, pydict_keys, pydict_items, pydict_values, pyfunc, pyset, \
     T1, T2, T3, T4, T5, T6, txt, t, index, offset, N, dstruct, dtup, dseq, void, dmap, dframe, matrix, num, py
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 
 
 dict_keys = type({}.keys())
@@ -95,10 +95,6 @@ def appendTo(x, xs:dseq&(N**T1)) -> dseq&(N**T1):
 # at - if the selector is N** then this means a depth access - use atAll for breadth
 # **********************************************************************************************************************
 
-# @coppertop(style=binary)
-# def at(xs, selector):
-#     return xs[selector]
-
 @coppertop(style=binary)
 def at(xs:dseq+pylist+pytuple, o:offset) -> py:
     return xs[o]
@@ -108,7 +104,7 @@ def at(xs:dseq+pylist+pytuple, i:index):
     return xs[i - 1]
 
 @coppertop(style=binary)
-def at(s:dstruct+pydict+dmap, k:txt):
+def at(s:pydict+dmap, k:txt):
     return s[k]
 
 @coppertop(style=binary)
@@ -116,7 +112,7 @@ def at(s:py, k:txt):
     return s[k]
 
 @coppertop(style=binary)
-def at(s:dstruct+pydict+dmap, ks:pylist):
+def at(s:pydict+dmap, ks:pylist):
     for k in ks:
         s = s[k]
     return s
@@ -356,6 +352,26 @@ def atSlicesPut(m, ss, y):
 
 
 # **********************************************************************************************************************
+# atSlot
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def atSlot(s: dstruct, k: txt):
+    return s[k]
+
+
+# **********************************************************************************************************************
+# atSlotPut
+# **********************************************************************************************************************
+
+@coppertop(style=ternary)
+def atSlotPut(s:dstruct, name:txt, value) -> dstruct:
+    s = dstruct(s)
+    s[name] = value
+    return s
+
+
+# **********************************************************************************************************************
 # both
 # **********************************************************************************************************************
 
@@ -367,6 +383,13 @@ def both(a:pylist+pydict_items, f:pyfunc, b:pylist+pydict_items) -> pylist:
 def both(a:pydict, f:pyfunc, b:pydict) -> pylist:
     answer = []
     for (ak, av), (bk, bv) in zip((a.items(), b.items())):
+        answer.append(f(ak, av, bk, bv))
+    return answer
+
+@coppertop(style=ternary)
+def both(a:dmap, f:pyfunc, b:dmap) -> pylist:
+    answer = []
+    for (ak, av), (bk, bv) in zip(a.items(), b.items()):
         answer.append(f(ak, av, bk, bv))
     return answer
 
@@ -692,12 +715,6 @@ def drop(s:dmap, name:txt) -> dmap:
     return answer
 
 @coppertop(style=binary)
-def drop(s:dstruct, name:txt) -> dstruct:
-    answer = dstruct(s)
-    del answer[name]
-    return answer
-
-@coppertop(style=binary)
 def drop(f:dframe, k:txt) -> dframe:
     return dframe({k_:f[k_] for k_ in f >> keys >> drop >> k})
 
@@ -806,6 +823,29 @@ def dropRows(m:matrix&tvarray, n:t.count):
 
 
 # **********************************************************************************************************************
+# dropSlot
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def dropSlot(s:dstruct, name:txt) -> dstruct:
+    answer = dstruct(s)
+    answer._pop(name, None)
+    return answer
+
+
+# **********************************************************************************************************************
+# dropSlots
+# **********************************************************************************************************************
+
+@coppertop(style=binary)
+def dropSlots(s:dstruct, names:pylist) -> dstruct:
+    answer = dstruct(s)
+    for name in names:
+        answer._pop(name, None)
+    return answer
+
+
+# **********************************************************************************************************************
 # eachCol_
 # TODO use sequence instead
 # **********************************************************************************************************************
@@ -851,7 +891,7 @@ def first(x:pylist+pytuple):
     return x[0]
 
 @coppertop
-def first(xs:pydict_values+pydict_keys):
+def first(xs:pydict_values+pydict_keys+pydict_items):
     # https://stackoverflow.com/questions/30362391/how-do-you-find-the-first-key-in-a-dictionary
     for x in xs:
         return x
@@ -1075,6 +1115,14 @@ def keys(d:pydict) -> pylist:     # (T1**T2)&map -> (N**T1)&pylist
     return list(d.keys())
 
 @coppertop
+def keys(m:dmap) -> pylist:
+    return list(m.keys())
+
+@coppertop
+def keys(x: dmap[T1]) -> pylist:
+    return list(x.keys())
+
+@coppertop
 def keys(x:(T1**T2)[dmap][T3]) -> (N**T1)[pylist]:
     return tv(
         (N**x._t.parent.parent.indexType)[pylist],
@@ -1082,15 +1130,11 @@ def keys(x:(T1**T2)[dmap][T3]) -> (N**T1)[pylist]:
     )
 
 @coppertop
-def keys(m:dmap) -> pylist:
-    return list(m.keys())
-
-@coppertop
 def keys(f:dframe) -> pylist:
     return list(f._keys())
 
 @coppertop
-def keys(s:(dstruct & T1)+dstruct) -> list: #(N**txt)[pydict_keys]: needs a tvdict_keys!!!
+def keys(s:(dstruct & T1)+dstruct) -> list: #(N**txt)[pydict_keys]: needs a tvmap_keys!!!
     return list(s._keys())
 
 
@@ -1112,19 +1156,27 @@ def keys_(s:dmap) -> pydict_keys:
 # **********************************************************************************************************************
 
 @coppertop
-def kvs(x:dmap) -> pydict_items:
-    return x._kvs()
+def kvs(x:dmap) -> collections.abc.ItemsView:
+    return x.items()
 
 @coppertop
-def kvs(x:dmap) -> pydict_items:
-    return x._kvs()
+def kvs(x:dmap[T1], tByT) -> collections.abc.ItemsView:
+    return x.items()
 
 @coppertop
-def kvs(x:(T1**T2)[dstruct][T3]) -> pydict_items:
+def kvs(x:dstruct) -> pydict_items:
     return x._v._kvs()
 
 @coppertop
-def kvs(x:(T1**T2)[dstruct][T3]) -> pydict_items:
+def kvs(x:dstruct[T1], tByT) -> pydict_items:
+    return x._v._kvs()
+
+@coppertop
+def kvs(x:(T1**T2)[dstruct][T3], tByT) -> pydict_items:
+    return x._v._kvs()
+
+@coppertop
+def kvs(x:(T1**T2)[dstruct]) -> pydict_items:
     return x._v._kvs()
 
 @coppertop
@@ -1894,7 +1946,7 @@ def values(x:dmap) -> pytuple:
     return tuple(x._values())
 
 @coppertop
-def values_(x:dmap) -> pydict_values:
+def values_(x:dmap[T1]) -> pydict_values:
     return x._values()
 
 @coppertop
@@ -1959,5 +2011,5 @@ def XXT(x:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def zipAll(x:pylist+pytuple+pydict_keys+pydict_values+pydict_items):
+def zipAll(x:pylist+pytuple+pydict_keys+pydict_values+pydict_items+py):
     return builtins.zip(*x)

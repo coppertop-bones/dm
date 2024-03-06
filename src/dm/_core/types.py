@@ -23,7 +23,7 @@ from bones.core.sentinels import Missing
 from bones.lang.metatypes import BTAtom, BType, weaken
 from bones.lang.types import *
 import bones.lang.types
-from dm._core.structs import tvtuple, tvstruct, tvarray, tvlist, tvdict
+from dm._core.structs import tvtuple, tvstruct, tvarray, tvseq, tvmap
 from bones.lang.utils import Constructors
 
 
@@ -401,13 +401,13 @@ map = BTAtom.define('map')
 
 dtup = tup[tvarray].nameAs('dtup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
 dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogonal(obj)
-dseq = seq[tvlist].nameAs('dseq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
-dmap = map[tvdict].nameAs('dmap').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
+dseq = seq[tvseq].nameAs('dseq').setConstructor(tvseq).setOrthogonal(obj)                 # & N**T
+dmap = map[tvmap].nameAs('dmap').setConstructor(tvmap).setOrthogonal(obj)                 # & T1**T2
 dframe = frame[tvstruct].nameAs('dframe').setConstructor(createDFrame).setOrthogonal(obj)       # & N**BTStruct(...)
 # dm.tup = tup[tvarray].nameAs('dm.tup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
 # dm.adhoc = struct[tvstruct].nameAs('dm.adhoc').setConstructor(tvstruct).setOrthogonal(obj)
-# dm.seq = seq[tvlist].nameAs('dm.seq').setConstructor(tvlist).setOrthogonal(obj)                 # & N**T
-# dm.map = map[tvdict].nameAs('dm.map').setConstructor(tvdict).setOrthogonal(obj)                 # & T1**T2
+# dm.seq = seq[tvseq].nameAs('dm.seq').setConstructor(tvseq).setOrthogonal(obj)                 # & N**T
+# dm.map = map[tvmap].nameAs('dm.map').setConstructor(tvmap).setOrthogonal(obj)                 # & T1**T2
 # dm.frame = frame[tvstruct].nameAs('dm.frame').setConstructor(createDFrame).setOrthogonal(obj)       # & N**BTStruct(...)
 
 

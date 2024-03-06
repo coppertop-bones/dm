@@ -12,7 +12,7 @@ from coppertop.pipe import *
 from dm.core import to, shape
 from bones.core.utils import assertRaises
 from dm.core.types import matrix
-from dm._core.structs import tvarray
+from dm.core.structs import tvarray
 from dm.testing import check, equals
 from dm.core.conv import to
 from dm.pp import PP
