@@ -17,7 +17,9 @@ import bones.lang.ctx
 from bones.lang.infer import InferenceLogger
 
 from bones.lang.tests._utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, _newKernel
-
+from dm.testing import check
+from dm.core import startsWith, drop
+# from dm.core import equals
 
 import dm.pp, dm.testing
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
@@ -32,11 +34,11 @@ def test_partition(**ctx):
 
     src = r'''
         load dm.core, dm.testing
-        from dm.core import sum, count, isEmpty, ifTrue:, first, collect, joinAll, prependTo, to, takeDrop, join
-        from dm.testing import check, equals
+        from dm.core import sum, count, isEmpty, ifTrue:, first, collect, joinAll, prependTo, to, takeDrop, join, ==
+        from dm.testing import check
         
         partitions: {{[xs, sizes]
-            sizes sum check equals (xs count)
+            sizes sum check == (xs count)
             xs _partitions(, xs count, sizes)
         }}
         

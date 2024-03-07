@@ -11,6 +11,21 @@
 #
 # **********************************************************************************************************************
 
+# this first set of imports makes PuCharm happy
+# from dm.core.aggman import *
+# from dm.core.comparisons import *
+# from dm.core.contextual_scope import *
+# from dm.core.conv import *
+# from dm.core.datetime import *
+# from dm.core.frame import *
+# from dm.core.lang import *
+# from dm.core.maths import *
+# from dm.core.misc import *
+# from dm.core.stats import *
+# from dm.core.text import *
+# from dm.core.types import *
+
+# redo so we have the correct overloads
 from _.dm.core.aggman import *
 from _.dm.core.comparisons import *
 from _.dm.core.contextual_scope import *
