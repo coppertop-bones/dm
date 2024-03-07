@@ -20,12 +20,10 @@ from bones.lang.tests._utils import dropFirstNL, pace, evalPyInComments, errorMs
 
 
 import dm.pp, dm.testing
-from dm.core import PP, check, equals, startsWith, underride, withCtx, raises, drop
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
-
+from _ import *
 
 bones.lang.ctx.PYCHARM = True
-
 
 
 
@@ -34,7 +32,8 @@ def test_partition(**ctx):
 
     src = r'''
         load dm.core, dm.testing
-        from dm.core import check, equals, sum
+        from dm.core import sum, count, isEmpty, ifTrue:, first, collect, joinAll, prependTo, to, takeDrop, join
+        from dm.testing import check, equals
         
         partitions: {{[xs, sizes]
             sizes sum check equals (xs count)
@@ -43,8 +42,8 @@ def test_partition(**ctx):
         
         _partitions: {[xs, n, sizes]
             sizes isEmpty ifTrue: [^ (())]
-            xs _combRest(, n, sizes first) each {[a, b]
-                _partitions(b, .n - (.sizes first), .sizes drop 1) each {
+            xs _combRest(, n, sizes first) collect {[a, b]
+                _partitions(b, .n - (.sizes first), .sizes drop 1) collect {
                     .a prependTo r
                 }
             } joinAll
@@ -54,9 +53,9 @@ def test_partition(**ctx):
             m == 0 ifTrue: [^ ( ((), xs) ) to <:N**T1>]
             m == n ifTrue: [^ ( (xs, ()) ) to <:N**T1>]
             (s1, s2): xs takeDrop 1
-            _combRest(s2, s2 count, m - 1) each { (.s1 join a, b) }    // #1
+            _combRest(s2, s2 count, m - 1) collect { (.s1 join a, b) }    // #1
               join
-              _combRest(s2, s2 count, m) each { (a, .s1 join b) }      // #2
+              _combRest(s2, s2 count, m) collect { (a, .s1 join b) }      // #2
         }
     ''' >> dropFirstNL
 

@@ -17,12 +17,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from bones import jones
 from coppertop.pipe import *
-from dm.core.types import bool, matrix, pytuple
-from dm.core.structs import tvarray
-from dm.core.maths import EPS
-from bones.core.errors import NotYetImplemented
+from dm.core.types import pytuple
 from bones.core.sentinels import function
-
+from dm.core.comparisons import *
 
 # OPEN: allow nullary >> unary etc
 
@@ -98,65 +95,5 @@ def raises(fn0, exceptionType) -> pytuple:
 def same(a, fn1, b) -> pytuple:
     actual, expected = fn1(a), fn1(b)
     return actual, actual == expected, repr(actual), repr(expected)
-
-
-# **********************************************************************************************************************
-# some binary comparison fns
-# **********************************************************************************************************************
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def doesNotFitWithin(a, b) -> bool:
-    return not fitsWithin(a, b)
-
-@coppertop(style=binary)
-def closeTo(a, b) -> bool:
-    return closeTo(a, b, EPS)
-
-@coppertop(style=binary)
-def closeTo(a, b, tol) -> bool:
-    if abs(a) < tol:
-        return abs(b) < tol
-    else:
-        return abs(a - b) / abs(a) < tol
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def startsWith(a, b) -> bool:
-    return a.startswith(b)
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def endsWith(a, b) -> bool:
-    return a.endswith(b)
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equals(a, b) -> bool:
-    return a == b
-
-@coppertop(style=binary)
-def gt(a, b) -> bool:
-    return a > b
-
-@coppertop(style=binary)
-def ge(a, b) -> bool:
-    return a >= b
-
-@coppertop(style=binary)
-def lt(a, b) -> bool:
-    return a < b
-
-@coppertop(style=binary)
-def le(a, b) -> bool:
-    return a <= b
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
-    return bool((a == b).all())
-
-@coppertop(style=binary)
-def different(a, b) -> bool:
-    return a != b
-
-@coppertop(style=binary)
-def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
-    return bool((a != b).any())
 
 

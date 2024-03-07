@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2017-2021 David Briant. All rights reserved.
+#                             Copyright (c) 2020-2024 David Briant. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
 # with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -11,18 +11,12 @@
 #
 # **********************************************************************************************************************
 
-from _.dm.core.aggman import *
-from _.dm.core.comparisons import *
-from _.dm.core.contextual_scope import *
-from _.dm.core.conv import *
-from _.dm.core.datetime import *
-from _.dm.core.frame import *
-from _.dm.core.lang import *
-from _.dm.core.maths import *
-from _.dm.core.misc import *
-from _.dm.core.stats import *
-from _.dm.core.text import *
-from _.dm.core.types import *
+import sys
+if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import dm
-dm.__version__ = "2023.03.21"
+from coppertop.pipe import *
+from dm.core.types import bool
+
+@coppertop(name='ifTrue:')
+def ifTrue(res, block) -> bool:
+    if res: block()

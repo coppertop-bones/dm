@@ -1809,21 +1809,11 @@ def takeDiag(m: matrix & tvarray) -> array_:
 
 
 # **********************************************************************************************************************
-# takePanel
-# **********************************************************************************************************************
-
-@coppertop
-def takePanel(f:dframe) -> matrix&tvarray:
-    return (matrix&tvarray)(np.hstack(f >> values))
-
-
-# **********************************************************************************************************************
-# takeRemain
-# A takeRemain 1
+# takeDrop
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeRemain(f:dframe, n:t.count):
+def takeDrop(f:dframe, n:t.count):
     t, r = dframe(), dframe()
     for k, v in f._kvs():
         t[k] = v[:n]
@@ -1832,11 +1822,11 @@ def takeRemain(f:dframe, n:t.count):
 
 
 # **********************************************************************************************************************
-# takeRemainUsing
+# takeDropUsing
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeRemainUsing(xs:pytuple, f1):
+def takeDropUsing(xs:pytuple, f1):
     selected = []
     rejected = []
     for x in xs:
@@ -1845,6 +1835,15 @@ def takeRemainUsing(xs:pytuple, f1):
         else:
             rejected.append(x)
     return tuple(selected), tuple(rejected)
+
+
+# **********************************************************************************************************************
+# takePanel
+# **********************************************************************************************************************
+
+@coppertop
+def takePanel(f:dframe) -> matrix&tvarray:
+    return (matrix&tvarray)(np.hstack(f >> values))
 
 
 # **********************************************************************************************************************

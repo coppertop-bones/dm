@@ -20,33 +20,10 @@ from bones.core.sentinels import Missing
 from dm.core.types import pylist, pytuple, pydict, txt, index, bool
 
 
-@coppertop
-def pad(s:txt, options:pydict):
-    left = options.get('left', Missing)
-    right = options.get('right', Missing)
-    center = options.get('center', Missing)
-    pad = options.get('pad', ' ')
-    if right is not Missing:
-        return s.rjust(right, pad)
-    if center is not Missing:
-        return s.center(center, pad)
-    return s.ljust(left, pad)
-
-@coppertop
-def strip(s):
-    return s.strip()
-
-@coppertop
-def strip(s, chars):
-    return s.strip(chars)
 
 @coppertop(style=binary)
-def splitOn(s, sep):
-    return s.split(sep)
-
-@coppertop(style=binary)
-def splitOn(s, sep, maxsplit):
-    return s.split(sep, maxsplit)
+def endsWith(s1:txt, s2:txt) -> bool:
+    return s1.endswith(s2)
 
 # see https://realpython.com/python-formatted-output/ and https://www.python.org/dev/peps/pep-3101/
 @coppertop
@@ -65,15 +42,39 @@ def format(args:pylist+pytuple, f:txt, kwargs:pydict) -> txt:
 def format(kwargs:pydict, f:txt) -> txt:
     return f.format(**kwargs)
 
+@coppertop
+def pad(s:txt, options:pydict):
+    left = options.get('left', Missing)
+    right = options.get('right', Missing)
+    center = options.get('center', Missing)
+    pad = options.get('pad', ' ')
+    if right is not Missing:
+        return s.rjust(right, pad)
+    if center is not Missing:
+        return s.center(center, pad)
+    return s.ljust(left, pad)
+
 @coppertop(style=ternary)
 def replace(haystack:txt, needle:txt, alt:txt) -> txt:
     return haystack.replace(needle, alt)
 
 @coppertop(style=binary)
-def endsWith(s1:txt, s2:txt) -> bool:
-    return s1.endswith(s2)
+def splitOn(s, sep):
+    return s.split(sep)
+
+@coppertop(style=binary)
+def splitOn(s, sep, maxsplit):
+    return s.split(sep, maxsplit)
 
 @coppertop(style=binary)
 def startsWith(s1:txt, s2:txt) -> bool:
     return s1.startswith(s2)
+
+@coppertop
+def strip(s):
+    return s.strip()
+
+@coppertop
+def strip(s, chars):
+    return s.strip(chars)
 
