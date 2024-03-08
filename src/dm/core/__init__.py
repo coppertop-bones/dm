@@ -18,7 +18,6 @@
 # from dm.core.conv import *
 # from dm.core.datetime import *
 # from dm.core.frame import *
-# from dm.core.lang import *
 # from dm.core.maths import *
 # from dm.core.misc import *
 # from dm.core.stats import *
@@ -32,7 +31,6 @@ from _.dm.core.contextual_scope import *
 from _.dm.core.conv import *
 from _.dm.core.datetime import *
 from _.dm.core.frame import *
-from _.dm.core.lang import *
 from _.dm.core.maths import *
 from _.dm.core.misc import *
 from _.dm.core.stats import *

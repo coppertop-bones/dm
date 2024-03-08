@@ -15,11 +15,12 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import enum
 
 from coppertop.pipe import *
-from dm.testing import check, equals, closeTo
+from dm.testing import check
 from dm.core import sequence, collect, inject
+from dm.core.comparisons import equals
 from dm.core.types import dstruct
 from dm.pmf import uniform, rvAdd, mix, toXsPs, PMF, pmfMul, normalise, L, formatPmf, CMF, quantile
-from _ import SS, PP, at, atSlot, atSlotPut, to
+from _ import SS, PP, at, atSlot, atSlotPut, to, closeTo
 
 
 class E(enum.IntEnum):
@@ -48,6 +49,7 @@ def test_pmf():
     d4 = sequence(1, 4) >> uniform
     d6 = sequence(1, 6) >> uniform
     rv = d4 >> rvAdd >> d4
+
     rv >> at >> 2 >> check >> equals >> 1/16
 
     d4d6 = [d4, d6] >> mix

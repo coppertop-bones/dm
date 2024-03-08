@@ -11,61 +11,56 @@
 #
 # **********************************************************************************************************************
 
+# functions the dm.core is providing for bones to use
+
+
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
-from dm.core.types import bool, matrix
-from dm.core.structs import tvarray
-from dm.core.maths import EPS
+from dm.core.types import bool
 
-@coppertop(style=binary)
-def closeTo(a, b) -> bool:
-    return closeTo(a, b, EPS)
+# @coppertop(bname='ifFalse:')
+# def _ifFalse(res, block) -> bool:
+#     if not res: block()
 
-@coppertop(style=binary)
-def closeTo(a, b, tol) -> bool:
-    if abs(a) < tol:
-        return abs(b) < tol
-    else:
-        return abs(a - b) / abs(a) < tol
+# @coppertop(bname='ifTrue:')
+# def _ifTrue(res, block) -> bool:
+#     if res: block()
 
-@coppertop(style=binary)
+# @coppertop(bname='ifTrue:')
+# def _ifTrueifFalse(res, trueBlock, falseBlock) -> bool:
+#     if res: trueBlock()
+#     else: falseBlock()
+
+@coppertop(style=binary, bname='!=')
 def different(a, b) -> bool:
     return a != b
 
-@coppertop(style=binary)
+@coppertop(style=binary, bname='!=')
 def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
     return bool((a != b).any())
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def doesNotFitWithin(a, b) -> bool:
-    return not fitsWithin(a, b)
-
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+@coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
 def equals(a, b) -> bool:
     return a == b
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True)
+@coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
 def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
     return bool((a == b).all())
 
-@coppertop(style=binary)
+@coppertop(style=binary, bname='>=')
 def ge(a, b) -> bool:
     return a >= b
 
-@coppertop(style=binary)
+@coppertop(style=binary, bname='>')
 def gt(a, b) -> bool:
     return a > b
 
-@coppertop
-def isEmpty(x) -> bool:
-    return len(x) == 0
-
-@coppertop(style=binary)
+@coppertop(style=binary, bname='<')
 def le(a, b) -> bool:
     return a <= b
 
-@coppertop(style=binary)
+@coppertop(style=binary, bname='<=')
 def lt(a, b) -> bool:
     return a < b

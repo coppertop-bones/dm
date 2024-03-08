@@ -147,7 +147,9 @@ def _materialise(r):
             r.popFront()
     return answer
 
-materialise = coppertop(name='materialise')(_materialise)
+@coppertop
+def materialise(r):
+    return _materialise(r)
 
 
 # **********************************************************************************************************************

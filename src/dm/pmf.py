@@ -38,35 +38,36 @@ from dm.pp import PP
 # types and construction
 # **********************************************************************************************************************
 
-def _makeDF(ts, *args, **kwargs):
+def _makeDF(cs, *args, **kwargs):
     assert len(args) == 1
     arg = args[0]
     if isinstance(arg, dict):
         for k, v in arg.items():
             assert isinstance(k, (int, float))
             assert isinstance(v, (int, float))
-        return dstruct(fn_=dmap(arg), **kwargs) | DF
+        return dstruct(cs, fn_=dmap(arg), **kwargs)
     elif isinstance(arg, list):
         for k, v in arg:
             if not isinstance(k, (int, float)): raise TypeError(f'k must be an int or float but got {k} which is a {type(k)}')
             if not isinstance(v, (int, float)): raise TypeError(f'v must be an int or float but got {v} which is a {type(v)}')
-        return dstruct(fn_=dmap(arg), **kwargs) | DF
+        return dstruct(cs, fn_=dmap(arg), **kwargs)
     elif fitsWithin(typeOf(arg), DF):
         assert len(kwargs) == 0
-        answer = dstruct(arg) | DF
+        answer = dstruct(cs, arg)
         answer.fn_ = dmap(answer.fn_)
         return answer
     else:
         raise NotYetImplemented()
 
-def _makePmf(ts, *args, **kwargs):
-    answer = _makeDF(ts, *args, **kwargs)
+def _makePmf(cs, *args, **kwargs):
+    answer = _makeDF(cs, *args, **kwargs)
     if answer: answer = _normaliseInPlace(answer)
-    return answer | PMF
+    return answer
 
-def _makeCmf(ts, *args, **kwargs):
+def _makeCmf(cs, *args, **kwargs):
     # OPEN: check 0 < all values <= 1 and last v == 1
-    answer = _makeDF(ts, *args, **kwargs)
+
+    answer = _makeDF(cs, *args, **kwargs)
     return answer | CMF
 
 DF = dstruct['DF'].setConstructor(_makeDF)
@@ -77,7 +78,7 @@ PMF = DF['PMF'].setPP('PMF').setConstructor(_makePmf)
 PMF.__doc__ = 'PMF - subtype of DF whose fn_ values form a probability measure'
 PMF.__module__ = __name__
 
-L = DF['L'].setPP('L').setConstructor(lambda ts, *args, **kwargs: _makeDF(ts, *args, **kwargs) | L)
+L = DF['L'].setPP('L').setConstructor(lambda cs, *args, **kwargs: _makeDF(cs, *args, **kwargs) | L)
 L.__doc__ = 'Likelihood - subtype of DF'
 L.__module__ = __name__
 

@@ -44,10 +44,13 @@ def getAttr(x, name):
 def compose(x, fs):
     return fs >> inject(_, x, _) >> (lambda x, f: f(x))
 
-def _not_(b):
+@coppertop
+def not_(b):
     return False if b else True
-Not = coppertop(name='Not')(_not_)
-not_ = coppertop(name='not_')(_not_)
+
+@coppertop
+def Not(b):
+    return False if b else True
 
 repr = coppertop(dispatchEvenIfAllTypes=True)(builtins.repr)
 

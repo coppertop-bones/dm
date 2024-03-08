@@ -61,8 +61,8 @@ def mul(dom:tvccy[T2], fx:fxT1T2, tByT) -> tvccy[T1]:
 
 
 def testFx():
-    cacheId1, fits1, tByT1, distance1 = fitsWithin_(GBP, tvccy[T1])
-    cacheId2, fits2, tByT2, distance2 = fitsWithin_(GBPUSD, fxT1T2)
+    cacheId1, fits1, tByT1, distance1 = fullFitsWithin(GBP, tvccy[T1])
+    cacheId2, fits2, tByT2, distance2 = fullFitsWithin(GBPUSD, fxT1T2)
 
     (100|GBP) >> mul >> (1.3|GBPUSD) >> addccy >> (20|USD) >> check >> equals >> (150|USD)
     (130|USD) >> mul >> (1.3|GBPUSD) >> check >> equals >> (100|GBP)

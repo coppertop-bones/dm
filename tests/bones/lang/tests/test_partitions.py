@@ -33,7 +33,7 @@ def test_partition(**ctx):
     k = _newKernel()
 
     src = r'''
-        load dm.core, dm.testing
+        load dm.core, dm.testing, dm.core.bones
         from dm.core import sum, count, isEmpty, ifTrue:, first, collect, joinAll, prependTo, to, takeDrop, join, ==
         from dm.testing import check
         
