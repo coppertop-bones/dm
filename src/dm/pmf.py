@@ -12,6 +12,7 @@
 # **********************************************************************************************************************
 
 # data structures and functions to implement the examples and exercises in Allen Downey's Think Bayes
+# See also https://zenodo.org/record/1432246/files/article.pdf
 #
 # Using https://en.wikipedia.org/wiki/Continuous_or_discrete_variable for inspiration
 # DF is a discrete function x:num->y:num where each x can be mapped to a natural number and has these subtypes
