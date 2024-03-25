@@ -11,7 +11,7 @@
 from glob import glob
 import os.path
 from bones.lang import lex
-from .core import group, PP
+from ..utils import group, PP, newKernel, _
 
 
 def test_canon():
@@ -26,7 +26,7 @@ def test_canon():
         else:
             f'{ppPfn}' >> PP
             with open(os.path.join(home, pfn)) as f:
-                    f.read() >> group
+                f.read() >> group(_, newKernel())
 
 def main():
     test_canon()

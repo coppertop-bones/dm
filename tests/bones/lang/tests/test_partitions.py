@@ -33,12 +33,13 @@ def test_partition(**ctx):
     k = _newKernel()
 
     src = r'''
-        load dm.core, dm.testing, dm.core.bones
-        from dm.core import sum, count, isEmpty, ifTrue:, first, collect, joinAll, prependTo, to, takeDrop, join, ==
+        load dm.core, dm.testing, dm.core.bones2
+        from dm.core import sum, count, isEmpty, first, collect, joinAll, prependTo, to, takeDrop, join, equals
+        from dm.core.bones2 import ifTrue
         from dm.testing import check
         
         partitions: {{[xs, sizes]
-            sizes sum check == (xs count)
+            sizes sum check equals (xs count)
             xs _partitions(, xs count, sizes)
         }}
         

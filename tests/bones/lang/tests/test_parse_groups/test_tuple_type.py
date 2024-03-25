@@ -8,7 +8,8 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-from .core import *
+from ..utils import group_ as oldgroup_, group as oldgroup, _
+from ..utils import *
 
 
 @coppertop
@@ -17,6 +18,10 @@ def getTupleType(x):
 
 
 def test():
+    k = newKernel()
+    group = oldgroup(_, k)
+    group_ = oldgroup_(_, k)
+
     context.testcase = 'null tuple'
     '()' >> group >> check >> getTupleType >> equals >> TUPLE_NULL \
         >> check >> bb >> equals >> '()'

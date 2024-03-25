@@ -13,7 +13,7 @@ from bones.lang.tests.test_parse_groups import test_load
 from bones.lang.tests.test_parse_groups import test_misc
 from bones.lang.tests.test_parse_groups import test_tuple_type
 
-from .core import *
+from ..utils import *
 
 
 def main():

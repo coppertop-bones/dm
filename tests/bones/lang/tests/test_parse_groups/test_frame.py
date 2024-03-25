@@ -8,21 +8,15 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-from .core import *
-
-
-@coppertop(style=binary)
-def forcase(any, testcase):
-    context.testcase = testcase
-    return any
-
-@coppertop
-def setcase(testcase):
-    context.testcase = testcase
-    return None
+from ..utils import group_ as oldgroup_, group as oldgroup, _
+from ..utils import *
 
 
 def test():
+    k = newKernel()
+    group = oldgroup(_, k)
+    group_ = oldgroup_(_, k)
+
     '''
         ([]
             s0: (0.95;0.2) <:probs>                 // missing comma
