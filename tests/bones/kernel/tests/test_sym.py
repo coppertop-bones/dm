@@ -8,11 +8,11 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-from bones.kernel.sym import SymTable
+from bones.kernel.sym import SymManager
 
 
 def test():
-    symbols = SymTable()
+    symbols = SymManager()
     a = symbols.Sym("sally")
     b = symbols.Sym("joe")
     c = symbols.Sym("fred")

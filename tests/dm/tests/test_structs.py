@@ -12,7 +12,7 @@ from dm.core.misc import _v, box
 from dm.core.conv import to
 from dm.pp import PP
 
-from dm.core.types import N, num, index, txt, litint, pydict, pylist, dtup, dstruct, dseq, dmap, dframe, T1
+from dm.core.types import N, num, index, txt, litint, pydict, pylist, dtup, dstruct, dseq, dmap, dframe, T1, littxt
 # def to(xs:N**T, t:N**(T)) -> N**(T):
 
 
@@ -21,7 +21,7 @@ def test_dtup():
     # inferred type one level and 1D only
     # dtup() >> typeOf >> check >> equals >> null
 
-    dtup((1,2,"hello"))
+    dtup((1,2,"hello")) >> typeOf >> check >> equals >> litint*litint*littxt
 
     # with assertRaises(NotYetImplemented):
     #     # inferring type of more than 2d is ambiguous - should a nested list be a subarray or a pylist?
@@ -138,7 +138,7 @@ def test_nd_():
 
 
 def main():
-    test_dtup()
+    # test_dtup()
     test_dstruct()
     test_dseq()
     test_dmap()

@@ -12,11 +12,11 @@
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
-from bones.lang.ctx import Ctx
-import bones.lang.ctx
+from bones.lang.symbol_table import SymTab
+import bones.lang.symbol_table
 from bones.lang.infer import InferenceLogger
 
-from bones.lang.tests._utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, _newKernel
+from bones.lang.tests.utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, newKernel
 from dm.testing import check
 from dm.core import startsWith, drop
 # from dm.core import equals
@@ -25,17 +25,17 @@ import dm.pp, dm.testing
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
 from _ import *
 
-bones.lang.ctx.PYCHARM = True
+bones.lang.symbol_table.PYCHARM = True
 
 
 
 def test_partition(**ctx):
-    k = _newKernel()
+    k = newKernel()
 
     src = r'''
         load dm.core, dm.testing, dm.core.bones2
         from dm.core import sum, count, isEmpty, first, collect, joinAll, prependTo, to, takeDrop, join, equals
-        from dm.core.bones2 import ifTrue
+        from dm.core.bones2 import ifTrue:
         from dm.testing import check
         
         partitions: {{[xs, sizes]
