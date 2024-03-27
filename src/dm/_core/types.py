@@ -23,7 +23,8 @@ from bones.core.sentinels import Missing
 from bones.lang.metatypes import BTAtom, BType, weaken
 from bones.lang.types import *
 import bones.lang.types
-from dm._core.structs import tvtuple, tvstruct, tvarray, tvseq, tvmap
+from bones.lang.structs import tvstruct
+from dm._core.structs import tvarray, tvseq, tvmap
 from bones.lang.utils import Constructors
 
 

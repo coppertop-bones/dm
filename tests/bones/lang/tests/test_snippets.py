@@ -15,8 +15,8 @@ from bones.core.sentinels import Missing
 from bones.kernel import psm
 from bones.kernel.bones import BonesKernel
 from bones.lang.core import GLOBAL, SCRATCH
-from bones.lang.ctx import Ctx
-import bones.lang.ctx
+from bones.lang.symbol_table import SymTab
+import bones.lang.symbol_table
 from bones.lang.lex import LINE_COMMENT, BREAKOUT
 from bones.lang.execute import TCInterpreter
 from bones.lang.infer import InferenceLogger
@@ -26,18 +26,18 @@ import dm.pp, dm.testing
 from dm.core import PP, check, equals, startsWith, underride, withCtx, raises, drop
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
 
-bones.lang.ctx.PYCHARM = True
+bones.lang.symbol_table.PYCHARM = True
 
 
 def _newKernel():
     sm = psm.PythonStorageManager()
     k = BonesKernel(sm)
-    k.ctxs[GLOBAL] = Ctx(k, Missing, Missing, Missing, Missing, GLOBAL)
-    k.ctxs[SCRATCH] = scratchCtx = Ctx(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
+    k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
+    k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx
     k.tcrunner = TCInterpreter(k, scratchCtx)
-    sm.frameForCtx(k.ctxs[GLOBAL])
-    sm.frameForCtx(k.ctxs[SCRATCH])
+    sm.framesForSymTab(k.ctxs[GLOBAL])
+    sm.framesForSymTab(k.ctxs[SCRATCH])
     return k
 
 class Res(object): pass
