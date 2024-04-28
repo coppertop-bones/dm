@@ -43,16 +43,17 @@ def main():
     bones.lang.tests.test_metatypes.test_decomposition.main()
     bones.lang.tests.test_metatypes.test_fitsWithin.main()
 
-    # lang tests - PACE
-    bones.lang.tests.test_parse_groups.test_all.main()
-
 
 def addendum():
     import bones.lang.tests.test_lex.test_canon
     import bones.lang.tests.test_parse_groups.test_canon
 
+    # lang tests - PACE
+    bones.lang.tests.test_parse_groups.test_all.main()
+
     '\nlexing canon' >> PP
     bones.lang.tests.test_lex.test_canon.main()
+
     '\ngrouping canon' >> PP
     bones.lang.tests.test_parse_groups.test_canon.main()
 

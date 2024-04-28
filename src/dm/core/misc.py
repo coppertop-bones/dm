@@ -20,13 +20,13 @@ import builtins, numpy as np
 from coppertop.pipe import *
 from bones.core.sentinels import Missing, dict_keys, dict_values, dict_items, function
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import BTAtom as _BTAtom
+from bones.lang.metatypes import BTNom as _BTNom
 from dm.core.aggman import inject
 from bones.lang.structs import tv
 from dm.core.types import T, pylist, txt, pydict, pyfunc, T1, T2, py
 
 
-_SBT = _BTAtom.define('ShouldBeTyped')      # temporary type to allow"  'DE000762534' >> box | tISIN - i.e. make the box then type it
+_SBT = _BTNom.define('ShouldBeTyped')      # temporary type to allow"  'DE000762534' >> box | tISIN - i.e. make the box then type it
 
 @coppertop
 def box(v) -> _SBT:

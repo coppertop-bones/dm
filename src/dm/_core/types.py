@@ -20,7 +20,7 @@ import sys, builtins
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from bones.core.sentinels import Missing
-from bones.lang.metatypes import BTAtom, BType, weaken
+from bones.lang.metatypes import BTNom, BType, weaken
 from bones.lang.types import *
 import bones.lang.types
 from bones.lang.structs import tvstruct
@@ -31,16 +31,16 @@ from bones.lang.utils import Constructors
 __all__ = bones.lang.types.__all__
 
 
-i8 = BTAtom.define('i8').setOrthogonal(obj)
-u8 = BTAtom.define('u8').setOrthogonal(obj)
-i16 = BTAtom.define('i16').setOrthogonal(obj)
-u16 = BTAtom.define('u16').setOrthogonal(obj)
-i32 = BTAtom.define('i32').setOrthogonal(obj)
-u32 = BTAtom.define('u32').setOrthogonal(obj)
-i64 = BTAtom.define('i64').setOrthogonal(obj)
-u64 = BTAtom.define('u64').setOrthogonal(obj)
-f32 = BTAtom.define('f32').setOrthogonal(obj)
-f64 = BTAtom.define('f64').setOrthogonal(obj)
+i8 = BTNom.define('i8').setOrthogonal(obj)
+u8 = BTNom.define('u8').setOrthogonal(obj)
+i16 = BTNom.define('i16').setOrthogonal(obj)
+u16 = BTNom.define('u16').setOrthogonal(obj)
+i32 = BTNom.ensure('i32').setOrthogonal(obj)        # a standard type
+u32 = BTNom.define('u32').setOrthogonal(obj)
+i64 = BTNom.define('i64').setOrthogonal(obj)
+u64 = BTNom.define('u64').setOrthogonal(obj)
+f32 = BTNom.define('f32').setOrthogonal(obj)
+f64 = BTNom.define('f64').setOrthogonal(obj)
 
 __all__ += [
     'i8', 'u8', 'i16', 'u16', 'i32', 'u32', 'i64', 'u64', 'f32', 'f64',
@@ -52,7 +52,7 @@ __all__ += [
 # bool - in reality we just equate bool and python bool
 def _makeBool(t, v):
     return builtins.bool(v)
-bool = BTAtom.define('bool').setOrthogonal(obj).setCoercer(_makeBool).setConstructor(_makeBool)
+bool = BTNom.define('bool').setOrthogonal(obj).setCoercer(_makeBool).setConstructor(_makeBool)
 __all__ += ['bool']
 
 
@@ -146,10 +146,10 @@ __all__ += [
 
 N = BType('N')
 for i in range(1, 11):
-    t = N.ensure(BType(f'{i}'))
+    t = BType(f'N{i}')
     locals()[t.name] = t
 for o in range(26):
-    t = N.ensure(BType(chr(ord('a')+o)))
+    t = BType(f'N{chr(ord("a")+o)}')
     locals()[t.name] = t
 __all__ += [
     'N',
@@ -240,7 +240,7 @@ class str_(builtins.str):
         return self
     def __repr__(self):
         return f'{super().__repr__()}'
-txt = BTAtom.define('txt').setOrthogonal(obj).setCoercer(str_).setConstructor(str_)
+txt = BTNom.define('txt').setOrthogonal(obj).setCoercer(str_).setConstructor(str_)
 
 
 class tvstr(builtins.str):
@@ -276,7 +276,7 @@ __all__ += ['txt', 'tvstr']
 
 # litdate is parsed in the SM to a storage format of a python datetime.date and on assignment is notionally weakened
 # to a date - in reality we just equate rub date and python datetime.date
-date = BTAtom.define('date').setOrthogonal(obj)
+date = BTNom.define('date').setOrthogonal(obj)
 
 __all__ += ['date']
 
@@ -286,7 +286,7 @@ __all__ += ['date']
 # types for dealing with python - not needed in a non-python implementation
 # **********************************************************************************************************************
 
-py = BTAtom.ensure("py").setOrthogonal(obj)
+py = BTNom.ensure("py").setOrthogonal(obj)
 
 pylist = py['pylist']
 pytuple = py['pytuple']
@@ -311,8 +311,8 @@ __all__ += [
 # **********************************************************************************************************************
 
 
-err = BTAtom.define('err')             # an error code of some sort
-missing = BTAtom.define('missing')     # something that isn't there and should be there
+err = BTNom.define('err')             # an error code of some sort
+missing = BTNom.define('missing')     # something that isn't there and should be there
 
 sys._Missing._t = missing
 sys._ERR._t = err
@@ -397,8 +397,8 @@ def createDFrame(*args_, **kwargs):
 
 
 
-seq = BTAtom.define('seq')
-map = BTAtom.define('map')
+seq = BTNom.define('seq')
+map = BTNom.define('map')
 
 dtup = tup[tvarray].nameAs('dtup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
 dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogonal(obj)

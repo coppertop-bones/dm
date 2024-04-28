@@ -15,7 +15,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
-from bones.lang.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, S, isT
+from bones.lang.metatypes import BTNom, BType, BTSeq, BTMap, BTFn, S, isT
 from dm.testing import check, equals
 from dm.core.aggman import collect, joinAll, sortUsing
 from dm.core.conv import to
@@ -25,9 +25,9 @@ from dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruc
 
 
 
-tFred = BTAtom.ensure('fred')
-tJoe = BTAtom.ensure('joe')
-tSally = BTAtom.ensure('sally')
+tFred = BTNom.ensure('fred')
+tJoe = BTNom.ensure('joe')
+tSally = BTNom.ensure('sally')
 
 
 
@@ -91,7 +91,7 @@ def testBTFn():
 
 
 def testStructCreation():
-    label = BTAtom.ensure('label').setConstructor(dstruct)
+    label = BTNom.ensure('label').setConstructor(dstruct)
     title = label(text='My cool Tufte-compliant scatter graph')
     title._keys() == ['text']
 
@@ -100,9 +100,9 @@ def test_hasT():
     assert isT(T)
     assert isT(T1)
 
-    matrix = BTAtom.ensure('matrix2')
-    inout = BTAtom.ensure('inout')
-    out = BTAtom.ensure('out')
+    matrix = BTNom.ensure('matrix2')
+    inout = BTNom.ensure('inout')
+    out = BTNom.ensure('out')
     assert matrix[inout, T1].hasT
 
     ccy = BType('ccy')

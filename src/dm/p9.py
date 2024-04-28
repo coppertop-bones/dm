@@ -12,11 +12,11 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom
+from bones.lang.metatypes import BTNom
 from bones.lang.structs import tv
 
 
-P9 = BTAtom.ensure('P9').setCoercer(tv)
+P9 = BTNom.ensure('P9').setCoercer(tv)
 
 @coppertop
 def PP(p: P9) -> P9:

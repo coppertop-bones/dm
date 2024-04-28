@@ -16,7 +16,7 @@
 
 from enum import IntEnum
 
-from bones.lang.metatypes import BTAtom, S
+from bones.lang.metatypes import BTNom, S
 from dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq
 from bones.core.sentinels import Missing
 
@@ -112,16 +112,16 @@ rooms = [Ba, Bi, Co, Di, Ha, Ki, Li, Lo, St]
 NS_TO_S = 1 / 1_000_000_000
 
 
-card = BTAtom.ensure('card')
-handId = BTAtom.ensure('handId')
-ndmap = BTAtom.ensure('ndmap')
+card = BTNom.ensure('card')
+handId = BTNom.ensure('handId')
+ndmap = BTNom.ensure('ndmap')
 pad_element = S(has=txt, suggestions=count, like=count)
-cluedo_pad = ((card * handId) ** pad_element)[ndmap] & BTAtom.ensure('cluedo_pad')
-cluedo_pad = pydict  # & BTAtom.ensure('cluedo_pad') once we have tvmap we can do this
-cluedo_bag = (dstruct & BTAtom.ensure('_cluedo_bag')).nameAs('cluedo_bag')
+cluedo_pad = ((card * handId) ** pad_element)[ndmap] & BTNom.ensure('cluedo_pad')
+cluedo_pad = pydict  # & BTNom.ensure('cluedo_pad') once we have tvmap we can do this
+cluedo_bag = (dstruct & BTNom.ensure('_cluedo_bag')).nameAs('cluedo_bag')
 
-tPair = BTAtom.ensure('pair')
-display_table = (N ** txt)[dseq][BTAtom.ensure('table')].setCoercer(dseq)
+tPair = BTNom.ensure('pair')
+display_table = (N ** txt)[dseq][BTNom.ensure('table')].setCoercer(dseq)
 
 YES = 'X'
 NO = '-'

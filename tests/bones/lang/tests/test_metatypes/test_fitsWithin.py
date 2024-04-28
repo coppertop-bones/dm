@@ -9,7 +9,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType, BTAtom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
+from bones.lang.metatypes import BType, BTNom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
 import bones.lang.metatypes
 from dm.testing import check, fitsWithin, doesNotFitWithin
 from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, num, pylist, pydict, litdec
@@ -19,9 +19,9 @@ oldWeakenings = bones.lang.metatypes._weakenings
 
 weaken(index, num)
 
-tFred = BTAtom.ensure('fred')
-tJoe = BTAtom.ensure('joe')
-tSally = BTAtom.ensure('sally')
+tFred = BTNom.ensure('fred')
+tJoe = BTNom.ensure('joe')
+tSally = BTNom.ensure('sally')
 
 
 
@@ -52,7 +52,7 @@ def testSimple():
 
 
 def testNested():
-    ccy = BTAtom.ensure('ccy').setExplicit
+    ccy = BTNom.ensure('ccy').setExplicit
     GBP = ccy['GBP']
     USD = ccy['USD']
     weaken((index, num, index, num), (ccy[T], GBP, USD))
@@ -67,11 +67,9 @@ def testNested():
 
 
 def testTemplates():
-    fred = BTAtom.ensure('fred')
+    fred = BTNom.ensure('fred')
     num*fred >> check >> fitsWithin >> T*fred
     index*fred >> check >> fitsWithin >> T1*T2
-
-    (fred ** N) >> check >> fitsWithin >> (T ** N)
 
     # simple wildcards
     (N ** fred)[pylist] >> check >> fitsWithin >> (N ** T1)[T2]

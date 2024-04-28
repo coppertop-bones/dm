@@ -19,14 +19,14 @@ from dm.testing import check, equals
 from dm.core import collect, interleave
 from dm.pp import PP
 from dm.core.types import txt, index, num, bool, T1, litint, pylist
-from bones.lang.metatypes import BTAtom
+from bones.lang.metatypes import BTNom
 from bones.lang.structs import tv
 
 from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo
 
 
-A = BTAtom.ensure("A")
-B = BTAtom.ensure("B")
+A = BTNom.ensure("A")
+B = BTNom.ensure("B")
 (A & B & litint).setCoercer(tv)
 (A & litint).setCoercer(tv)
 (B & litint).setCoercer(tv)

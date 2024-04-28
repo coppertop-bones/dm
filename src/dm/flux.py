@@ -59,7 +59,7 @@ def appendTo(x, xs:pylist) -> pylist:
 # **********************************************************************************************************************
 
 # @coppertop(style=binary)
-# def drop(xs:(T2**T1)[pylist], ks:(T2**T1)[pylist]) -> (T2**T1)[pylist]:
+# def drop(xs:(N**T1)[pylist], ks:(N**T2)[pylist]) -> (N**T1)[pylist]:
 #     answer = []
 #     for x in xs:
 #         if x not in ks:

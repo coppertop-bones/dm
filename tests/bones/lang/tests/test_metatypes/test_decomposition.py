@@ -11,7 +11,7 @@
 import random
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
-from bones.lang.metatypes import BTAtom, S, _partition, BType, weaken
+from bones.lang.metatypes import BTNom, S, _partition, BType, weaken
 import bones.lang.metatypes
 from bones.lang.structs import tv
 from dm.testing import check, equals, fitsWithin, doesNotFitWithin
@@ -23,18 +23,18 @@ from dm.linalg.types import square, right
 
 oldWeakenings = bones.lang.metatypes._weakenings
 
-tFred = BTAtom.ensure('fred')
-tJoe = BTAtom.ensure('joe')
-tSally = BTAtom.ensure('sally')
-pystr2 = BTAtom.ensure('pystr2')
+tFred = BTNom.ensure('fred')
+tJoe = BTNom.ensure('joe')
+tSally = BTNom.ensure('sally')
+pystr2 = BTNom.ensure('pystr2')
 weaken(txt, (pystr2,))
 
-ccy = BTAtom.ensure('ccy').setExplicit
-fx = BTAtom.ensure('fx').setExplicit
+ccy = BTNom.ensure('ccy').setExplicit
+fx = BTNom.ensure('fx').setExplicit
 
-anon = BTAtom.define('anon').setFamilial
-named = BTAtom.define('named').setFamilial
-aliased = BTAtom.define('aliased').setImplicit
+anon = BTNom.define('anon').setFamilial
+named = BTNom.define('named').setFamilial
+aliased = BTNom.define('aliased').setImplicit
 weaken(anon, aliased)
 weaken(named, aliased)
 
@@ -49,6 +49,18 @@ weaken(named, aliased)
 # B intersect A - common stuff, if we only have common stuff then it's an exact fit
 # B' intersect A - stuff in A but not in B - we term this the residual
 #
+
+
+# we have these metatypes - atom, union, intersection, product (tuples and structs), exponential (arrays, maps
+# and functions) & distinguished.
+#
+#
+# when we do a A >> fitsWithin >> B we partition the two sets into three parts
+#
+# A' intersect B - stuff in A but not in B - anything here then it's not a fit
+# A intersect B - common stuff, if we only have common stuff then it's an exact fit
+# A intersect B' - stuff in B but not in A - we term this the residual
+
 #
 # when types are in the residual set we allow them to behave in exlusively one of the following ways:
 #
@@ -75,26 +87,26 @@ weaken(named, aliased)
 # generic / vanilla / tags / occasional / unremarkable / exceptional / partial / minor /
 
 
-tmatrix = BTAtom.ensure('tmatrix')
-tdd = BTAtom.ensure('tdd')
+tmatrix = BTNom.ensure('tmatrix')
+tdd = BTNom.ensure('tdd')
 
 # implicit / contextual
-red = BTAtom.ensure('red')
-yellow = BTAtom.ensure('yellow')
-blue = BTAtom.ensure('blue')
+red = BTNom.ensure('red')
+yellow = BTNom.ensure('yellow')
+blue = BTNom.ensure('blue')
 # mouseButton = BTSet([red, yellow, blue], default=blue)
 
 
 # familial
-ISIN = BTAtom.ensure('ISIN').setFamilial
-CUSIP = BTAtom.ensure('CUSIP').setFamilial
-inches = BTAtom.ensure('inches').setFamilial
-cm = BTAtom.ensure('cm').setFamilial
+ISIN = BTNom.ensure('ISIN').setFamilial
+CUSIP = BTNom.ensure('CUSIP').setFamilial
+inches = BTNom.ensure('inches').setFamilial
+cm = BTNom.ensure('cm').setFamilial
 
 
 # explicit
-col = BTAtom.ensure('col').setExplicit
-row = BTAtom.ensure('row').setExplicit
+col = BTNom.ensure('col').setExplicit
+row = BTNom.ensure('row').setExplicit
 
 GBP = ccy['GBP2'].setCoercer(tv)
 USD = ccy['USD2'].setCoercer(tv)
@@ -102,8 +114,8 @@ USD = ccy['USD2'].setCoercer(tv)
 
 # orthogonal
 # anything including a python class, e.g. tmatrix&tvarray
-# pylist = BTAtom.ensure('pylist').setOrthogonal(obj)
-lol = BTAtom.ensure('lol').setOrthogonal(obj)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
+# pylist = BTNom.ensure('pylist').setOrthogonal(obj)
+lol = BTNom.ensure('lol').setOrthogonal(obj)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
 
 # (txt).setConstructor(tv)
 (ISIN & txt).setConstructor(tv)

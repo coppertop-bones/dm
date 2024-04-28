@@ -21,6 +21,7 @@ from dm.core.types import txt, index, N, py, dseq, pylist
 
 def test_anon():
     f = makeFn(index^index, lambda x: x + 1)
+    N ** index
     fxs = dseq((N ** index)[dseq], [1, 2, 3]) >> collect >> f
     fxs >> check >> typeOf >> (N ** index)[dseq]
     with assertRaises(TypeError):
