@@ -10,7 +10,7 @@
 
 from bones.core.errors import ErrSite
 
-class Fred(object):
+class Fred:
     def __init__(self):
         self.site1 = ErrSite(self.__class__)
         self.site2 = ErrSite(self.__class__, "#1")

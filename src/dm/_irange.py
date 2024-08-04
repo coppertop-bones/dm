@@ -17,7 +17,7 @@
 from coppertop.pipe import *
 from dm.core.types import bool, index
 
-class IInputRange(object):
+class IInputRange:
     @property
     def empty(self) -> bool:
         raise NotImplementedError()
@@ -40,7 +40,7 @@ class IInputRange(object):
     def _getIRIter(self):
         return IInputRange._Iter(self)
 
-    class _Iter(object):
+    class _Iter:
         def __init__(self, r):
             self.r = r
         def __iter__(self):
@@ -100,7 +100,7 @@ class IRandomAccessInfinite(IForwardRange):
         raise NotImplementedError()
 
 
-class IOutputRange(object):
+class IOutputRange:
     def put(self, value):
         """Answers void"""
         raise NotImplementedError()

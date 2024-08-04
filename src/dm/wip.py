@@ -27,7 +27,7 @@ from dm.core.conv import to
 
 
 
-class OStreamWrapper(object):
+class OStreamWrapper:
     def __init__(self, sGetter):
         self._sGetter = sGetter
     def __lshift__(self, other):

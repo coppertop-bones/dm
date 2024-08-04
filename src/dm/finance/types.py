@@ -14,11 +14,11 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-from bones.lang.metatypes import BTNom as _BTNom
+from bones.lang.metatypes import BTNom
 
 
-ccy = _BTNom.ensure('ccy').setExplicit
-fx = _BTNom.ensure('fx').setExplicit
+ccy = BTNom.ensure('ccy').setExplicit
+fx = BTNom.ensure('fx').setExplicit
 
 
 

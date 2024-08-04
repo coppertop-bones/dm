@@ -31,7 +31,7 @@ tSally = BTNom.ensure('sally')
 
 
 
-def testNominalAndAtoms():
+def testBTNom():
     assert repr(tFred) == 'fred'
     assert tFred == BType('fred')
     assert tFred is BType('fred')
@@ -51,12 +51,12 @@ def testNominalAndAtoms():
 
 
 def testBTUnion():
-    s = tFred+tJoe
+    s = tFred + tJoe
 
     assert (repr(s) == 'fred+joe') or (repr(s) == 'joe+fred')
     assert tFred in s
     assert tSally not in s
-    assert tJoe+tFred == s   # summing is commutative
+    assert tJoe+tFred == s   # is commutative
 
     assert isinstance('hello' >> box | tFred, s)
 
@@ -132,7 +132,7 @@ def testNaming():
 
 
 def main():
-    testNominalAndAtoms()
+    testBTNom()
     testBTUnion()
     testBTTuple()
     testBTSeq()
@@ -146,3 +146,4 @@ def main():
 if __name__ == '__main__':
     main()
     print('pass')
+

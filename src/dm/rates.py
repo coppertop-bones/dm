@@ -51,7 +51,7 @@ def cc(df:num, tau:num) -> num:
     return math.log(df) / -tau
 
 
-class Curve(object):
+class Curve:
     def __init__(self):
         self.d1 = []
         self.d2 = []

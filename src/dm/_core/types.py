@@ -20,6 +20,7 @@ import sys, builtins
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from bones.core.sentinels import Missing
+from bones.core.errors import ProgrammerError
 from bones.lang.metatypes import BTNom, BType, weaken
 from bones.lang.types import *
 import bones.lang.types
@@ -375,7 +376,7 @@ def create2DTvArray(*args_, **kwargs):
 
 # could make +, -, / and * be type aware by having index, offset, count, etc being familial as well as orthogonal
 
-class thing(object): pass
+class thing: pass
 t = thing()     # t for types in anticipation of BType namespacing and import coppertop.bones_types as t
 t.count = count
 t.index = index
@@ -423,7 +424,7 @@ dframe = frame[tvstruct].nameAs('dframe').setConstructor(createDFrame).setOrthog
 # adhoc(S(fred=pyint), fred=1)
 # " " ~ " "
 #
-# class fred(object):
+# class fred:
 #     def __
 
 __all__ += [

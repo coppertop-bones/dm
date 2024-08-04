@@ -128,7 +128,7 @@ NO = '-'
 MAYBE = '?'
 
 
-class HasOne(object):
+class HasOne:
     def __init__(self, handId=Missing):
         self.handId = handId
 

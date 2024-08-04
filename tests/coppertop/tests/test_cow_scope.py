@@ -47,7 +47,7 @@ def test_scope():
     with assertRaises(KeyError):
         _.joe['a']
 
-    class Sally(object):pass
+    class Sally:pass
     _.sally = Sally()
     with assertRaises(AttributeError):
         _.sally.a

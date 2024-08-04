@@ -11,7 +11,7 @@
 import random
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
-from bones.lang.metatypes import BTNom, S, _partition, BType, weaken
+from bones.lang.metatypes import BTNom, S, _partitionIntersectionTLs, weaken, BTypeError
 import bones.lang.metatypes
 from bones.lang.structs import tv
 from dm.testing import check, equals, fitsWithin, doesNotFitWithin
@@ -39,29 +39,40 @@ weaken(anon, aliased)
 weaken(named, aliased)
 
 
-# we have these metatypes - atom, union, intersection, product (tuples and structs), exponential (arrays, maps
+# we have these metatypes - nominal, union, intersection, product (tuples and structs), exponential (arrays, maps
 # and functions) & distinguished.
 #
 #
-# when we do a A >> fitsWithin >> B we partition the two sets into three parts
+# when we do X >> fitsWithin >> Y we partition the two sets into three parts
 #
-# B intersect A' - stuff in B but not in A - anything here then it's not a fit
-# B intersect A - common stuff, if we only have common stuff then it's an exact fit
-# B' intersect A - stuff in A but not in B - we term this the residual
-#
+# X intersect Y' - stuff in X but not in Y - anything here then it's not a fit
+# X intersect Y - common stuff, if we only have common stuff then it's an exact fit
+# X' intersect Y - X' & Y - stuff not in X but in Y - we term this the residual
 
 
-# we have these metatypes - atom, union, intersection, product (tuples and structs), exponential (arrays, maps
-# and functions) & distinguished.
-#
-#
-# when we do a A >> fitsWithin >> B we partition the two sets into three parts
-#
-# A' intersect B - stuff in A but not in B - anything here then it's not a fit
-# A intersect B - common stuff, if we only have common stuff then it's an exact fit
-# A intersect B' - stuff in B but not in A - we term this the residual
+# A & B <: A
+# {}, A & B, A - A&B  (A & B')
 
+# A <: A & B
+
+
+# f64 <: f64 & cm
 #
+# QR(f64 & numpy)
+# QR(f64 & lol)
+#
+# txt & isin
+#
+# concat(txt & isin, txt & isin)
+# concat(txt, txt)
+# concat(txt & T, txt & T)
+#
+#
+# txt & isin <: txt?
+# {}, txt & isin, {}
+
+
+
 # when types are in the residual set we allow them to behave in exlusively one of the following ways:
 #
 # generic - the default of all types, e.g. matrix (i.e. N**N**num), matrix&left, right, upper, lower, orthogonal,
@@ -70,14 +81,24 @@ weaken(named, aliased)
 #     orthogonal case
 #     i.e. generics do not prevent matching, thus effectively are discarded from the matching decision
 #
+#
+# IMPLICIT TYPES
 # implicit - e.g. anon, named, aliased with aliased as the implicit default, defaults do not prevent matching, and
 #     non-defaults can be explicity weakened to the default to provide the right behaviour
+#
+# e.g if the residual contains an implicit type we can safely ignore it and no distance is added
+#
+#
+# EXPLICIT TYPES
+# e,g, ccy, fx, anything explicit in a residual results in no match, e.g.
+# - f64 <: f64 & inches has inches in the residual
+# - f64 & inches <: f64 has inches & (f64 & inches)'
+#
 #
 # familial - e.g. ISIN, CUSIP, inches, cm, all instances in the signature must have the same residual, i.e. like a T1,
 #     thus add(num, num) called with (cm, inches) will not match as cm and inches are both familial, and (cm, num) will
 #     not match as cm is familial to all other types
 #
-# explicit - e,g, ccy, fx, anything explicit in a residual results in no match
 #
 # orthogonal - e.g. listOfLists, dtup, ascii, txt (typically classes / structs / values / etc) only one orthogonal type
 #     may exist in the residual and common. Currently classes are the only orthogonal type I can think of - maybe null set,
@@ -177,14 +198,14 @@ def opB(A:tmatrix&anon) -> tmatrix&anon:
 
 
 def testPartition():
-    _partition((tmatrix & square).types, (tmatrix, )) >> check >> equals >> ((square,), (tmatrix,), (), {})
-    _partition((tmatrix & square).types, (ISIN & CUSIP).types) >> check >> equals >> ((square, tmatrix,), (), (ISIN, CUSIP), {})
-    _partition((txt & square).types, (pystr2, )) >> check >> equals >> ((square,), (txt,), (), {txt:pystr2})
-    _partition((pystr2 & square).types, (txt, )) >> check >> equals >> ((square, pystr2), (), (txt,), {})
+    _partitionIntersectionTLs((tmatrix & square).types, (tmatrix, )) >> check >> equals >> ((square,), (tmatrix,), (), {})
+    _partitionIntersectionTLs((tmatrix & square).types, (ISIN & CUSIP).types) >> check >> equals >> ((square, tmatrix,), (), (ISIN, CUSIP), {})
+    _partitionIntersectionTLs((txt & square).types, (pystr2, )) >> check >> equals >> ((square,), (txt,), (), {txt:pystr2})
+    _partitionIntersectionTLs((pystr2 & square).types, (txt, )) >> check >> equals >> ((square, pystr2), (), (txt,), {})
 
 
 def testExclusive():
-    with assertRaises(TypeError) as ex:
+    with assertRaises(BTypeError) as ex:
         lol & pylist
     (txt & square) >> check >> fitsWithin >> txt
     tv(tmatrix & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
@@ -233,7 +254,7 @@ def testOrthogonal():
     (str)('DE') >> _join >> (str)('0008402215') >> check >> equals >> join_psps
     (CUSIP & txt)('DE') >> _join >> (CUSIP & txt)('0008402215') >> check >> equals >> join_pstpst
     (ISIN & txt)('DE') >> _join >> (ISIN & txt)('0008402215') >> check >> equals >> join_ipsips
-    with assertRaises(TypeError) as ex:
+    with assertRaises(BTypeError) as ex:
         (ISIN & txt)('DE') >> _join >> ('0008402215')
 
 
@@ -323,6 +344,7 @@ def main():
     testExplicitStructs()
 
 if __name__ == '__main__':
+    t = fx[S(d=ccy[T1], f=ccy[T2])]
     main()
     print('pass')
 

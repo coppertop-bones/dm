@@ -41,7 +41,7 @@ def newKernel():
 def dropFirstNL(s):
     return s[1:] if s[0:1] == '\n' else s
 
-class Res(object): pass
+class Res: pass
 
 @coppertop
 def evalPyInComments(res):

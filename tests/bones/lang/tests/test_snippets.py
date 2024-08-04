@@ -40,7 +40,7 @@ def _newKernel():
     sm.framesForSymTab(k.ctxs[SCRATCH])
     return k
 
-class Res(object): pass
+class Res: pass
 
 @coppertop
 def evalPyInComments(res):

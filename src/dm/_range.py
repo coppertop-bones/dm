@@ -26,7 +26,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - i
 
 
 if not hasattr(sys, '_EMPTY'):
-    class _EMPTY(object):
+    class _EMPTY:
         def __bool__(self):
             return False
         def __repr__(self):

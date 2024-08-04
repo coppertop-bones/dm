@@ -21,7 +21,7 @@ from importlib import reload
 from bones.core.sentinels import Void
 
 
-class _callFReturnX(object):
+class _callFReturnX:
     def __init__(self, f2, pp, retF=lambda x:x):
         self.f2 = f2
         self.f1 = lambda x:x
