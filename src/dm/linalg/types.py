@@ -13,7 +13,7 @@
 
 import numpy as np
 from coppertop.pipe import *
-from bones.lang.metatypes import BTNom, BTStruct
+from bones.lang.metatypes import BTAtom, BTStruct
 from dm.core.types import matrix, N, num, pytuple, dstruct
 from dm.core.structs import tvarray
 
@@ -21,20 +21,20 @@ from dm.core.structs import tvarray
 # NB a 1x1 matrix is assumed to be a scalar, e.g. https://®®en.wikipedia.org/wiki/Dot_product#Algebraic_definition
 
 
-I = BTNom.define('I')
-square = BTNom.define('square')
-right = BTNom.define('right')
-left = BTNom.define('left')
-upper = BTNom.define('upper')
-lower = BTNom.define('lower')
-orth = BTNom.define('orth')
-diag = BTNom.define('diag')
-tri = BTNom.define('tri')
-cov = BTNom.define('cov')
-colvec = BTNom.define('colvec')
-rowvec = BTNom.define('rowvec')
+I = BTAtom('I')
+square = BTAtom('square')
+right = BTAtom('right')
+left = BTAtom('left')
+upper = BTAtom('upper')
+lower = BTAtom('lower')
+orth = BTAtom('orth')
+diag = BTAtom('diag')
+tri = BTAtom('tri')
+cov = BTAtom('cov')
+colvec = BTAtom('colvec')
+rowvec = BTAtom('rowvec')
 
-Cholesky = BTNom.ensure('Cholesky')
+Cholesky = BTAtom('Cholesky')
 
 
 matrix_ = matrix & tvarray

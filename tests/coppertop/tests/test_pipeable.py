@@ -15,15 +15,15 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import BTNom
+from bones.lang.metatypes import BTAtom
 from dm.testing import check, equals
 from coppertop.tests.take1 import _take
 from _.coppertop.tests.take2 import _take
 from dm.core.types import index, pylist, litint
 from dm.core.structs import tvarray
 
-mat = BTNom.ensure("mat2")
-vec = BTNom.ensure("vec2")
+mat = BTAtom("mat2")
+vec = BTAtom("vec2")
 
 
 @coppertop(style=binary)

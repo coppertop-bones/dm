@@ -1,24 +1,23 @@
 # **********************************************************************************************************************
-#
-#                             Copyright (c) 2022 David Briant. All rights reserved.
-#
+# Copyright (c) 2025 David Briant. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
 # with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for
 # the specific language governing permissions and limitations under the License.
-#
 # **********************************************************************************************************************
 
-from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom
-from bones.lang.structs import tv
 
+from bones.tests.jones import test_sm
+from bones.tests.jones import test_tm
+from bones.tests.type_system import test_tl
 
-P9 = BTAtom('P9').setCoercer(tv)
+def main():
+    test_sm.main()
+    test_tm.main()
+    test_tl.main()
 
-@coppertop
-def PP(p: P9) -> P9:
-    fig = p._v.draw(show=True)
-    return p
+if __name__ == '__main__':
+    main()
+    print('passed')

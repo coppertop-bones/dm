@@ -21,7 +21,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from bones.core.sentinels import Missing
 from bones.core.errors import ProgrammerError
-from bones.lang.metatypes import BTNom, BType, weaken
+from bones.lang.metatypes import BTAtom, BType, weaken, BTypeError
 from bones.lang.types import *
 import bones.lang.types
 from bones.lang.structs import tvstruct
@@ -32,16 +32,16 @@ from bones.lang.utils import Constructors
 __all__ = bones.lang.types.__all__
 
 
-i8 = BTNom.define('i8').setOrthogonal(obj)
-u8 = BTNom.define('u8').setOrthogonal(obj)
-i16 = BTNom.define('i16').setOrthogonal(obj)
-u16 = BTNom.define('u16').setOrthogonal(obj)
-i32 = BTNom.ensure('i32').setOrthogonal(obj)        # a standard type
-u32 = BTNom.define('u32').setOrthogonal(obj)
-i64 = BTNom.define('i64').setOrthogonal(obj)
-u64 = BTNom.define('u64').setOrthogonal(obj)
-f32 = BTNom.define('f32').setOrthogonal(obj)
-f64 = BTNom.define('f64').setOrthogonal(obj)
+i8 = BTAtom('i8', space=obj)
+u8 = BTAtom('u8', space=obj)
+i16 = BTAtom('i16', space=obj)
+u16 = BTAtom('u16', space=obj)
+i32 = BTAtom('i32', space=obj)        # a standard type
+u32 = BTAtom('u32', space=obj)
+i64 = BTAtom('i64', space=obj)
+u64 = BTAtom('u64', space=obj)
+f32 = BTAtom('f32', space=obj)
+f64 = BTAtom('f64', space=obj)
 
 __all__ += [
     'i8', 'u8', 'i16', 'u16', 'i32', 'u32', 'i64', 'u64', 'f32', 'f64',
@@ -53,7 +53,7 @@ __all__ += [
 # bool - in reality we just equate bool and python bool
 def _makeBool(t, v):
     return builtins.bool(v)
-bool = BTNom.define('bool').setOrthogonal(obj).setCoercer(_makeBool).setConstructor(_makeBool)
+bool = BTAtom('bool', space=obj).setCoercer(_makeBool).setConstructor(_makeBool)
 __all__ += ['bool']
 
 
@@ -241,7 +241,7 @@ class str_(builtins.str):
         return self
     def __repr__(self):
         return f'{super().__repr__()}'
-txt = BTNom.define('txt').setOrthogonal(obj).setCoercer(str_).setConstructor(str_)
+txt = BTAtom('txt', space=obj).setCoercer(str_).setConstructor(str_)
 
 
 class tvstr(builtins.str):
@@ -277,7 +277,7 @@ __all__ += ['txt', 'tvstr']
 
 # litdate is parsed in the SM to a storage format of a python datetime.date and on assignment is notionally weakened
 # to a date - in reality we just equate rub date and python datetime.date
-date = BTNom.define('date').setOrthogonal(obj)
+date = BTAtom('date', space=obj)
 
 __all__ += ['date']
 
@@ -287,7 +287,10 @@ __all__ += ['date']
 # types for dealing with python - not needed in a non-python implementation
 # **********************************************************************************************************************
 
-py = BTNom.ensure("py").setOrthogonal(obj)
+try:
+    py = BType("py")
+except BTypeError:
+    py = BTAtom("py", space=obj)
 
 pylist = py['pylist']
 pytuple = py['pytuple']
@@ -312,8 +315,8 @@ __all__ += [
 # **********************************************************************************************************************
 
 
-err = BTNom.define('err')             # an error code of some sort
-missing = BTNom.define('missing')     # something that isn't there and should be there
+err = BTAtom('err')             # an error code of some sort
+missing = BTAtom('missing')     # something that isn't there and should be there
 
 sys._Missing._t = missing
 sys._ERR._t = err
@@ -398,8 +401,8 @@ def createDFrame(*args_, **kwargs):
 
 
 
-seq = BTNom.define('seq')
-map = BTNom.define('map')
+seq = BTAtom('seq')
+map = BTAtom('map')
 
 dtup = tup[tvarray].nameAs('dtup').setConstructor(tvarray).setOrthogonal(obj)               # OPEN change from tvarray to tvtuple once implemented
 dstruct = struct[tvstruct].nameAs('dstruct').setConstructor(tvstruct).setOrthogonal(obj)
