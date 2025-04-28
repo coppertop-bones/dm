@@ -12,7 +12,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTNom
+from bones.lang.metatypes import BTAtom
 from bones.lang.structs import tv
 from bones.core.sentinels import Null
 
@@ -24,9 +24,9 @@ from dm.pp import PP
 # Inspired by the wikipedia article on multi-dispatch - https://en.wikipedia.org/wiki/Multiple_dispatch
 # Hopefully this is even more readable than Julia
 
-tAsteroid = BTNom.ensure('asteroid').setCoercer(tv)
-tShip = BTNom.ensure('ship').setCoercer(tv)
-tEvent = BTNom.ensure('event').setCoercer(tv)
+tAsteroid = BTAtom('asteroid').setCoercer(tv)
+tShip = BTAtom('ship').setCoercer(tv)
+tEvent = BTAtom('event').setCoercer(tv)
 
 
 @coppertop

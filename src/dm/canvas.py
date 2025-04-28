@@ -44,7 +44,7 @@
 from ipycanvas import Canvas, RoughCanvas, hold_canvas
 from coppertop.pipe import *
 from dm.core.types import num, tvfloat, index, num, txt
-from bones.lang.metatypes import BType, BTNom
+from bones.lang.metatypes import BType, BTAtom
 
 __all__ = [
     'canvas', 'rough', 'fill', 'clear', 'outline', 'style', 'line', 'text', 'save', 'restore', 'clip',
@@ -64,11 +64,11 @@ def _newRough(*args, **kwargs):
     c._v = c
     return c
 
-canvas = BTNom.ensure('canvas')
+canvas = BTAtom('canvas')
 canvas.setConstructor(_newCanvas)
 
 # MUSTDO fleshout the rough stuff
-rough = BTNom.ensure('rough')
+rough = BTAtom('rough')
 rough.setConstructor(_newRough)
 
 relative = num['canvas.relative'].setCoercer(tvfloat)

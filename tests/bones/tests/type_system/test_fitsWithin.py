@@ -9,19 +9,20 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType, BTNom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
+from bones.lang.metatypes import BType, BTAtom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
 import bones.lang.metatypes
 from dm.testing import check, fitsWithin, doesNotFitWithin
 from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, num, pylist, pydict, litdec
+from dm.finance.types import ccy
 
 
 oldWeakenings = bones.lang.metatypes._weakenings
 
 weaken(index, num)
 
-tFred = BTNom.ensure('fred')
-tJoe = BTNom.ensure('joe')
-tSally = BTNom.ensure('sally')
+tFred = BTAtom('fred')
+tJoe = BTAtom('joe')
+tSally = BTAtom('sally')
 
 
 
@@ -52,7 +53,6 @@ def testSimple():
 
 
 def testNested():
-    ccy = BTNom.ensure('ccy').setExplicit
     GBP = ccy['GBP']
     USD = ccy['USD']
     weaken((index, num, index, num), (ccy[T], GBP, USD))
@@ -67,7 +67,7 @@ def testNested():
 
 
 def testTemplates():
-    fred = BTNom.ensure('fred')
+    fred = BTAtom('fred')
     num*fred >> check >> fitsWithin >> T*fred
     index*fred >> check >> fitsWithin >> T1*T2
 

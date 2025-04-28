@@ -11,7 +11,7 @@
 import random
 from coppertop.pipe import *
 from bones.core.utils import assertRaises
-from bones.lang.metatypes import BTNom, S, _partitionIntersectionTLs, weaken, BTypeError
+from bones.lang.metatypes import BTAtom, S, _partitionIntersectionTLs, weaken, BTypeError, BTReserved
 import bones.lang.metatypes
 from bones.lang.structs import tv
 from dm.testing import check, equals, fitsWithin, doesNotFitWithin
@@ -19,22 +19,22 @@ from dm.core.misc import _v
 from dm.core.conv import to
 from dm.core.aggman import drop
 from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq, obj
+from dm.finance.types import ccy, fx
 from dm.linalg.types import square, right
 
 oldWeakenings = bones.lang.metatypes._weakenings
 
-tFred = BTNom.ensure('fred')
-tJoe = BTNom.ensure('joe')
-tSally = BTNom.ensure('sally')
-pystr2 = BTNom.ensure('pystr2')
+tFred = BTAtom('fred')
+tJoe = BTAtom('joe')
+tSally = BTAtom('sally')
+pystr2 = BTAtom('pystr2')
 weaken(txt, (pystr2,))
 
-ccy = BTNom.ensure('ccy').setExplicit
-fx = BTNom.ensure('fx').setExplicit
-
-anon = BTNom.define('anon').setFamilial
-named = BTNom.define('named').setFamilial
-aliased = BTNom.define('aliased').setImplicit
+aliased = BTReserved()
+_aliased = BTAtom('_aliased', self=BTReserved(implicitly=aliased))
+aliased = BTAtom('aliased', self=aliased, space=_aliased)
+anon = BTAtom('anon', space=_aliased)
+named = BTAtom('named', space=_aliased)
 weaken(anon, aliased)
 weaken(named, aliased)
 
@@ -108,26 +108,27 @@ weaken(named, aliased)
 # generic / vanilla / tags / occasional / unremarkable / exceptional / partial / minor /
 
 
-tmatrix = BTNom.ensure('tmatrix')
-tdd = BTNom.ensure('tdd')
+tmatrix = BTAtom('tmatrix')
+tdd = BTAtom('tdd')
 
 # implicit / contextual
-red = BTNom.ensure('red')
-yellow = BTNom.ensure('yellow')
-blue = BTNom.ensure('blue')
+red = BTAtom('red')
+yellow = BTAtom('yellow')
+blue = BTAtom('blue')
 # mouseButton = BTSet([red, yellow, blue], default=blue)
 
 
 # familial
-ISIN = BTNom.ensure('ISIN').setFamilial
-CUSIP = BTNom.ensure('CUSIP').setFamilial
-inches = BTNom.ensure('inches').setFamilial
-cm = BTNom.ensure('cm').setFamilial
+_ISINy = BTAtom('_ISINy')
+ISIN = BTAtom('ISIN', space=_ISINy)
+CUSIP = BTAtom('CUSIP', space=_ISINy)
+inches = BTAtom('inches', space=_ISINy)
+cm = BTAtom('cm', space=_ISINy)
 
 
 # explicit
-col = BTNom.ensure('col').setExplicit
-row = BTNom.ensure('row').setExplicit
+col = BTAtom('col', explicit=True)
+row = BTAtom('row', explicit=True)
 
 GBP = ccy['GBP2'].setCoercer(tv)
 USD = ccy['USD2'].setCoercer(tv)
@@ -135,8 +136,8 @@ USD = ccy['USD2'].setCoercer(tv)
 
 # orthogonal
 # anything including a python class, e.g. tmatrix&tvarray
-# pylist = BTNom.ensure('pylist').setOrthogonal(obj)
-lol = BTNom.ensure('lol').setOrthogonal(obj)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
+# pylist = BTAtom('pylist', space=obj)
+lol = BTAtom('lol', space=obj)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
 
 # (txt).setConstructor(tv)
 (ISIN & txt).setConstructor(tv)
