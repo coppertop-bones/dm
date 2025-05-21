@@ -10,8 +10,8 @@
 
 from coppertop.pipe import *
 from coppertop.pipe import CoppertopError
-from bones.core.utils import assertRaises
 from dm.core.text import startsWith, endsWith
+from dm.utils.testing import assertRaises
 from dm.testing import check, equals
 from bones import jones
 from dm.pp import NB

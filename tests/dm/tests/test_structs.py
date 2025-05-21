@@ -6,6 +6,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
+from bones.lang.metatypes import BType
 from dm.testing import check, equals
 from dm.core.aggman import append, prepend, prependTo, appendTo, join, drop, at, keys, sort, kvs
 from dm.core.misc import _v, box
@@ -56,7 +57,7 @@ def test_dseq():
 
 
 def test_dmap():
-    DF2 = dmap['DF2'].setConstructor(dmap)
+    DF2 = BType('DF2: DF2 & dmap')
 
     @coppertop
     def kvs(x: dmap[T1]) -> pylist:
@@ -115,7 +116,7 @@ class nd_(np.ndarray):
     def __array_finalize__(self, instance):
         # see - https://numpy.org/doc/stable/user/basics.subclassing.html
         if instance is None: return
-        #self._t_ = getattr(instance, '_t_', tvarray)
+        #self._t_ = getattr(instance, '_t_', darray)
 
     def __new__(cls, *args, **kwargs):
         instance = np.asarray(args[0], **kwargs).view(cls)

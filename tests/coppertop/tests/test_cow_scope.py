@@ -17,8 +17,8 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from ctypes import c_long
 from bones.core.context import context
 from bones.core.errors import ProgrammerError
-from bones.core.utils import assertRaises
 from coppertop._scopes import _CoWProxy, _CoWScope
+from dm.utils.testing import assertRaises
 from dm.testing import check, equals
 from dm.core.types import dstruct
 from dm.pp import PP

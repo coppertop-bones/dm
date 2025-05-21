@@ -12,11 +12,11 @@
 
 import sys         
 # sys._TRACE_IMPORTS = True
-if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
+if getattr(sys, '_TRACE_IMPORTS', False): print(__name__)
 
 
 from coppertop.pipe import *
-from bones.lang.metatypes import S
+from bones.lang.metatypes import S, BType
 from dm.core.types import T1, T2, tvfloat, pyfunc
 from dm.finance.types import ccy, fx
 from dm.testing import check, raises, equals
@@ -33,8 +33,8 @@ from dm.testing import check, raises, equals
 #
 # <:rat:()
 
-GBP = ccy['GBP'][tvfloat].setCoercer(tvfloat)
-USD = ccy['USD'][tvfloat].setCoercer(tvfloat)
+GBP = BType('GBP: GBP & ccy & tvfloat').setCoercer(tvfloat)
+USD = BType('USD: USD & ccy & tvfloat').setCoercer(tvfloat)
 tvccy = ccy & tvfloat
 
 GBPUSD = fx[S(domestic=GBP, foreign=USD)].nameAs('GBPUSD')[tvfloat].setCoercer(tvfloat)
@@ -66,7 +66,6 @@ def testFx():
 
     (100|GBP) >> mul >> (1.3|GBPUSD) >> addccy >> (20|USD) >> check >> equals >> (150|USD)
     (130|USD) >> mul >> (1.3|GBPUSD) >> check >> equals >> (100|GBP)
-
 
     (100|GBP) >> addccy_ >> (100|USD) >> check >> raises >> TypeError
 

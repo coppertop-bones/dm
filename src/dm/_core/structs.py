@@ -24,7 +24,7 @@ from bones.lang.metatypes import BType, fitsWithin, cacheAndUpdate
 from bones.lang.utils import Constructors
 
 
-__all__ = ['tvarray', 'tvseq', 'tvmap']
+__all__ = ['_tvarray', '_tvseq', '_tvmap']
 
 
 
@@ -32,7 +32,7 @@ __all__ = ['tvarray', 'tvseq', 'tvmap']
 # see https://en.wikipedia.org/wiki/Tensor
 # https://medium.com/@quantumsteinke/whats-the-difference-between-a-matrix-and-a-tensor-4505fbdc576c
 
-# tvarray is not a tensor - see Dan Fleisch - https://www.youtube.com/watch?v=f5liqUk0ZTw&t=447s
+# darray is not a tensor - see Dan Fleisch - https://www.youtube.com/watch?v=f5liqUk0ZTw&t=447s
 # I understand a tensor to be a n dimensional matrix of coefficients with each coefficient corresponding to m vectors in and
 
 # tensors are combination of components and basis vectors
@@ -60,7 +60,7 @@ class nd_(np.ndarray):
         return NotImplemented
 
 
-class tvarray(nd_):
+class _tvarray(nd_):
 
     def __new__(cls, *args_, **kwargs):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
@@ -76,7 +76,7 @@ class tvarray(nd_):
         elif len(args) == 2:
             arg1, arg2 = args
             if isinstance(arg1, BType):
-                # tvarray(t, iterable)
+                # darray(t, iterable)
                 try:
                     instance = np.asarray(arg2, **kwargs).view(cls)
                     instance._t_ = arg1
@@ -92,7 +92,7 @@ class tvarray(nd_):
     def __array_finalize__(self, instance):
         # see - https://numpy.org/doc/stable/user/basics.subclassing.html
         if instance is None: return
-        self._t_ = getattr(instance, '_t_', tvarray)
+        self._t_ = getattr(instance, '_t_', _tvarray)
 
     @property
     def _v(self):
@@ -120,34 +120,34 @@ class tvarray(nd_):
         return f'{self._t}({np.array2string(self)})'
 
 
-class tvseq(UserList):
+class _tvseq(UserList):
     def __init__(self, *args_):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         if len(args) == 1:
             arg = args[0]
-            if isinstance(arg, tvseq):
-                # tvseq(tvseq)
+            if isinstance(arg, _tvseq):
+                # dseq(dseq)
                 super().__init__(arg._v)
                 self._t = arg._t
             elif isinstance(arg, BType):
-                # tvseq(<BType>)
+                # dseq(<BType>)
                 super().__init__()
                 self._t = arg
             else:
-                raise TypeError("Can't create tvseq without type information")
+                raise TypeError("Can't create dseq without type information")
         elif len(args) == 2:
-            # tvseq(t, iterable)
+            # dseq(t, iterable)
             arg1, arg2 = args
             super().__init__(arg2)
             self._t = arg1
         elif len(args) == 3:
-            # tvseq(dseq, t, iterable)
+            # dseq(dseq, t, iterable)
             arg1, arg2, arg3 = args
             assert isinstance(arg1, Constructors)
             super().__init__(arg3)
             self._t = arg2
         else:
-            raise TypeError("Invalid arguments to tvseq constructor")
+            raise TypeError("Invalid arguments to dseq constructor")
 
     @property
     def _v(self):
@@ -160,7 +160,7 @@ class tvseq(UserList):
     def __repr__(self):
         itemStrings = (f"{str(e)}" for e in self.data)
         t = self._t
-        if type(t) is abc.ABCMeta or t is tvseq:
+        if type(t) is abc.ABCMeta or t is _tvseq:
             name = self._t.__name__
         else:
             name = str(self._t)
@@ -168,7 +168,7 @@ class tvseq(UserList):
         return rep
 
     def __eq__(self, other):
-        if isinstance(other, tvseq):
+        if isinstance(other, _tvseq):
             return self._t == other._t and self.data == other.data
         else:
             return False
@@ -180,19 +180,19 @@ class tvseq(UserList):
             return self.data[i]
 
 
-class tvmap(UserDict):
+class _tvmap(UserDict):
     __slots__ = ['_t', 'data']
 
     def __new__(cls, *args_, **kwargs):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         if len(args) == 0:
             if not kwargs:
-                # tvmap()
+                # dmap()
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
             else:
-                # tvmap(a=1, b=2)
+                # dmap(a=1, b=2)
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
@@ -202,7 +202,7 @@ class tvmap(UserDict):
             arg1 = args[0]
             if not kwargs:
                 if isinstance(arg1, BType):
-                    # tvmap(t)
+                    # dmap(t)
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = arg1
@@ -215,15 +215,14 @@ class tvmap(UserDict):
                     instance.update(arg1)
             else:
                 if isinstance(arg1, BType):
-                    # tvmap(t, a=1, b=2)
+                    # dmap(t, a=1, b=2)
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = arg1
                     instance.update(kwargs)
                 else:
                     raise PathNotTested()
-                    raise SyntaxError(
-                        f"if kwargs are given and just one arg then it must be a BType - got {arg1} instead")
+                    raise SyntaxError(f'if kwargs are given and just one arg then it must be a BType - got {arg1} instead')
         elif len(args) == 2:
             arg1, arg2 = args
             if not kwargs:
@@ -255,3 +254,5 @@ class tvmap(UserDict):
     def _asT(self, t):
         self._t = t
         return self
+
+

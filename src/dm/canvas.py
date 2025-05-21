@@ -64,12 +64,10 @@ def _newRough(*args, **kwargs):
     c._v = c
     return c
 
-canvas = BTAtom('canvas')
-canvas.setConstructor(_newCanvas)
+canvas = BType('canvas: atom in mem').setConstructor(_newCanvas)
 
 # MUSTDO fleshout the rough stuff
-rough = BTAtom('rough')
-rough.setConstructor(_newRough)
+rough = BType('rough: atom in mem').setConstructor(_newRough)
 
 relative = num['canvas.relative'].setCoercer(tvfloat)
 

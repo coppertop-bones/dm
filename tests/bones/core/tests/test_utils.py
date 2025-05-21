@@ -13,8 +13,8 @@ import sys
 # sys._TRACE_IMPORTS = True
 
 
-from bones.core.utils import HookStdOutErrToLines, assertRaises
-
+from bones.core.utils import HookStdOutErrToLines
+from dm.utils.testing import assertRaises
 
 def testStdoutHooker():
     with HookStdOutErrToLines() as outerr:

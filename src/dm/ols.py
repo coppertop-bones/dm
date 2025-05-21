@@ -14,15 +14,15 @@
 import numpy as np, scipy.stats
 
 from coppertop.pipe import *
-from dm.core.structs import tvarray
-from dm.core.types import N, num, matrix, pytuple, pydict, dstruct
+from bones.lang.metatypes import BType
+from dm.core.types import N, num, matrix, pytuple, pydict, darray
 from dm.core.aggman import takeRowRemain, hjoin, numRows
 
 
-OLSResult = dstruct['OLSResult'].setConstructor(dstruct)
+OLSResult = BType('OLSResult: OLSResult & dstruct')
 
-array_ = (N**num)&tvarray
-matrix_ = matrix&tvarray
+array_ = (N**num)&darray
+matrix_ = matrix&darray
 
 # OLS
 # why replicate the work?
@@ -80,14 +80,14 @@ matrix_ = matrix&tvarray
 # https://en.wikipedia.org/wiki/Mean_squared_error#In_regression
 
 @coppertop(style=nullary)
-def ols(Y:matrix&tvarray, X:matrix&tvarray) -> OLSResult:
+def ols(Y:matrix&darray, X:matrix&darray) -> OLSResult:
     return _ols(Y, X, {})
 
 @coppertop(style=nullary)
-def ols(Y: matrix & tvarray, X: matrix & tvarray, options:pydict) -> OLSResult:
+def ols(Y: matrix & darray, X: matrix & darray, options:pydict) -> OLSResult:
     return _ols(Y, X, options)
 
-def _ols(Y:matrix&tvarray, X:matrix&tvarray, options) -> OLSResult:
+def _ols(Y:matrix&darray, X:matrix&darray, options) -> OLSResult:
     addIntercept = options.get('addIntercept', False)
     X = np.append(np.ones((X.shape[0], 1)), X, axis=1) if addIntercept else X
     N, K = X.shape  # N is number of observations, K is number of betaHats, plus one for the intercept, YBar, if required
@@ -97,7 +97,7 @@ def _ols(Y:matrix&tvarray, X:matrix&tvarray, options) -> OLSResult:
     # `np.array([[1], [2]]) + np.array([1, 2]) == np.array([2,3],[3,4])`
     # so until we've made np.array's +, - etc type safe we'll answer a column matrix
     # recalling that we answer xHat in A.xHat = b + e
-    betaHat = (matrix&tvarray)(betaHat)
+    betaHat = (matrix&darray)(betaHat)
     # TODO in the future treat np.float64 as litdec (which weakens to num)
     # the type system whilst not preventing us from making mistakes it does constrain us to thoughtful architecture
     SSres = float(SSres)
@@ -117,7 +117,7 @@ def _ols(Y:matrix&tvarray, X:matrix&tvarray, options) -> OLSResult:
     ))
 
 @coppertop
-def betaHat(res:OLSResult) -> matrix&tvarray:
+def betaHat(res:OLSResult) -> matrix&darray:
     return res.betaHat
 
 def _r2(res:OLSResult):
@@ -158,19 +158,19 @@ def fCrit(res:OLSResult, confidence) -> num:
     return float(scipy.stats.f.ppf(q=1-confidence, dfn=res.K - 1, dfd=res.resDoF))
 
 @coppertop
-def residuals(res:OLSResult, Y:matrix&tvarray, X:matrix&tvarray) -> array_:
+def residuals(res:OLSResult, Y:matrix&darray, X:matrix&darray) -> array_:
     return array_((Y - X @ res.betaHat).reshape(Y.shape[0]))
 
 
 @coppertop
-def predictedR2(Y: matrix & tvarray, X: matrix & tvarray) -> pytuple:
+def predictedR2(Y: matrix & darray, X: matrix & darray) -> pytuple:
     return _predictedR2(Y, X, {})
 
 @coppertop
-def predictedR2(Y: matrix & tvarray, X: matrix & tvarray, options) -> pytuple:
+def predictedR2(Y: matrix & darray, X: matrix & darray, options) -> pytuple:
     return _predictedR2(Y, X, options)
 
-def _predictedR2(Y: matrix & tvarray, X: matrix & tvarray, options) -> pytuple:
+def _predictedR2(Y: matrix & darray, X: matrix & darray, options) -> pytuple:
     addIntercept = options.get('addIntercept', False)
     betaHats = []
     errors = []
@@ -179,7 +179,7 @@ def _predictedR2(Y: matrix & tvarray, X: matrix & tvarray, options) -> pytuple:
         y, Y_ = Y >> takeRowRemain >> i
         x, X_ = X >> takeRowRemain >> i
         lm = ols(Y_, X_, options)
-        x = ((tvarray&matrix)(np.ones((1, 1))) >> hjoin >> x) if addIntercept else x
+        x = ((darray&matrix)(np.ones((1, 1))) >> hjoin >> x) if addIntercept else x
         betaHats.append(lm.betaHat)
         yHat = (x @ lm.betaHat)[0]
         errors.append(yHat - y[0])

@@ -14,9 +14,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from bones.core.utils import assertRaises
 from bones.lang.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, S, isT
 from dm.testing import check, equals
+from dm.utils.testing import assertRaises
 from dm.core.aggman import collect, joinAll, sortUsing
 from dm.core.conv import to
 from dm.core.misc import box
@@ -92,7 +92,7 @@ def testBTFn():
 
 
 def testStructCreation():
-    label = BTAtom('label').setConstructor(dstruct)
+    label = BType('label: atom in mem').setConstructor(dstruct)
     title = label(text='My cool Tufte-compliant scatter graph')
     title._keys() == ['text']
 
@@ -108,11 +108,11 @@ def test_hasT():
 
     ccy = BType('ccy')
     fx = BType('fx')
-    GBP = ccy['GBP']
-    USD = ccy['USD']
+    GBP = BType('GBP: GBP & ccy')
+    USD = BType('USD: USD & ccy')
     assert fx[S(domestic=GBP, foreign=T1)].hasT
 
-    N = BType('N')
+    N = BTAtom('N')
     assert (N**T).hasT
     assert ((T*num)^num).hasT
     assert ((num*num)^T).hasT

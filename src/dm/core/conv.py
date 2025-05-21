@@ -20,15 +20,14 @@ from _strptime import _strptime
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from dm.core.structs import tvarray
 from bones.lang.metatypes import BType
 from dm.core.datetime import toCTimeFormat
 from dm.core.types import dframe, dmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
-    num, npfloat, dtup, dseq, matrix, t
+    num, npfloat, dtup, dseq, matrix, t, darray
 
 
-array_ = (N**num)&tvarray
-matrix_ = matrix&tvarray
+array_ = (N**num)&darray
+matrix_ = matrix&darray
 
 _defaultDateFmt = toCTimeFormat('YYYY.MM.DD')
 
@@ -107,12 +106,12 @@ def to(x, t:num) -> num:
     return float(x)
 
 @coppertop(style=binary)
-# def to(x:pylist, t:matrix&tvarray) -> matrix&tvarray:
-def to(x:pylist, t:matrix&tvarray) -> matrix&tvarray:
-    return (matrix&tvarray)(t, x)
+# def to(x:pylist, t:matrix&darray) -> matrix&darray:
+def to(x:pylist, t:matrix&darray) -> matrix&darray:
+    return (matrix&darray)(t, x)
 
 @coppertop(style=binary)
-def to(x:matrix&tvarray, t:array_) -> array_:
+def to(x:matrix&darray, t:array_) -> array_:
     return array_(x.reshape(max(x.shape)))
 
 @coppertop(style=binary)
@@ -140,25 +139,25 @@ def to(xs:pylist, t:array_) -> array_:
     return array_([parseNum(x) for x in xs])
 
 @coppertop(style=binary)
-def to(xs:pylist, t:(N**date)&tvarray, f:txt) -> (N**date)&tvarray:
+def to(xs:pylist, t:(N**date)&darray, f:txt) -> (N**date)&darray:
     cFormat = toCTimeFormat(f)
-    return tvarray((N**date)&tvarray, [parseDate(x, cFormat) for x in xs])
+    return darray((N**date)&darray, [parseDate(x, cFormat) for x in xs])
 
 @coppertop
-def toRow(xs:pylist) -> matrix&tvarray:
+def toRow(xs:pylist) -> matrix&darray:
     if len(xs) == 0: raise ValueError("can't create an empty matrix")
     if isinstance(xs[0], str):
         raise NotYetImplemented()
     raise NotYetImplemented()
     cFormat = toCTimeFormat(f)
-    return tvarray((N**date)&tvarray, [parseDate(x, cFormat) for x in xs])
+    return darray((N**date)&darray, [parseDate(x, cFormat) for x in xs])
 
 @coppertop
-def toCol(xs:pylist) -> matrix&tvarray:
+def toCol(xs:pylist) -> matrix&darray:
     if len(xs) == 0: raise ValueError("can't create an empty matrix")
     if isinstance(xs[0], str):
-        return tvarray(matrix&tvarray, [parseNum(x) for x in xs]).reshape(len(xs), 1)
-    return tvarray(matrix&tvarray, xs).reshape(len(xs), 1)
+        return darray(matrix&darray, [parseNum(x) for x in xs]).reshape(len(xs), 1)
+    return darray(matrix&darray, xs).reshape(len(xs), 1)
 
 @coppertop(style = binary)
 def withKeys(vs, ks) -> pydict:

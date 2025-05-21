@@ -17,13 +17,12 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import builtins, numpy as np
 
 from coppertop.pipe import *
-from dm.core.types import T1, T2, pylist, N, num, matrix
-from dm.core.structs import tvarray
+from dm.core.types import T1, T2, pylist, N, num, matrix, darray
 
 
 
-array_ = (N**num)&tvarray
-matrix_ = matrix&tvarray
+array_ = (N**num)&darray
+matrix_ = matrix&darray
 
 
 
@@ -32,8 +31,8 @@ matrix_ = matrix&tvarray
 # **********************************************************************************************************************
 
 @coppertop
-def cov(A:matrix_) -> matrix&tvarray:
-    return (matrix&tvarray)(np.cov(A))
+def cov(A:matrix_) -> matrix&darray:
+    return (matrix&darray)(np.cov(A))
 
 @coppertop
 def max(x:matrix_):
@@ -84,4 +83,5 @@ def sum(x:(N**T1)[pylist][T2]) -> num:
 @coppertop
 def sum(x:(N**T1)[pylist]) -> num:
     return builtins.sum(x._v)
+
 

@@ -16,7 +16,7 @@ import time, numpy as np
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
-from dm.core.structs import tvarray
+from dm.core.structs import darray
 from dm.core.types import N, Nn, Nm, num, matrix, count, bool, N1, missing, T1, T2
 from dm.linalg.types import colvec, Cholesky, QR, SVD
 from dm.linalg.core import solve
@@ -25,8 +25,8 @@ from dm.linalg.core import solve
 class StopSearch(RuntimeError): pass
 
 
-array_ = (N**num)[tvarray]
-matrix_ = matrix[tvarray]
+array_ = (N**num)[darray]
+matrix_ = matrix[darray]
 
 
 

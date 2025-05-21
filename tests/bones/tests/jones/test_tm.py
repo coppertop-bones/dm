@@ -11,7 +11,7 @@
 import sys, traceback
 from bones import jones
 from bones.core.sentinels import Missing
-from bones._utils.testing import assertRaises
+from dm.utils.testing import assertRaises
 from bones.jones import BTypeError
 from bones.lang.type_lang import TypeLangInterpreter
 from bones.lang._type_lang.py_type_manager import PyTypeManager
@@ -421,11 +421,23 @@ def test_offsets(TM):
     return "test_offsets passed"
 
 
+def test_fred(TM):
+    tli = TypeLangInterpreter(tm := TM())
 
+    c = tli.eval('''
+        a:b:mem: atom
+        py: atom in mem
+        c: a & py in mem
+    ''')
+
+    bc = tli.eval('c & b')
+
+    print(bs)
 
 def main():
 
     fns = [
+        test_fred,
         test_atom,
         test_intersection,
         test_union,

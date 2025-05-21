@@ -22,12 +22,12 @@ import numpy as np
 
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
-from dm.core.structs import tvarray
+from dm.core.structs import darray
 from dm.core.types import num, count, offset, matrix, N
 from dm.core.aggman import toDiag
 
-a_ = (N**num) & tvarray
-m_ = matrix & tvarray
+a_ = (N**num) & darray
+m_ = matrix & darray
 
 
 @coppertop(style=nullary)

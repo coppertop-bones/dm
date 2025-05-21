@@ -16,7 +16,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 # manipulation of these aggregation classes:
-# txt, sym, dtup, dstruct, dseq, dmap, dframe, pylist, pydict, pytup, pyset, nd, (N**num)&tvarray, matrix&tvarray
+# txt, sym, dtup, dstruct, dseq, dmap, tvframe, pylist, pydict, pytup, pyset, nd, (N**num)&darray, matrix&darray
 #
 #
 # NOTES
@@ -37,8 +37,8 @@ from bones.lang.structs import tv
 from bones.core.sentinels import Void
 
 from dm.core.types import pylist, pydict, pytuple, pydict_keys, pydict_items, pydict_values, pyfunc, pyset, \
-    T1, T2, T3, T4, T5, T6, txt, t, index, offset, N, dstruct, dtup, dseq, void, dmap, dframe, matrix, num, py
-from dm.core.structs import tvarray
+    T1, T2, T3, T4, T5, T6, txt, t, index, offset, N, dstruct, dtup, dseq, void, dmap, dframe, matrix, num, py, \
+    darray
 
 
 dict_keys = type({}.keys())
@@ -49,8 +49,8 @@ def _fitsWithin(a, b):
     return doesFit
 
 
-array_ = (N**num) & tvarray
-matrix_ = matrix & tvarray
+array_ = (N**num) & darray
+matrix_ = matrix & darray
 
 
 # **********************************************************************************************************************
@@ -130,11 +130,11 @@ def at(xs:pylist, s1:offset, s2: offset):
     return xs[s1:s2]
 
 @coppertop(style=binary)
-def at(a:dframe, f:txt) -> (N**T1)&tvarray:
+def at(a:dframe, f:txt) -> (N**T1)&darray:
     return a[f]
 
 @coppertop(style=binary)
-def at(a:(N**T1)[dframe], f:txt) -> (N**N**T2)[tvarray]:
+def at(a:(N**T1)[dframe], f:txt) -> (N**N**T2)[darray]:
     # T2 is a column in  the struct T1
     return a[f]
 
@@ -159,15 +159,15 @@ def at(a:dframe, os:pylist+pytuple) -> dframe:
     return dstruct(items)
 
 @coppertop(style=binary)
-def at(xs:(N**T1)&tvarray, o:t.offset) -> T1:
+def at(xs:(N**T1)&darray, o:t.offset) -> T1:
     return xs[o]
 
 @coppertop(style=binary)
-def at(xs:(N**T1)&tvarray, i:t.index) -> T1:
+def at(xs:(N**T1)&darray, i:t.index) -> T1:
     return xs[i-1]
 
 @coppertop(style=binary)
-def at(xs:(N**T1)&tvarray, os:pylist) -> (N**T1)&tvarray:
+def at(xs:(N**T1)&darray, os:pylist) -> (N**T1)&darray:
     return xs[os]
 
 
@@ -198,11 +198,11 @@ def atAllPut(xs:pydict, ks:pylist+pytuple, vs:pylist+pytuple) -> pydict:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def atCol(a: matrix & tvarray, o:offset) -> matrix & tvarray:
+def atCol(a: matrix & darray, o:offset) -> matrix & darray:
     return a[:, [o]]
 
 @coppertop(style=binary)
-def atCol(a: matrix & tvarray, i:index) -> matrix & tvarray:
+def atCol(a: matrix & darray, i:index) -> matrix & darray:
     return a[:, [i - 1]]
 
 
@@ -247,7 +247,7 @@ def atPut(s:dstruct, name:txt, value) -> dstruct:
     return s
 
 @coppertop(style=ternary)
-def atPut(m:(T2**T1)[dstruct][T3], ks:(N**T1)[pylist], v:T2) -> (T2**T1)[dstruct][T3]:
+def atPut(m:(T1**T2)[dstruct][T3], ks:(N**T1)[pylist], v:T2) -> (T1**T2)[dstruct][T3]:
     for k in ks._v:
         m[k] = v
     return m
@@ -257,7 +257,7 @@ def atPut(a:dframe, o:offset, row:dstruct) -> dframe:
     raise NotYetImplemented()
 
 @coppertop(style=ternary)
-def atPut(a:dframe, f:txt, col:(N**T1)[tvarray]) -> dframe:
+def atPut(a:dframe, f:txt, col:(N**T1)[darray]) -> dframe:
     a[f] = col
     return a
 
@@ -429,11 +429,11 @@ def both(a:(T1 ** T2)[dstruct][T3], fn:pyfunc, b:(T4 ** T5)[dstruct][T6]) -> pyl
         >> b._kvs()
 
 @coppertop(style=ternary)
-def both(a: matrix&tvarray, f, b:matrix&tvarray) -> matrix&tvarray:
+def both(a: matrix&darray, f, b:matrix&darray) -> matrix&darray:
     with np.nditer([a, b, None]) as it:
         for x, y, z in it:
             z[...] = f(x,y)
-        return it.operands[2].view(matrix&tvarray)
+        return it.operands[2].view(matrix&darray)
 
 
 # **********************************************************************************************************************
@@ -441,7 +441,7 @@ def both(a: matrix&tvarray, f, b:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def centerCols(panel:matrix&tvarray) -> matrix&tvarray:
+def centerCols(panel:matrix&darray) -> matrix&darray:
     return panel - np.mean(panel, 0).reshape((1, panel.shape[1]))
 
 
@@ -536,7 +536,7 @@ def count(x:txt+pylist+pytuple+pyset+pydict_keys+pydict_values) -> t.count:
     return len(x)
 
 @coppertop
-def count(m:matrix&tvarray) -> t.count:
+def count(m:matrix&darray) -> t.count:
     nr, nc = m.shape
     return nr
 
@@ -747,7 +747,7 @@ def drop(f:dframe, ss:pytuple) -> dframe:
     raise NotYetImplemented()
 
 @coppertop(style=binary)
-def drop(xs:(N**T1)&tvarray, c:t.count) -> (N**T1)&tvarray:
+def drop(xs:(N**T1)&darray, c:t.count) -> (N**T1)&darray:
     return xs[c:]
 
 
@@ -776,7 +776,7 @@ def dropColRemain(m, i):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def dropCols(m:matrix&tvarray, n:t.count):
+def dropCols(m:matrix&darray, n:t.count):
     return m[:,n:]
 
 
@@ -815,7 +815,7 @@ def dropRowRemain(m, i):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def dropRows(m:matrix&tvarray, n:t.count):
+def dropRows(m:matrix&darray, n:t.count):
     if n >= 0:
         return m[n:,:]
     else:
@@ -851,7 +851,7 @@ def dropSlots(s:dstruct, names:pylist) -> dstruct:
 # **********************************************************************************************************************
 
 @coppertop
-def eachCol_(m: matrix & tvarray) -> pylist:
+def eachCol_(m: matrix & darray) -> pylist:
     answer = []
     nr, nc = m.shape
     for i in range(nc):
@@ -865,7 +865,7 @@ def eachCol_(m: matrix & tvarray) -> pylist:
 # **********************************************************************************************************************
 
 @coppertop
-def eachRow_(m: matrix & tvarray) -> pylist:
+def eachRow_(m: matrix & darray) -> pylist:
     answer = []
     nr, nc = m.shape
     for i in range(nc):
@@ -915,7 +915,7 @@ def firstLast(x:pylist+pytuple) -> pytuple:
     return x[0], x[-1]
 
 @coppertop
-def firstLast(x:(N**T1)&tvarray) -> (N**T1)&tvarray:
+def firstLast(x:(N**T1)&darray) -> (N**T1)&darray:
     return x[[0,-1]]
 
 
@@ -925,10 +925,10 @@ def firstLast(x:(N**T1)&tvarray) -> (N**T1)&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def hjoin(a:tvarray&matrix, b:tvarray&matrix) -> tvarray&matrix:
+def hjoin(a:darray&matrix, b:darray&matrix) -> darray&matrix:
     aShape = a.shape; bShape = b.shape
     if aShape[0] != bShape[0]: raise ValueError('A and B are different heights!')
-    return (tvarray&matrix)(np.append(a, b, axis=1))
+    return (darray&matrix)(np.append(a, b, axis=1))
 
 
 # **********************************************************************************************************************
@@ -1274,7 +1274,7 @@ def numCols(f: dframe) -> t.count:
     return len(f._keys())
 
 @coppertop
-def numCols(x:matrix&tvarray) -> t.count:
+def numCols(x:matrix&darray) -> t.count:
     return x.shape[1] | t.count
 
 @coppertop
@@ -1294,7 +1294,7 @@ def numRows(f: dframe) -> t.count:
     return firstCol.shape[0]
 
 @coppertop
-def numRows(x:matrix&tvarray) -> t.count:
+def numRows(x:matrix&darray) -> t.count:
     return x.shape[0] | t.count
 
 @coppertop
@@ -1393,7 +1393,7 @@ def replace(d:pydict, f:txt, new):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def scalarProduct(A:matrix&tvarray, B:matrix&tvarray) -> num:
+def scalarProduct(A:matrix&darray, B:matrix&darray) -> num:
     return float(np.dot(A, B))
 
 
@@ -1479,7 +1479,7 @@ def setOrder(a, ks):
 # **********************************************************************************************************************
 
 @coppertop
-def shape(x:matrix&tvarray) -> pytuple:
+def shape(x:matrix&darray) -> pytuple:
     return x.shape
 
 @coppertop
@@ -1511,7 +1511,7 @@ def shift(m:array_, n:t.count) -> array_:
 # **********************************************************************************************************************
 
 @coppertop
-def shuffleColsInPlace(panel:matrix&tvarray) -> matrix&tvarray:
+def shuffleColsInPlace(panel:matrix&darray) -> matrix&darray:
     for i in range(panel >> numCols):
         ix = np.arange(panel >> numRows)
         np.random.shuffle(ix)      # destructive
@@ -1671,7 +1671,7 @@ def subsetOf(a, b):
 # **********************************************************************************************************************
 
 @coppertop
-def T(A:matrix&tvarray) -> matrix&tvarray:
+def T(A:matrix&darray) -> matrix&darray:
     return A.T
 
 
@@ -1760,7 +1760,7 @@ def take(xs:pylist, ss:pytuple) -> pylist:
             return xs[s1:s2]
 
 @coppertop(style=binary)
-def take(xs:(N**T1)&tvarray, c:t.count) -> (N**T1)&tvarray:
+def take(xs:(N**T1)&darray, c:t.count) -> (N**T1)&darray:
     if c >= 0:
         return xs[:c]
     else:
@@ -1773,7 +1773,7 @@ def take(xs:(N**T1)&tvarray, c:t.count) -> (N**T1)&tvarray:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeCol(m:matrix&tvarray, i:offset):
+def takeCol(m:matrix&darray, i:offset):
     return m[:,[i]]
 
 
@@ -1792,7 +1792,7 @@ def takeColRemain(m, i):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeCols(m:matrix&tvarray, n:t.count) -> matrix&tvarray:
+def takeCols(m:matrix&darray, n:t.count) -> matrix&darray:
     if n >= 0:
         return m[:,0:n]
     else:
@@ -1804,7 +1804,7 @@ def takeCols(m:matrix&tvarray, n:t.count) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def takeDiag(m: matrix & tvarray) -> array_:
+def takeDiag(m: matrix & darray) -> array_:
     return np.diag(m) | array_
 
 
@@ -1842,8 +1842,8 @@ def takeDropUsing(xs:pytuple, f1):
 # **********************************************************************************************************************
 
 @coppertop
-def takePanel(f:dframe) -> matrix&tvarray:
-    return (matrix&tvarray)(np.hstack(f >> values))
+def takePanel(f:dframe) -> matrix&darray:
+    return (matrix&darray)(np.hstack(f >> values))
 
 
 # **********************************************************************************************************************
@@ -1862,7 +1862,7 @@ def takeRow(m, i):
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeRowRemain(X:matrix&tvarray, i:offset) -> pytuple:
+def takeRowRemain(X:matrix&darray, i:offset) -> pytuple:
     remain = np.delete(X, i, axis=0)
     take = X[[i],:]
     return take, remain
@@ -1873,7 +1873,7 @@ def takeRowRemain(X:matrix&tvarray, i:offset) -> pytuple:
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def takeRows(m:matrix&tvarray, n:t.count) -> matrix&tvarray:
+def takeRows(m:matrix&darray, n:t.count) -> matrix&darray:
     if n >= 0:
         return m[:n, :]
     else:
@@ -1885,8 +1885,8 @@ def takeRows(m:matrix&tvarray, n:t.count) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def toDiag(m: array_) -> matrix & tvarray:
-    return (matrix & tvarray)(np.diag(m))
+def toDiag(m: array_) -> matrix & darray:
+    return (matrix & darray)(np.diag(m))
 
 
 # **********************************************************************************************************************
@@ -1992,7 +1992,7 @@ def without(xs:(N**T1)[dseq], x:T1, tByT) -> (N**T1)[dseq]:
 # **********************************************************************************************************************
 
 @coppertop
-def XTX(x:matrix&tvarray) -> matrix&tvarray:
+def XTX(x:matrix&darray) -> matrix&darray:
     return x.T @ x
 
 
@@ -2001,7 +2001,7 @@ def XTX(x:matrix&tvarray) -> matrix&tvarray:
 # **********************************************************************************************************************
 
 @coppertop
-def XXT(x:matrix&tvarray) -> matrix&tvarray:
+def XXT(x:matrix&darray) -> matrix&darray:
     return x @ x.T
 
 

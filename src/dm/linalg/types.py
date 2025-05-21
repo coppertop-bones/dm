@@ -13,9 +13,8 @@
 
 import numpy as np
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BTStruct
-from dm.core.types import matrix, N, num, pytuple, dstruct
-from dm.core.structs import tvarray
+from bones.lang.metatypes import BTAtom, BType
+from dm.core.types import matrix, N, num, pytuple, dstruct, darray
 
 
 # NB a 1x1 matrix is assumed to be a scalar, e.g. https://®®en.wikipedia.org/wiki/Dot_product#Algebraic_definition
@@ -37,11 +36,11 @@ rowvec = BTAtom('rowvec')
 Cholesky = BTAtom('Cholesky')
 
 
-matrix_ = matrix & tvarray
-array_ = (N**num) & tvarray
+matrix_ = matrix & darray
+array_ = (N**num) & darray
 
 
-QR = BTStruct(qT=matrix, r=matrix&right)
+QR = BType('QR: QR & {qT:matrix, r:matrix&right} in mem')
 @coppertop(style=nullary, local=True)
 def _makeQR(ts, q:matrix_, r:matrix_):
     return dstruct(QR&dstruct, q=q, r=r)
@@ -51,8 +50,8 @@ def _makeQR(ts, qr:pytuple):
 QR.setConstructor(_makeQR)
 
 
-SVD = BTStruct(u=matrix, s=N**num, vt=matrix)
+SVD = BType('SVD: SVD & {u:matrix, s:N**num, vt:matrix} & dstruct in mem')
 @coppertop(style=nullary, local=True)
-def _makeSVD(ts, u:matrix_, s:array_, vT:matrix_) -> SVD&dstruct:
+def _makeSVD(ts, u:matrix_, s:array_, vT:matrix_) -> SVD:
     return dstruct(SVD&dstruct, u=u, s=s, vT=vT)
 SVD.setConstructor(_makeSVD)

@@ -20,8 +20,7 @@ from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.core.sentinels import Missing, function
 from dm.core.types import dframe, txt, pydict, dtup, t, N, num, pylist, pytuple, pydict_keys, pydict_values, matrix, \
-    offset, pyfunc
-from dm.core.structs import tvarray
+    offset, pyfunc, darray
 from dm.core.aggman import count
 
 
@@ -178,7 +177,7 @@ def firstLast(f:dframe) -> dframe:
 
 @coppertop
 def firstLast(f:dframe, n:t.count) -> dframe:
-    return dframe({k:(N**num)[tvarray](np.append(f[k][:n], f[k][-n:])) for k in f._keys()})
+    return dframe({k:(N**num)[darray](np.append(f[k][:n], f[k][-n:])) for k in f._keys()})
 
 
 # **********************************************************************************************************************
@@ -370,7 +369,7 @@ def take(f:dframe, fields) -> dframe:
 # **********************************************************************************************************************
 
 @coppertop
-def takePanel(f: dframe) -> matrix&tvarray:
+def takePanel(f: dframe) -> matrix&darray:
     raise NotYetImplemented()
 
 

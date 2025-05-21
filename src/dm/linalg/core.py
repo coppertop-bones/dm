@@ -14,7 +14,7 @@
 import scipy.linalg, numpy as np, numpy.linalg
 
 from coppertop.pipe import *
-from dm.core.structs import tvarray
+from dm.core.structs import darray
 from dm.core.types import matrix, N, num, T
 from dm.linalg.types import orth, right, upper, lower, Cholesky, QR, SVD, left
 import dm.linalg.orient
@@ -22,8 +22,8 @@ import dm.linalg.orient
 from dm.core import dm
 
 
-array_ = (N**num)[tvarray]
-matrix_ = matrix[tvarray]
+array_ = (N**num)[darray]
+matrix_ = matrix[darray]
 
 
 # NB a 1x1 matrix is assumed to be a scalar, e.g. https://®®en.wikipedia.org/wiki/Dot_product#Algebraic_definition
@@ -58,13 +58,13 @@ def svd(A:matrix_) -> SVD:
 @coppertop(style=binary)
 def solve(U:(upper&matrix_)+(right&matrix_), b:matrix_[T]) -> matrix_:
     """Returns the solution x of Ux = b where U is upper triangular"""
-    return scipy.linalg.solve_triangular(U, b, lower=False).view(tvarray) | matrix_
+    return scipy.linalg.solve_triangular(U, b, lower=False).view(darray) | matrix_
 
 
 @coppertop(style=binary)
 def solve(L:(lower&matrix_)+(left&matrix_), b:matrix_[T]) -> matrix_:
     """Returns the solution x of Lx = b where U is lower triangular"""
-    return scipy.linalg.solve_triangular(L, b, lower=True).view(tvarray) | matrix_
+    return scipy.linalg.solve_triangular(L, b, lower=True).view(darray) | matrix_
 
 
 @coppertop(style=binary)
@@ -76,7 +76,7 @@ def solve(c:Cholesky&matrix, b:matrix_[T]) -> matrix_:
 @coppertop(style=binary)
 def solve(qr:QR, b:matrix_[T]) -> matrix_:
     """Returns the solution x of Ax = b given a QR decomposition of A"""
-    return scipy.linalg.solve_triangular(qr.r, qr.T @ b, lower=False).view(tvarray) | matrix_
+    return scipy.linalg.solve_triangular(qr.r, qr.T @ b, lower=False).view(darray) | matrix_
 
 
 @coppertop(style=binary)
@@ -86,7 +86,7 @@ def solve(svd:SVD, b:matrix_[T]) -> matrix_:
 
 
 @coppertop
-def pca(panel:matrix&tvarray):
+def pca(panel:matrix&darray):
     u, s, vh = dm.linalg.np.svd(panel)
     vor, e, sfv, thetas, sorts = dm.linalg.orientEigenvectors(vh.T, s)
     return vor, s

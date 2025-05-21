@@ -18,7 +18,7 @@ import builtins, polars as pl, numpy as np
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from dm.core.types import pylist, pytuple, pydict_keys, pydict_values, pyset, txt, t, offset, matrix
-from dm.core.structs import tvarray
+from dm.core.structs import darray
 
 
 
@@ -214,8 +214,8 @@ def take(f: pl.DataFrame, k: txt) -> pl.DataFrame:
 # **********************************************************************************************************************
 
 @coppertop
-def takePanel(f: pl.DataFrame) -> matrix&tvarray:
-    return (matrix&tvarray)(f.to_numpy())
+def takePanel(f: pl.DataFrame) -> matrix&darray:
+    return (matrix&darray)(f.to_numpy())
 
 
 # **********************************************************************************************************************

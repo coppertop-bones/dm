@@ -10,17 +10,16 @@
 
 from coppertop.pipe import *
 from dm.core import to, shape
-from bones.core.utils import assertRaises
-from dm.core.types import matrix
-from dm.core.structs import tvarray
+from dm.utils.testing import assertRaises
+from dm.core.types import matrix, darray
 from dm.testing import check, equals
 from dm.core.conv import to
 from dm.pp import PP
 
 
 def test():
-    A = [[1, 2], [3, 5]] >> to >> (matrix&tvarray)
-    b = [1, 2] >> to >> (matrix&tvarray) >> PP
+    A = [[1, 2], [3, 5]] >> to >> (matrix&darray)
+    b = [1, 2] >> to >> (matrix&darray) >> PP
     A @ b >> shape >> check >> equals >> (2,1)
     with assertRaises(Exception) as e:
         b @ A

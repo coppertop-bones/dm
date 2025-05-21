@@ -23,9 +23,9 @@ import bones.kernel.tests.test_site
 import bones.kernel.tests.test_sym
 
 # lang tests - types and selection
-import bones.lang.tests.test_metatypes.test_constructors
-import bones.lang.tests.test_metatypes.test_decomposition
-import bones.lang.tests.test_metatypes.test_fitsWithin
+import bones.lang.tests.test_constructors
+import bones.lang.tests.test_decomposition
+import bones.lang.tests.test_fitsWithin
 
 import bones.lang.tests.test_parse_groups.test_all
 
@@ -39,9 +39,9 @@ def main():
     bones.kernel.tests.test_sym.main()
 
     # lang tests - types and selection
-    bones.lang.tests.test_metatypes.test_constructors.main()
-    bones.lang.tests.test_metatypes.test_decomposition.main()
-    bones.lang.tests.test_metatypes.test_fitsWithin.main()
+    bones.lang.tests.test_constructors.main()
+    bones.lang.tests.test_decomposition.main()
+    bones.lang.tests.test_fitsWithin.main()
 
 
 def addendum():

@@ -15,8 +15,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
-from dm.core.types import bool, matrix
-from dm.core.structs import tvarray
+from dm.core.types import bool, matrix, darray
 from dm.core.maths import EPS
 
 @coppertop(style=binary)
@@ -35,7 +34,7 @@ def different(a, b) -> bool:
     return a != b
 
 @coppertop(style=binary)
-def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+def different(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a != b).any())
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
@@ -47,7 +46,7 @@ def equals(a, b) -> bool:
     return a == b
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
-def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+def equals(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a == b).all())
 
 @coppertop(style=binary)

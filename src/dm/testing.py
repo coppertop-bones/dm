@@ -14,7 +14,8 @@
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-
+import traceback
+from bones.core.context import context
 from bones import jones
 from coppertop.pipe import *
 from dm.core.types import pytuple

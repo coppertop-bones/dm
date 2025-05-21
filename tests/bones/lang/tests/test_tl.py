@@ -12,7 +12,8 @@ import antlr4, traceback, os
 
 from bones.jones import BTypeError
 
-from bones._utils.testing import assertRaises
+from dm.utils.testing import assertRaises
+from bones.core.context import context              # needed for conditional break points whilst debugging
 
 from bones.lang.core import TLError, bmtatm
 from bones.lang.type_lang import TypeLangInterpreter
@@ -96,23 +97,53 @@ def test_intersection_redefine(TM):
     ''')
 
     tli.eval('''
-        isin: isin & txt in finanicial
-        isin: isin & txt in finanicial
-        bbgcode: bbgcode & txt in finanicial
+        isin: isin & txt in financial
+        isin: isin & txt in financial
+        bbgcode: bbgcode & txt in financial
         bbgcodeOrIsin: bbgcode & txt + isin & txt  // okay if not assigning
     ''')
 
     with assertRaises(Exception):
         tli.eval('''
-            isin: isin & txt in finanicial
+            isin: isin & txt in financial
             isin: isin & txt
         ''')
 
     with assertRaises(Exception):
         tli.eval('''
             cusip: cusip & txt
-            cusip: cusip & txt in finanicial
+            cusip: cusip & txt in financial
         ''')
+
+
+def test_complicated_spaces(TM):
+    tli = TypeLangInterpreter(tm := TM())
+
+    tli.eval('''
+        S1: S2: S3: a: b: c: d: f: atom
+        ab: a & b in S1
+        cd: c & d in S1
+
+        e: atom in S1
+        ef: e & f in S1
+        aef: a & ef in S1
+        ac: a & c in S2
+
+        g: atom in S1
+
+        ag: a & g in S2
+        acef: aef & ac in S3
+    ''')
+
+    with assertRaises((BTypeError, TLError)):
+        tli.eval('ab & cd')  # ab and cd are both in S1
+
+    with context(stop=False):
+        with assertRaises((BTypeError, TLError)):
+            tli.eval('acef & ab')  # e and ab are in S1
+
+    with assertRaises((BTypeError, TLError)):
+        tli.eval('acef & ag')  # e and g are in S1
 
 
 def test_union(TM):
@@ -280,7 +311,6 @@ def test_runtime_fx(TM):
     tli.eval(src)
 
 
-
 def test_runtime_fx_err(TM):
     # ccy is correctly to be an implicit recursive type but is not used immediately in the assignment
     tli = TypeLangInterpreter(tm := TM())
@@ -392,7 +422,6 @@ def test_static_fx2(TM):
         problem is we have {dom: ccy & T1, for: ccy & T2} & {dom: ccy & GBP, for: ccy & USD} in GBPUSD
     '''
 
-
     # NOTES:
     # three orthogonal spaces: ccy, fx, domfor
     # use && for intersections "in"
@@ -487,6 +516,47 @@ def test_recursive_space(TM):
     # ''')
 
 
+def test_pyAndPylistEtc(TM):
+    tli = TypeLangInterpreter(tm := TM())
+    tli.eval('''
+        mem: atom
+        py: atom in mem
+        txt: txt & py in mem
+        pylist: pylist & py in mem
+        pydict: pydict & py in mem
+    ''')
+    pylist = tm['pylist']
+    txts = tli.eval('N**txt')
+    t = tm.intersection((txts, pylist))
+    
+    tli.eval('(N**txt) & pylist')
+
+    with assertRaises((BTypeError, TLError)):
+        tli.eval('pylist & py')
+
+    with assertRaises((BTypeError, TLError)):
+        tli.eval('pylist & pydict')
+
+
+def test_cStyleConst(TM):
+    tli = TypeLangInterpreter(tm := TM())
+
+    tli.eval('''
+        fred: joe: sally: consty: atom
+        mut: tbc
+        const: atom in consty implicitly mut
+        mut: mut & const in consty
+    ''')
+
+    tli.eval('fred & const')
+    tli.eval('fred & const & joe')
+    tli.eval('fred & mut')
+    tli.eval('fred & mut & joe')
+
+    with assertRaises((BTypeError, TLError)):
+        tli.eval('mut & const')
+
+
 def test_files(TM):
     tli = TypeLangInterpreter(tm := TM())
     thisPath = os.path.dirname(__file__)
@@ -518,6 +588,7 @@ def test_pp(TM):
     pass
 
 
+
 def debug(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -526,11 +597,8 @@ def debug(TM):
     ''')
 
 
-
-
 def main():
     fns = [
-        debug,
         test_recursive_space,
         test_runtime_ccy,
         test_atom1,
@@ -538,6 +606,7 @@ def main():
         # test_atom_redefine,
         test_intersection,
         # test_intersection_redefine,
+        test_complicated_spaces,
         test_union,
         # test_namespaces,
         test_fitsWithin,
@@ -551,6 +620,8 @@ def main():
         test_runtime_fx_err,
         # test_static_fx1,
         # test_static_fx2,
+        test_pyAndPylistEtc,
+        test_cStyleConst,
         test_files,
         # test_pp,                  // requires namespaces
     ]

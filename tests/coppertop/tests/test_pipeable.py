@@ -13,14 +13,13 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from bones.core.utils import assertRaises
 from bones.core.errors import NotYetImplemented
 from bones.lang.metatypes import BTAtom
+from dm.utils.testing import assertRaises
 from dm.testing import check, equals
 from coppertop.tests.take1 import _take
 from _.coppertop.tests.take2 import _take
-from dm.core.types import index, pylist, litint
-from dm.core.structs import tvarray
+from dm.core.types import index, pylist, litint, darray
 
 mat = BTAtom("mat2")
 vec = BTAtom("vec2")
@@ -33,8 +32,8 @@ def mmul(A:mat, B:vec) -> vec:
 
 
 def test_mmul():
-    a = tvarray(mat, [[1, 2], [3, 4]])
-    b = tvarray(vec, [1, 2])
+    a = darray(mat, [[1, 2], [3, 4]])
+    b = darray(vec, [1, 2])
     res = a >> mmul >> b
     res >> check >> typeOf >> vec
 

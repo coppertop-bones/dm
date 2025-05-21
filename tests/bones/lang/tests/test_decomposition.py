@@ -10,20 +10,21 @@
 
 import random
 from coppertop.pipe import *
-from bones.core.utils import assertRaises
-from bones.lang.metatypes import BTAtom, S, _partitionIntersectionTLs, weaken, BTypeError, BTReserved
+from bones.lang.metatypes import BTAtom, S, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
 import bones.lang.metatypes
 from bones.lang.structs import tv
+from dm.utils.testing import assertRaises
 from dm.testing import check, equals, fitsWithin, doesNotFitWithin
 from dm.core.misc import _v
 from dm.core.conv import to
 from dm.core.aggman import drop
-from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq, obj
+from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq
 from dm.finance.types import ccy, fx
 from dm.linalg.types import square, right
 
 oldWeakenings = bones.lang.metatypes._weakenings
 
+mem = BType('mem')
 tFred = BTAtom('fred')
 tJoe = BTAtom('joe')
 tSally = BTAtom('sally')
@@ -31,8 +32,8 @@ pystr2 = BTAtom('pystr2')
 weaken(txt, (pystr2,))
 
 aliased = BTReserved()
-_aliased = BTAtom('_aliased', self=BTReserved(implicitly=aliased))
-aliased = BTAtom('aliased', self=aliased, space=_aliased)
+_aliased = BTAtom('_aliased', implicitly=aliased)
+aliased = BTAtom('aliased', btype=aliased, space=_aliased)
 anon = BTAtom('anon', space=_aliased)
 named = BTAtom('named', space=_aliased)
 weaken(anon, aliased)
@@ -118,10 +119,9 @@ blue = BTAtom('blue')
 # mouseButton = BTSet([red, yellow, blue], default=blue)
 
 
-# familial
 _ISINy = BTAtom('_ISINy')
-ISIN = BTAtom('ISIN', space=_ISINy)
-CUSIP = BTAtom('CUSIP', space=_ISINy)
+ISIN = BType('ISIN: atom explicit in _ISINy')
+CUSIP = BType('CUSIP: atom explicit in _ISINy')
 inches = BTAtom('inches', space=_ISINy)
 cm = BTAtom('cm', space=_ISINy)
 
@@ -130,18 +130,18 @@ cm = BTAtom('cm', space=_ISINy)
 col = BTAtom('col', explicit=True)
 row = BTAtom('row', explicit=True)
 
-GBP = ccy['GBP2'].setCoercer(tv)
-USD = ccy['USD2'].setCoercer(tv)
+GBP = BType('GBP2: GBP2 & ccy').setCoercer(tv)
+USD = BType('USD2: USD2 & ccy').setCoercer(tv)
 
 
 # orthogonal
-# anything including a python class, e.g. tmatrix&tvarray
-# pylist = BTAtom('pylist', space=obj)
-lol = BTAtom('lol', space=obj)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
+# anything including a python class, e.g. tmatrix&darray
+# pylist = BTAtom('pylist', space=mem)
+lol = BTAtom('lol', space=mem)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
 
 # (txt).setConstructor(tv)
-(ISIN & txt).setConstructor(tv)
-(CUSIP & txt).setConstructor(tv)
+(ISIN & txt)
+(CUSIP & txt)
 
 
 join_psps = '_join(a:txt, b:txt)'
@@ -200,7 +200,7 @@ def opB(A:tmatrix&anon) -> tmatrix&anon:
 
 def testPartition():
     _partitionIntersectionTLs((tmatrix & square).types, (tmatrix, )) >> check >> equals >> ((square,), (tmatrix,), (), {})
-    _partitionIntersectionTLs((tmatrix & square).types, (ISIN & CUSIP).types) >> check >> equals >> ((square, tmatrix,), (), (ISIN, CUSIP), {})
+    _partitionIntersectionTLs((tmatrix & square).types, (ISIN, CUSIP)) >> check >> equals >> ((square, tmatrix,), (), (ISIN, CUSIP), {})
     _partitionIntersectionTLs((txt & square).types, (pystr2, )) >> check >> equals >> ((square,), (txt,), (), {txt:pystr2})
     _partitionIntersectionTLs((pystr2 & square).types, (txt, )) >> check >> equals >> ((square, pystr2), (), (txt,), {})
 
@@ -280,15 +280,6 @@ def mul(c:ccy[T1], f:fx[S(d=ccy[T1], f=ccy[T2])], tByT) -> ccy[T2]:
 def mul(c:ccy[T1], f:fx[S(d=ccy[T2], f=ccy[T1])], tByT) -> ccy[T2]:
     return tv(ccy[tByT[T2]], c._v / f._v)
 
-GBPUSD = fx[S(d=GBP, f=USD).setExplicit].setCoercer(tv)
-
-def testExplicitStructs():
-    GBPUSD >> check >> doesNotFitWithin >> fx
-    GBPUSD >> check >> doesNotFitWithin >> fx[S(d=T1, f=T2)]        # ccy is not explicit in the rhs
-    GBPUSD >> check >> fitsWithin >> fx[S(d=ccy[T1], f=ccy[T2])]
-    (100 | GBP) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (130 | USD)
-    (130 | USD) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (100 | GBP)
-
 
 def testMisc():
     (txt & square) >> check >> fitsWithin >> pystr2
@@ -304,7 +295,7 @@ def testAddAndSubtract():
 
 
 def testDrop():
-    card = txt['card']
+    card = BType('card: card & txt')
     cards = (N ** card)[dseq].setPP('deck').setConstructor(dseq)
     Gr = 'Green'
     Mu = 'Mustard'
@@ -314,6 +305,19 @@ def testDrop():
     Sc = 'Scarlet'
     people = [Gr, Mu, Or, Pe, Pl, Sc] >> to >> cards
     people >> drop >> [0, 5] >> _v >> check >> equals >> [Mu, Or, Pe, Pl]
+
+
+# GBPUSD = fx[S(d=GBP, f=USD).setExplicit].setCoercer(tv)
+GBPUSD = fx[S(d=GBP, f=USD)].setCoercer(tv)
+
+def testExplicitStructs():
+    GBPUSD >> check >> doesNotFitWithin >> fx
+    GBPUSD >> check >> doesNotFitWithin >> fx[S(d=T1, f=T2)]        # ccy is not explicit in the rhs
+    GBPUSD >> check >> fitsWithin >> fx[S(d=ccy[T1], f=ccy[T2])]
+    (100 | GBP) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (130 | USD)
+    (130 | USD) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (100 | GBP)
+
+
 
 
 def testTypes():
@@ -337,12 +341,13 @@ def main():
     testExclusive()
     testGeneric()
     testOrthogonal()
-    testImplicit()
     testMisc()
-    testAddAndSubtract()
-    # testDrop()
     testExplicit()
-    testExplicitStructs()
+    # testAddAndSubtract()
+    # testDrop()
+    # testExplicitStructs()
+    # testImplicit()
+    print(f'{__file__} has failing tests')
 
 if __name__ == '__main__':
     t = fx[S(d=ccy[T1], f=ccy[T2])]

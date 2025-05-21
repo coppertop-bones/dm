@@ -16,7 +16,7 @@
 
 from enum import IntEnum
 
-from bones.lang.metatypes import BTAtom, S
+from bones.lang.metatypes import BTAtom, S, BType
 from dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq
 from bones.core.sentinels import Missing
 
@@ -117,8 +117,8 @@ handId = BTAtom('handId')
 ndmap = BTAtom('ndmap')
 pad_element = S(has=txt, suggestions=count, like=count)
 cluedo_pad = ((card * handId) ** pad_element)[ndmap] & BTAtom('cluedo_pad')
-cluedo_pad = pydict  # & BTAtom('cluedo_pad') once we have tvmap we can do this
-cluedo_bag = (dstruct & BTAtom('_cluedo_bag')).nameAs('cluedo_bag')
+cluedo_pad = pydict  # & BTAtom('cluedo_pad') once we have dmap we can do this
+cluedo_bag = BType('cluedobag: cluedobag & dstruct in mem')
 
 tPair = BTAtom('pair')
 display_table = (N ** txt)[dseq][BTAtom('table')].setCoercer(dseq)
@@ -142,7 +142,7 @@ class HasOne:
 one = HasOne()
 
 # SHOULDDO these are currently ficticious and need implementing
-possibleHand = (N ** txt)[pyset]['possibleHand']
+possibleHand = BType('possibleHand: possibleHand & (N ** txt) & pyset')
 cell = S(
     state=txt,
     suggestions=pylist,

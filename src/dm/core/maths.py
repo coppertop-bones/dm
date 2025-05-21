@@ -18,8 +18,7 @@ import builtins, numpy as np, math
 
 from bones.core.errors import NotYetImplemented
 from coppertop.pipe import *
-from dm.core.types import T1, pylist, N, num, matrix, t, pyset, pytuple, T
-from dm.core.structs import tvarray
+from dm.core.types import T1, pylist, N, num, matrix, t, pyset, pytuple, T, darray
 from dm.core.aggman import count
 
 import itertools, scipy
@@ -28,8 +27,8 @@ import itertools, scipy
 
 EPS = 7.105427357601E-15      # i.e. double precision
 
-array_ = (N**num)&tvarray
-matrix_ = matrix&tvarray
+array_ = (N**num)&darray
+matrix_ = matrix&darray
 
 
 
@@ -175,8 +174,8 @@ def roundHalfToPos(x):
     raise NotYetImplemented()
 
 @coppertop
-def round(xs:matrix&tvarray, figs:t.count) -> matrix&tvarray:
-    return (matrix&tvarray)(np.round(xs, figs))
+def round(xs:matrix&darray, figs:t.count) -> matrix&darray:
+    return (matrix&darray)(np.round(xs, figs))
 
 @coppertop
 def round(xs:array_, figs:t.count) -> array_:

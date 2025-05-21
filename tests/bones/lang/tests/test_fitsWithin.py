@@ -53,8 +53,8 @@ def testSimple():
 
 
 def testNested():
-    GBP = ccy['GBP']
-    USD = ccy['USD']
+    GBP = BType('GBP: GBP & ccy')
+    USD = BType('USD: USD & ccy')
     weaken((index, num, index, num), (ccy[T], GBP, USD))
 
     index >> check >> fitsWithin >> GBP
@@ -81,41 +81,37 @@ def testTemplates():
     (fred ** txt)[pylist] >> check >> doesNotFitWithin >> (T1 ** T1)[pylist]
 
 
+
 def testTemplates2():
 
-    account = txt['account']
+    account = BType('account: account & txt')
     weaken(txt, account)
 
-    dstruct = txt['tvstruct2']
-    pylist = txt['pylist2']
-    positions = (num ** account)[dstruct]['positions']
-
-    t1 = positions
-    t2 = (N**account)[pylist]
-    t3 = index
+    positions = BType('positions: positions & (account**num) & pydict')
+    accounts = (N**account)[pylist]
 
     tByT = {}
-    r1, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3]), tByT)
-    r2, tByT, distances = cacheAndUpdate(_fitsWithin(t2, (N**T1)[pylist]), tByT)
-    r3, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2), tByT)
+    r1, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3]), tByT)
+    r2, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, (N**T1)[pylist]), tByT)
+    r3, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2), tByT)
 
     assert r1 and r2 and r3
 
     # dispatch._fitsCache = {}
-    tByT = {}
-    r4, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2), tByT)
-    r5, tByT, distances = cacheAndUpdate(_fitsWithin(t2, (N**T1)[pylist]), tByT)
-    r6, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3]), tByT)
+    tByT2 = {}
+    r4, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2), tByT2)
+    r5, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, (N**T1)[pylist]), tByT2)
+    r6, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3]), tByT2)
 
     assert r4 and r5 and r6
 
     t2 = txt
     t3 = index
 
-    tByT = {}
-    r9, tByT, distances = cacheAndUpdate(_fitsWithin(t3, T2, tByT), tByT)
-    r8, tByT, distances = cacheAndUpdate(_fitsWithin(t2, T1, tByT), tByT)
-    r7, tByT, distances = cacheAndUpdate(_fitsWithin(t1, (T2**T1)[dstruct][T3], tByT), tByT)
+    tByT3 = {}
+    r9, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2, tByT3), tByT3)
+    r8, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, T1, tByT3), tByT3)
+    r7, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3], tByT3), tByT3)
 
     assert r7
     assert r8

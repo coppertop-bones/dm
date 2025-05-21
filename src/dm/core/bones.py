@@ -38,7 +38,7 @@ def different(a, b) -> bool:
     return a != b
 
 @coppertop(style=binary, bname='!=')
-def different(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+def different(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a != b).any())
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
@@ -46,7 +46,7 @@ def equals(a, b) -> bool:
     return a == b
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
-def equals(a:matrix&tvarray, b:matrix&tvarray) -> bool:
+def equals(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a == b).all())
 
 @coppertop(style=binary, bname='>=')

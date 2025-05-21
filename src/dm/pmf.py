@@ -20,18 +20,18 @@
 # PMF is a discrete random variable, i.e. a probability mass function
 # CMF is a cumulative mass function
 #
-# DF is implemented as {fn: f64**f64[tvmap], attr:txt**T[tvmap]} where the attr hold attributes such as a name
+# DF is implemented as {fn: f64**f64[dmap], attr:txt**T[dmap]} where the attr hold attributes such as a name
 #     in C or bones we might use a variable length struct
 
 import operator, random, numpy as np, enum, scipy.stats, collections.abc
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
+from bones.lang.metatypes import BType
 from dm.core.aggman import both, zipAll, values, keys, select, sort, kvs, collect, interleave, dropSlots, join
 from dm.core.conv import to
 from dm.core.misc import sequence
-from dm.core.types import pylist, index, pytuple, num, dstruct, matrix, dmap, py
-from dm.core.structs import tvarray
+from dm.core.types import pylist, index, pytuple, num, dstruct, matrix, dmap, py, darray
 from dm.pp import PP
 
 
@@ -71,19 +71,19 @@ def _makeCmf(cs, *args, **kwargs):
     answer = _makeDF(cs, *args, **kwargs)
     return answer | CMF
 
-DF = dstruct['DF'].setConstructor(_makeDF)
-DF.__doc__ = 'Discrete Function - {fn_: f64**f64[tvmap]} * {...} i.e. a fn and zero or more custom fields'
+DF = BType('DF: DF & dstruct in mem').setPP('DF').setConstructor(_makeDF)
+DF.__doc__ = 'Discrete Function - {fn_: f64**f64[dmap]} * {...} i.e. a fn and zero or more custom fields'
 DF.__module__ = __name__
 
-PMF = DF['PMF'].setPP('PMF').setConstructor(_makePmf)
+PMF = BType('PMF: PMF & DF in mem').setPP('PMF').setConstructor(_makePmf)
 PMF.__doc__ = 'PMF - subtype of DF whose fn_ values form a probability measure'
 PMF.__module__ = __name__
 
-L = DF['L'].setPP('L').setConstructor(lambda cs, *args, **kwargs: _makeDF(cs, *args, **kwargs) | L)
+L = BType('L: L & DF in mem').setPP('L').setConstructor(lambda cs, *args, **kwargs: _makeDF(cs, *args, **kwargs) | L)
 L.__doc__ = 'Likelihood - subtype of DF'
 L.__module__ = __name__
 
-CMF = DF['CMF'].setPP('CMF').setConstructor(_makeCmf)
+CMF = BType('CMF: CMF & DF in mem').setPP('CMF').setConstructor(_makeCmf)
 CMF.__doc__ = 'CMF - subtype of DF whose fn_ values are a cumulative mass function'
 CMF.__module__ = __name__
 
@@ -206,17 +206,17 @@ def gaussian_kde(data) -> scipy.stats.kde.gaussian_kde:
     return scipy.stats.gaussian_kde(data)
 
 @coppertop(style=binary)
-def sample(cmf:CMF, n:index) -> matrix[tvarray]:
+def sample(cmf:CMF, n:index) -> matrix[darray]:
     vals = []
     sortedCmf = cmf['_cmf']
     for _ in range(n):
         p = random.random()
         i = np.searchsorted(sortedCmf[:, 1], p, side='left')
         vals.append(sortedCmf[i, 0])
-    return matrix[tvarray](vals)
+    return matrix[darray](vals)
 
 @coppertop(style=binary)
-def sample(kde:scipy.stats.kde.gaussian_kde, n:index) -> matrix[tvarray]:
+def sample(kde:scipy.stats.kde.gaussian_kde, n:index) -> matrix[darray]:
     return kde.resample(n).flatten()
 
 @coppertop(style=binary)

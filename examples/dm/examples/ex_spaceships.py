@@ -12,7 +12,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom
+from bones.lang.metatypes import BTAtom, BType
 from bones.lang.structs import tv
 from bones.core.sentinels import Null
 
@@ -59,7 +59,7 @@ def process(e:null) -> txt:
 #     return 'nothing happened' if e._t == null else e._v
 
 
-borg = tShip['borg'].setCoercer(tv)
+borg = BType('borg: borg & ship').setCoercer(tv)
 
 @coppertop
 def collide(a:borg, b:tShip) -> tEvent:
