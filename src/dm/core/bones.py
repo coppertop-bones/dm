@@ -20,47 +20,47 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from dm.core.types import bool
 
-# @coppertop(bname='ifFalse:')
+# @coppertop(name='ifFalse:')
 # def _ifFalse(res, block) -> bool:
 #     if not res: block()
 
-# @coppertop(bname='ifTrue:')
+# @coppertop(name='ifTrue:')
 # def _ifTrue(res, block) -> bool:
 #     if res: block()
 
-# @coppertop(bname='ifTrue:')
+# @coppertop(name='ifTrue:')
 # def _ifTrueifFalse(res, trueBlock, falseBlock) -> bool:
 #     if res: trueBlock()
 #     else: falseBlock()
 
-@coppertop(style=binary, bname='!=')
+@coppertop(style=binary, name='!=')
 def different(a, b) -> bool:
     return a != b
 
-@coppertop(style=binary, bname='!=')
+@coppertop(style=binary, name='!=')
 def different(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a != b).any())
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
+@coppertop(style=binary, dispatchEvenIfAllTypes=True, name='==')
 def equals(a, b) -> bool:
     return a == b
 
-@coppertop(style=binary, dispatchEvenIfAllTypes=True, bname='==')
+@coppertop(style=binary, dispatchEvenIfAllTypes=True, name='==')
 def equals(a:matrix&darray, b:matrix&darray) -> bool:
     return bool((a == b).all())
 
-@coppertop(style=binary, bname='>=')
+@coppertop(style=binary, name='>=')
 def ge(a, b) -> bool:
     return a >= b
 
-@coppertop(style=binary, bname='>')
+@coppertop(style=binary, name='>')
 def gt(a, b) -> bool:
     return a > b
 
-@coppertop(style=binary, bname='<')
+@coppertop(style=binary, name='<')
 def le(a, b) -> bool:
     return a <= b
 
-@coppertop(style=binary, bname='<=')
+@coppertop(style=binary, name='<=')
 def lt(a, b) -> bool:
     return a < b

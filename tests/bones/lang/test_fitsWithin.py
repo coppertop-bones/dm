@@ -8,6 +8,9 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
+import pytest
+type_system = pytest.mark.type_system
+
 from coppertop.pipe import *
 from bones.lang.metatypes import BType, BTAtom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
 import bones.lang.metatypes
@@ -27,7 +30,7 @@ tSally = BTAtom('sally')
 
 
 
-
+@type_system
 def testSimple():
     # exact
     num >> check >> fitsWithin >> num
@@ -52,6 +55,7 @@ def testSimple():
     # float >> check >> fitsWithin >> num
 
 
+@type_system
 def testNested():
     GBP = BType('GBP: GBP & ccy')
     USD = BType('USD: USD & ccy')
@@ -66,6 +70,7 @@ def testNested():
     S(a=num, b=num) >> check >> fitsWithin >> S(a=num)
 
 
+@type_system
 def testTemplates():
     fred = BTAtom('fred')
     num*fred >> check >> fitsWithin >> T*fred
@@ -81,7 +86,7 @@ def testTemplates():
     (fred ** txt)[pylist] >> check >> doesNotFitWithin >> (T1 ** T1)[pylist]
 
 
-
+@type_system
 def testTemplates2():
 
     account = BType('account: account & txt')

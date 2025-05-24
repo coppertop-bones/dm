@@ -1,4 +1,3 @@
-# derived from https://github.com/mhalitk/line-counter/blob/master/linecounter.py
 
 import os
 
@@ -29,6 +28,8 @@ def ffn_linecount(ffn, opts, line_excls):
 
 
 def folder_linecount(folder, opts, exts, line_excls, path_excls):
+    # derived from https://github.com/mhalitk/line-counter/blob/master/linecounter.py
+
     count = 0
     folder = os.path.expanduser(folder)
     for fn in os.listdir(folder):

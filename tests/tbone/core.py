@@ -17,11 +17,11 @@ from dm.core.types import num, index, txt, bool, litint, litdec, littxt, T1, T2,
 true = tv(bool, True)
 false = tv(bool, False)
 
-@coppertop(bname='id')
+@coppertop(name='id')
 def ID(x:T1) -> T1:
     return x
 
-@coppertop(style=ternary, bname='ifTrue:ifFalse:')
+@coppertop(style=ternary, name='ifTrue:ifFalse:')
 def ifTrueIfFalse(cond:bool, x:T1, y:T2) -> T1 + T2:
     if cond:
         return x
@@ -53,86 +53,86 @@ def addOne(a:txt) -> txt:
 #         return y
 
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add(a:num, b:num) -> num:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add(a:index, b:index) -> index:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add(a:litint, b:litint) -> litint:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add(a:litdec, b:litdec) -> litdec:
     return a + b
 
 
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub(a:num, b:num) -> num:
     return a - b
 
 
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul(a:num, b:num) -> num:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul(a:index, b:index) -> index:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul(a:litint, b:litint) -> litint:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul(a:litdec, b:litdec) -> litdec:
     return a * b
 
 
 
-@coppertop(style=binary, bname='/')
+@coppertop(style=binary, name='/')
 def div(a:num, b:num) -> num:
     return a / b
 
 
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:num, b:num) -> bool:
     return a == b
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:index, b:index) -> bool:
     return a == b
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:txt, b:txt) -> bool:
     return a == b
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:bool, b:bool) -> bool:
     return a == b
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:litint, b:litint) -> bool:
     return a == b
 
-@coppertop(style=binary, bname='==')
+@coppertop(style=binary, name='==')
 def eq(a:litdec, b:litdec) -> bool:
     return a == b
 
 
 
 
-@coppertop(style=binary, bname='<')
+@coppertop(style=binary, name='<')
 def lt(a:num, b:num) -> bool:
     return a < b
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub(a:index, b:index) -> index:
     return a - b
 

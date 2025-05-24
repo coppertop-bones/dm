@@ -23,31 +23,31 @@ from bones.core.errors import NotYetImplemented
 # addition
 # **********************************************************************************************************************
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add_(a:num, b:num) -> num:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add_(a:litint, b:litint) -> litint:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add_(a:litdec, b:litdec) -> litdec:
     return a + b
 
-@coppertop(style=binary, bname='+')
+@coppertop(style=binary, name='+')
 def add_(a:tCount, b:tCount) -> tCount:
     return a + b
 
-# @coppertop(style=binary, bname='+')
+# @coppertop(style=binary, name='+')
 # def add_(a:err&T1, b:T2) -> err&T1:
 #     raise NotYetImplemented()
 #
-# @coppertop(style=binary, bname='+')
+# @coppertop(style=binary, name='+')
 # def add_(a:T1, b:err&T2) -> err&T2:
 #     raise NotYetImplemented()
 #
-# @coppertop(style=binary, bname='+')
+# @coppertop(style=binary, name='+')
 # def add_(a:err&T1, b:err&T1) -> err&T1:
 #     raise NotYetImplemented()
 
@@ -56,31 +56,31 @@ def add_(a:tCount, b:tCount) -> tCount:
 # subtraction
 # **********************************************************************************************************************
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:num, b:num) -> num:
     return a - b
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:litint, b:litint) -> litint:
     return a - b
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:litdec, b:litdec) -> litdec:
     return a - b
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:tCount, b:tCount) -> tCount:
     return a - b
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:err&T1, b:T2) -> err&T1:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:T1, b:err&T2) -> err&T2:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='-')
+@coppertop(style=binary, name='-')
 def sub_(a:err&T1, b:err&T1) -> err&T1:
     raise NotYetImplemented()
 
@@ -89,27 +89,27 @@ def sub_(a:err&T1, b:err&T1) -> err&T1:
 # multiplication
 # **********************************************************************************************************************
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:num, b:num) -> num:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:litint, b:litint) -> litint:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:litdec, b:litdec) -> litdec:
     return a * b
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:err&T1, b:T2) -> err&T1:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:T1, b:err&T2) -> err&T2:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='*')
+@coppertop(style=binary, name='*')
 def mul_(a:err&T1, b:err&T1) -> err&T1:
     raise NotYetImplemented()
 
@@ -118,19 +118,19 @@ def mul_(a:err&T1, b:err&T1) -> err&T1:
 # division
 # **********************************************************************************************************************
 
-@coppertop(style=binary, bname='/')
+@coppertop(style=binary, name='/')
 def div_(a:num, b:num) -> num + err&T:
     return a / b
 
-@coppertop(style=binary, bname='/')
+@coppertop(style=binary, name='/')
 def div_(a:err&T1, b:T2) -> err&T1:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='/')
+@coppertop(style=binary, name='/')
 def div_(a:T1, b:err&T2) -> err&T2:
     raise NotYetImplemented()
 
-@coppertop(style=binary, bname='/')
+@coppertop(style=binary, name='/')
 def div_(a:err&T1, b:err&T1) -> err&T1:
     raise NotYetImplemented()
 

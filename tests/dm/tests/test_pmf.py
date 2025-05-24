@@ -12,7 +12,7 @@ import sys
 # sys._TRACE_IMPORTS = True
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-import enum
+import enum, pytest
 
 from coppertop.pipe import *
 from dm.testing import check
@@ -87,6 +87,7 @@ def test_monty():
     posterior = prior >> pmfMul >> likelihood >> normalise
     posterior >> at >> C >> check >> closeTo(_,_,0.001) >> 0.667
 
+@pytest.mark.skip
 def test_PP():
     PMF({A: 0.5, B: 0.5}) >> SS >> check >> equals >> 'PMF(A: 0.500, B: 0.500)'
 

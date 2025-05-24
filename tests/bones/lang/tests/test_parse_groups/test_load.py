@@ -8,8 +8,8 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-from ..utils import group_ as oldgroup_, group as oldgroup, _
-from ..utils import *
+from bones.lang._testing_.utils import group_ as oldgroup_, group as oldgroup, _
+from bones.lang._testing_.utils import *
 
 
 def test():

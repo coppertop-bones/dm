@@ -51,7 +51,7 @@ def check(actual, fn, expected):
                     passed, ppAct, ppExp = fn(actual, expected), repr(actual), repr(expected)
         if not passed:
             msg = f"{_getTestTitle()}\n'{fnName}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
-            raise AssertionError(msg)
+            assert actual == expected, msg
     return actual
 
 def _getTestTitle():

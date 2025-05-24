@@ -11,7 +11,6 @@
 import antlr4, traceback, os
 
 from bones.jones import BTypeError
-
 from dm.utils.testing import assertRaises
 from bones.core.context import context              # needed for conditional break points whilst debugging
 
@@ -21,7 +20,13 @@ from bones.lang._type_lang.py_type_manager import PyTypeManager
 from bones.lang._type_lang.jones_type_manager import JonesTypeManager
 
 
+import pytest
+type_lang = pytest.mark.type_lang
+pytestmark = pytest.mark.parametrize("TM", [PyTypeManager, JonesTypeManager])
+xfail = pytest.mark.xfail
 
+
+@type_lang
 def test_atom1(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -39,6 +44,7 @@ def test_atom1(TM):
     return "test_atom passed"
 
 
+@type_lang
 def test_atom2(TM):
     tli = TypeLangInterpreter(tm := TM())
     t1 = tli.eval('''
@@ -50,6 +56,8 @@ def test_atom2(TM):
     assert t1 == t2 , f'{t1} != {t2}'
 
 
+@xfail
+@type_lang
 def test_atom_redefine(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -79,6 +87,7 @@ def test_atom_redefine(TM):
         ''')
 
 
+@type_lang
 def test_intersection(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -90,6 +99,8 @@ def test_intersection(TM):
     assert t1 == t2, f'{t1} != {t2}'
 
 
+@xfail
+@type_lang
 def test_intersection_redefine(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -116,6 +127,7 @@ def test_intersection_redefine(TM):
         ''')
 
 
+@type_lang
 def test_complicated_spaces(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -146,6 +158,7 @@ def test_complicated_spaces(TM):
         tli.eval('acef & ag')  # e and g are in S1
 
 
+@type_lang
 def test_union(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -163,6 +176,7 @@ def test_union(TM):
     ''')
 
 
+@type_lang
 def test_intersection_union_precedence(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -174,6 +188,7 @@ def test_intersection_union_precedence(TM):
     assert t1 == t2, f'{t1} != {t2}'
 
 
+@type_lang
 def test_tuple(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -189,6 +204,7 @@ def test_tuple(TM):
     assert t2 is t3, f'{t2} != {t3}'
 
 
+@type_lang
 def test_paren(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -202,6 +218,7 @@ def test_paren(TM):
     assert t2 is t4, f'{t2} == {t4}'
 
 
+@type_lang
 def test_doc2_othogonal_spaces(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -253,6 +270,8 @@ def test_doc2_othogonal_spaces(TM):
         # data dependent which is more complex)
 
 
+@xfail
+@type_lang
 def test_namespaces(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -265,6 +284,7 @@ def test_namespaces(TM):
     assert t1 is t2, f'{t1} != {t2}'
 
 
+@type_lang
 def test_arrow_intersections(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -280,6 +300,7 @@ def test_arrow_intersections(TM):
     tli.eval(src)
 
 
+@type_lang
 def test_runtime_ccy(TM):
     tli = TypeLangInterpreter(tm := TM())
     src = '''
@@ -298,6 +319,7 @@ def test_runtime_ccy(TM):
     assert not tm.fitsWithin(tm['GBP'], tm['USD'])
 
 
+@type_lang
 def test_runtime_fx(TM):
     tli = TypeLangInterpreter(tm := TM())
     src = '''
@@ -311,6 +333,7 @@ def test_runtime_fx(TM):
     tli.eval(src)
 
 
+@type_lang
 def test_runtime_fx_err(TM):
     # ccy is correctly to be an implicit recursive type but is not used immediately in the assignment
     tli = TypeLangInterpreter(tm := TM())
@@ -322,6 +345,7 @@ def test_runtime_fx_err(TM):
         tli.eval(src)
 
 
+@type_lang
 def test_static_fx1(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -369,6 +393,8 @@ def test_static_fx1(TM):
     '''
 
 
+@xfail
+@type_lang
 def test_static_fx2(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -461,6 +487,7 @@ def test_static_fx2(TM):
     '''
 
 
+@type_lang
 def test_fitsWithin(TM):
     tli = TypeLangInterpreter(tm := TM())
     
@@ -487,7 +514,7 @@ def test_fitsWithin(TM):
     assert tm.fitsWithin(tm['f64'], tm['T1'])
 
 
-
+@type_lang
 def test_recursive_space(TM):
     tli = TypeLangInterpreter(tm := TM())
     t = tli.eval('ccyfx: atom')
@@ -516,6 +543,7 @@ def test_recursive_space(TM):
     # ''')
 
 
+@type_lang
 def test_pyAndPylistEtc(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -538,6 +566,7 @@ def test_pyAndPylistEtc(TM):
         tli.eval('pylist & pydict')
 
 
+@type_lang
 def test_cStyleConst(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -557,12 +586,15 @@ def test_cStyleConst(TM):
         tli.eval('mut & const')
 
 
+@type_lang
 def test_files(TM):
     tli = TypeLangInterpreter(tm := TM())
     thisPath = os.path.dirname(__file__)
     tli.eval(antlr4.FileStream(os.path.join(thisPath, 'example.tl')))
 
 
+@xfail
+@type_lang
 def test_pp(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
@@ -589,12 +621,16 @@ def test_pp(TM):
 
 
 
+@type_lang
 def debug(TM):
     tli = TypeLangInterpreter(tm := TM())
     tli.eval('''
         f64: null: atom
         f64list: f64 * f64list + null
     ''')
+
+
+
 
 
 def main():
@@ -618,7 +654,7 @@ def main():
         test_runtime_ccy,
         test_runtime_fx,
         test_runtime_fx_err,
-        # test_static_fx1,
+        test_static_fx1,
         # test_static_fx2,
         test_pyAndPylistEtc,
         test_cStyleConst,

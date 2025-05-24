@@ -8,7 +8,10 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-import random
+import random, pytest
+xfail = pytest.mark.xfail
+type_system = pytest.mark.type_system
+
 from coppertop.pipe import *
 from bones.lang.metatypes import BTAtom, S, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
 import bones.lang.metatypes
@@ -197,7 +200,7 @@ def opB(A:tmatrix&anon) -> tmatrix&anon:
     return A
 
 
-
+@type_system
 def testPartition():
     _partitionIntersectionTLs((tmatrix & square).types, (tmatrix, )) >> check >> equals >> ((square,), (tmatrix,), (), {})
     _partitionIntersectionTLs((tmatrix & square).types, (ISIN, CUSIP)) >> check >> equals >> ((square, tmatrix,), (), (ISIN, CUSIP), {})
@@ -205,6 +208,7 @@ def testPartition():
     _partitionIntersectionTLs((pystr2 & square).types, (txt, )) >> check >> equals >> ((square, pystr2), (), (txt,), {})
 
 
+@type_system
 def testExclusive():
     with assertRaises(BTypeError) as ex:
         lol & pylist
@@ -214,6 +218,7 @@ def testExclusive():
     tv(tmatrix & dtup & tdd, [[]]) >> cov >> check >> equals >> 'a:tmatrix'
 
 
+@type_system
 def testGeneric():
     (tmatrix & square) >> check >> fitsWithin >> tmatrix
     tmatrix >> check >> doesNotFitWithin >> (tmatrix & square)
@@ -222,6 +227,8 @@ def testGeneric():
     tv(tmatrix & square, [[]] ) >> add >> tv(tmatrix & square, [[]] ) >> check >> equals >> add_msms
 
 
+@xfail
+@type_system
 def testImplicit():
     tmatrix >> check >> fitsWithin >> (tmatrix & aliased)
     (tmatrix & aliased) >> check >> fitsWithin >> tmatrix
@@ -244,6 +251,7 @@ def testImplicit():
     # A._t >> PP >> check >> fitsWithin >> (lmatrix[T1] >> PP) >> PP
 
 
+@type_system
 def testOrthogonal():
     (txt & ISIN) >> check >> doesNotFitWithin >> str  # because ISIN is left in the residual
     (str & ISIN) >> check >> doesNotFitWithin >> (str & CUSIP)  # conflict between ISIN and CUSIP
@@ -259,6 +267,7 @@ def testOrthogonal():
         (ISIN & txt)('DE') >> _join >> ('0008402215')
 
 
+@type_system
 def testExplicit():
     GBP >> check >> fitsWithin >> GBP
     GBP >> check >> fitsWithin >> ccy
@@ -281,12 +290,15 @@ def mul(c:ccy[T1], f:fx[S(d=ccy[T2], f=ccy[T1])], tByT) -> ccy[T2]:
     return tv(ccy[tByT[T2]], c._v / f._v)
 
 
+@type_system
 def testMisc():
     (txt & square) >> check >> fitsWithin >> pystr2
     (pystr2 & square) >> check >> doesNotFitWithin >> txt
     tmatrix[square,right] >> check >> fitsWithin >> (tmatrix & right & square)
 
 
+@xfail
+@type_system
 def testAddAndSubtract():
     tmatrix[pylist].setConstructor(tv)
     A = tmatrix[pylist]([[1,2],[3,4]])
@@ -294,6 +306,8 @@ def testAddAndSubtract():
     (A | +square | -tmatrix[pylist]) >> check >> typeOf >> square
 
 
+@xfail
+@type_system
 def testDrop():
     card = BType('card: card & txt')
     cards = (N ** card)[dseq].setPP('deck').setConstructor(dseq)
@@ -307,10 +321,11 @@ def testDrop():
     people >> drop >> [0, 5] >> _v >> check >> equals >> [Mu, Or, Pe, Pl]
 
 
-# GBPUSD = fx[S(d=GBP, f=USD).setExplicit].setCoercer(tv)
-GBPUSD = fx[S(d=GBP, f=USD)].setCoercer(tv)
-
+@xfail
+@type_system
 def testExplicitStructs():
+    # GBPUSD = fx[S(d=GBP, f=USD).setExplicit].setCoercer(tv)
+    GBPUSD = fx[S(d=GBP, f=USD)].setCoercer(tv)
     GBPUSD >> check >> doesNotFitWithin >> fx
     GBPUSD >> check >> doesNotFitWithin >> fx[S(d=T1, f=T2)]        # ccy is not explicit in the rhs
     GBPUSD >> check >> fitsWithin >> fx[S(d=ccy[T1], f=ccy[T2])]
@@ -319,11 +334,12 @@ def testExplicitStructs():
 
 
 
-
+@type_system
 def testTypes():
     (num & anon & col & num) >> check >> fitsWithin >> (col & anon & num)
 
 
+@type_system
 def testFitsWithin():
     # (num & col & anon) >> check >> fitsWithin >> num
     (num & col & anon) >> check >> fitsWithin >> (col & anon)

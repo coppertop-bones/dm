@@ -11,7 +11,7 @@
 from glob import glob
 import os.path
 from bones.lang import lex
-from ..utils import group, PP, newKernel, _
+from bones.lang._testing_.utils import group, PP, newKernel, _
 
 
 def test_canon():

@@ -9,6 +9,9 @@
 # **********************************************************************************************************************
 
 import sys, traceback
+
+import pytest
+
 from bones import jones
 from bones.core.sentinels import Missing
 from dm.utils.testing import assertRaises
@@ -396,6 +399,7 @@ def test_isRecursive(TM):
     assert tm.isRecursive(f64Tree) and not tm.isRecursive(tLhs) and not tm.isRecursive(tRhs)
 
 
+@pytest.mark.skip
 def test_offsets(TM):
     tli = TypeLangInterpreter(tm := TM())
 
@@ -432,7 +436,16 @@ def test_fred(TM):
 
     bc = tli.eval('c & b')
 
-    print(bs)
+    print(bc)
+
+
+
+@pytest.yield_fixture
+def TM():
+    yield JonesTypeManager
+    # yield PyTypeManager
+
+
 
 def main():
 

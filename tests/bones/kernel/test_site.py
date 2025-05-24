@@ -1,5 +1,5 @@
 # **********************************************************************************************************************
-# Copyright (c) 2021-2022 David Briant. All rights reserved.
+# Copyright (c) 2019-2022 David Briant. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
 # with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -8,31 +8,33 @@
 # the specific language governing permissions and limitations under the License.
 # **********************************************************************************************************************
 
-import sys
-# sys._TRACE_IMPORTS = True
-if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
+from dm.testing import check, equals
+from bones.core.errors import ErrSite
+from bones.kernel._testing_.fred import Fred
+
+import pytest
+skip = pytest.mark.skip
 
 
-# coppertop tests
-import coppertop.tests.test_anon_and_partial
-import coppertop.tests.test_misc
-import coppertop.tests.test_modules
-import coppertop.tests.test_pipeable
-import coppertop.tests.test_cow_scope
-import coppertop.tests.test_styles
+def test_site():
+    f = Fred()
+    # assert repr(f.site1) == 'bones.kernel.test_site.Fred>>__init__'
+    repr(f.site1) >> check >> equals >> 'bones.kernel._testing_.fred.Fred>>__init__'
+    repr(f.site2) >> check >> equals >> 'bones.kernel._testing_.fred.Fred>>__init__[#1]'
+
+
+@skip(reason='can only work from a shell or IDE, not pytest')
+def test_from_ide():
+    site = ErrSite()
+    repr(site) >> check >> equals >> '__main__>>test_from_ide'
 
 
 
 def main():
-    coppertop.tests.test_anon_and_partial.main()
-    coppertop.tests.test_misc.main()
-    coppertop.tests.test_modules.main()
-    coppertop.tests.test_pipeable.main()
-    coppertop.tests.test_cow_scope.main()
-    coppertop.tests.test_styles.main()
+    test_site()
 
 
 if __name__ == '__main__':
     main()
+    test_from_ide()
     print('pass')
-

@@ -10,13 +10,16 @@
 # **********************************************************************************************************************
 
 
+import pytest
+bones_lang = pytest.mark.bones_lang
+
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.lang.symbol_table import SymTab
 import bones.lang.symbol_table
-from bones.lang.infer import InferenceLogger
+# from bones.lang.infer import InferenceLogger
 
-from bones.lang.tests.utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, newKernel
+from bones.lang._testing_.utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, newKernel
 from dm.testing import check
 from dm.core import startsWith, drop
 # from dm.core import equals
@@ -28,7 +31,7 @@ from _ import *
 bones.lang.symbol_table.PYCHARM = True
 
 
-
+@bones_lang
 def test_partition(**ctx):
     k = newKernel()
 
@@ -79,8 +82,8 @@ def test_partition(**ctx):
 
 def main():
 
-    debug = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, tt=InferenceLogger())
-    debugNoRun = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, run=False, tt=InferenceLogger())
+    debug = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False)#, tt=InferenceLogger())
+    debugNoRun = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, run=False)#, tt=InferenceLogger())
 
     test_partition()
 

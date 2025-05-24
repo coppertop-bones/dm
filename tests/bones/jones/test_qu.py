@@ -1,4 +1,4 @@
-import math, time, itertools, numpy as np
+import math, time, itertools, numpy as np, pytest
 
 from bones import qu
 
@@ -278,6 +278,10 @@ def _PPTimesUs(times, N):
     dp = 1
     return f"{np.average(times) / 1_000:,.{dp}f}µS ± {np.std(times) / 1_000:,.{dp}f}µS (total: {np.average(times) * N / 1_000_000:,.{dp}f}mS)"
 
+
+@pytest.fixture
+def numRuns():
+    return 10
 
 def main():
     test_cn_Hart() >> PP

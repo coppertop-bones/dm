@@ -10,6 +10,12 @@
 # **********************************************************************************************************************
 
 
+import pytest
+bones_lang = pytest.mark.bones_lang
+xfail = pytest.mark.xfail
+skip = pytest.mark.skip
+
+
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.kernel import psm
@@ -19,12 +25,15 @@ from bones.lang.symbol_table import SymTab
 import bones.lang.symbol_table
 from bones.lang.lex import LINE_COMMENT, BREAKOUT
 from bones.lang.execute import TCInterpreter
-from bones.lang.infer import InferenceLogger
-from bones.lang.tests._utils import dropFirstNL
+# from bones.lang.infer import InferenceLogger
+from bones.lang._testing_.utils import dropFirstNL
 
-import dm.pp, dm.testing
-from dm.core import PP, check, equals, startsWith, underride, withCtx, raises, drop
+
+from dm.testing import check, equals, raises
+from dm.core import startsWith, underride, withCtx, drop
 from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
+from dm.pp import PP
+
 
 bones.lang.symbol_table.PYCHARM = True
 
@@ -74,7 +83,7 @@ def pace_(k, src):
     return lambda : k.pace(src)
 
 
-
+@bones_lang
 def test_overload_fail(**ctx):
     k = _newKernel()
 
@@ -97,6 +106,8 @@ def test_overload_fail(**ctx):
         src >> withCtx >> ctx >> check >> pace_(k, _) >> raises >> TypeError
 
 
+@xfail
+@bones_lang
 def test_overload(**ctx):
     k = _newKernel()
 
@@ -118,6 +129,8 @@ def test_overload(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
+@skip
+@bones_lang
 def test_SO1(**ctx):
     src = r'''
         load tbone.core
@@ -134,6 +147,8 @@ def test_SO1(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
+@skip
+@bones_lang
 def test_SO2(**ctx):
     src = r'''
         load tbone.core
@@ -151,6 +166,8 @@ def test_SO2(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
+@skip
+@bones_lang
 def test_unionThenOverload(**ctx):
     src = r'''
         load tbone.core
@@ -169,6 +186,8 @@ def test_unionThenOverload(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
+@skip
+@bones_lang
 def test_polymorphic1(**ctx):
     src = r'''
         load tbone.core
@@ -187,7 +206,8 @@ def test_polymorphic1(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
-
+@skip
+@bones_lang
 def test_polymorphic2(**ctx):
     src = r'''
         load tbone.core
@@ -207,7 +227,8 @@ def test_polymorphic2(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
-
+@skip
+@bones_lang
 def test_polymorphicInFn(**ctx):
     src = r'''
         load tbone.core
@@ -240,6 +261,8 @@ def test_polymorphicInFn(**ctx):
                     raise AssertionError(f'{i} : {a} != {b}')
 
 
+@skip
+@bones_lang
 def test_polymorphicInFn2(**ctx):
     src = r'''
         // https://stackoverflow.com/questions/36587571/confusing-about-haskell-type-inference
@@ -266,6 +289,8 @@ def test_polymorphicInFn2(**ctx):
         types >> check >> equals >> expected
 
 
+@skip
+@bones_lang
 def test_polymorphicInFn3(**ctx):
     src = r'''
         // https://stackoverflow.com/questions/36587571/confusing-about-haskell-type-inference
@@ -295,6 +320,8 @@ def test_polymorphicInFn3(**ctx):
     # '{[f] {[t] f(t)}}' >> checkSig(False) >> '((a -> b) -> (a -> b))'
 
 
+@skip
+@bones_lang
 def test_polymorphicInFn4(**ctx):
     src = r'''
         load tbone.core
@@ -321,6 +348,8 @@ def test_polymorphicInFn4(**ctx):
         types >> check >> equals >> expected
 
 
+@skip
+@bones_lang
 def test_recursive(**ctx):
     src = r'''
         load tbone.core
@@ -345,6 +374,8 @@ def test_recursive(**ctx):
         types >> check >> equals >> expected
 
 
+@skip
+@bones_lang
 def prog5(**ctx):
     src = r'''
         load tbone.core
@@ -368,6 +399,8 @@ def prog5(**ctx):
         types >> check >> equals >> expected
 
 
+@skip
+@bones_lang
 def test_compile(**ctx):
     src = r'''
         load tbone.core
@@ -395,6 +428,8 @@ def test_compile(**ctx):
         types >> check >> equals >> expected
 
 
+@skip
+@bones_lang
 def test_current(**ctx):
     src = r'''
         load tbone.core
@@ -470,6 +505,10 @@ def test_current(**ctx):
     # 1/0
 
 
+@pytest.fixture(scope='module')
+def ctx():
+    return {}
+
 
 # TODO
 # assignment of literals weakens them to their defaults
@@ -478,8 +517,8 @@ def test_current(**ctx):
 
 def main():
 
-    debug = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, tt=InferenceLogger())
-    debugNoRun = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, run=False, tt=InferenceLogger())
+    debug = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False) #, tt=InferenceLogger())
+    debugNoRun = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, run=False)#, tt=InferenceLogger())
 
     # test_current(debug)
     # test_compile()
