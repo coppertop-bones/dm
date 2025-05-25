@@ -12,11 +12,12 @@ import pytest
 type_system = pytest.mark.type_system
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType, BTAtom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
+from bones.lang.metatypes import BType, BTAtom, S, weaken, updateSchemaVarsWith, fitsWithin as _fitsWithin
 import bones.lang.metatypes
-from dm.testing import check, fitsWithin, doesNotFitWithin
-from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, num, pylist, pydict, litdec
+from dm.testing import check, fitsWithin, doesNotFitWithin, equals
+from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, T4, num, pylist, pydict, litdec
 from dm.finance.types import ccy
+from dm.core.aggman import atAll
 
 
 oldWeakenings = bones.lang.metatypes._weakenings
@@ -71,7 +72,7 @@ def testNested():
 
 
 @type_system
-def testTemplates():
+def test_schemaVars():
     fred = BTAtom('fred')
     num*fred >> check >> fitsWithin >> T*fred
     index*fred >> check >> fitsWithin >> T1*T2
@@ -87,7 +88,7 @@ def testTemplates():
 
 
 @type_system
-def testTemplates2():
+def test_schema():
 
     account = BType('account: account & txt')
     weaken(txt, account)
@@ -95,40 +96,42 @@ def testTemplates2():
     positions = BType('positions: positions & (account**num) & pydict')
     accounts = (N**account)[pylist]
 
-    tByT = {}
-    r1, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3]), tByT)
-    r2, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, (N**T1)[pylist]), tByT)
-    r3, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2), tByT)
+    t1, t2, t3 = account, num, positions
+
+    schemaVars1, running = {}, 0
+    schemaVars1, running = updateSchemaVarsWith(schemaVars1, running, r1 := positions >> fitsWithin >> (T1**T2)[pydict][T3]  )
+    r2 = accounts >> fitsWithin >> (N ** T1)[pylist]
+    schemaVars1, running = updateSchemaVarsWith(schemaVars1, running, r2 )
+    schemaVars1, running = updateSchemaVarsWith(schemaVars1, running, r3 := num >> fitsWithin >> T2  )
 
     assert r1 and r2 and r3
+    schemaVars1 >> atAll >> (T1, T2, T3) >> check >> equals >> [t1, t2, t3]
 
-    # dispatch._fitsCache = {}
-    tByT2 = {}
-    r4, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2), tByT2)
-    r5, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, (N**T1)[pylist]), tByT2)
-    r6, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3]), tByT2)
+
+    schemaVars2, running2 = {}, 0
+    schemaVars2, running2 = updateSchemaVarsWith(schemaVars2, running2, r4 := num >> fitsWithin >> T2  )
+    schemaVars2, running2 = updateSchemaVarsWith(schemaVars2, running2, r5 := accounts >> fitsWithin >> (N**T1)[pylist]  )
+    schemaVars2, running2 = updateSchemaVarsWith(schemaVars2, running2, r6 := positions >> fitsWithin >> (T1**T2)[pydict][T3]  )
 
     assert r4 and r5 and r6
+    schemaVars2 >> atAll >> (T1, T2, T3) >> check >> equals >> [t1, t2, t3]
 
-    t2 = txt
-    t3 = index
 
-    tByT3 = {}
-    r9, tByT, distances = cacheAndUpdate(_fitsWithin(index, T2, tByT3), tByT3)
-    r8, tByT, distances = cacheAndUpdate(_fitsWithin(accounts, T1, tByT3), tByT3)
-    r7, tByT, distances = cacheAndUpdate(_fitsWithin(positions, (T1**T2)[pydict][T3], tByT3), tByT3)
+    schemaVars3, running3 = {}, 0
+    schemaVars3, running3 = updateSchemaVarsWith(schemaVars3, running3, r7 := num >> fitsWithin >> T2)
+    schemaVars3, running3 = updateSchemaVarsWith(schemaVars3, running3, r8 := accounts >> fitsWithin >> T1)
+    schemaVars3, running3 = updateSchemaVarsWith(schemaVars3, running3, r9 := positions >> fitsWithin >> (T4 ** T2)[pydict][T3])
 
-    assert r7
-    assert r8
-    assert r9
+    assert r7 and r8 and r9
+    schemaVars3 >> atAll >> (T1, T2, T3, T4) >> check >> equals >> [accounts, num, positions, account]
 
 
 
 def main():
     testSimple()
     testNested()
-    testTemplates()
-    testTemplates2()
+    test_schemaVars()
+    test_schema()
 
 
 if __name__ == '__main__':

@@ -31,11 +31,11 @@ def closeTo(a, b, tol) -> bool:
 
 @coppertop(style=binary)
 def different(a, b) -> bool:
-    return a != b
+    return not fitsWithin(typeOf(a), typeOf(b)) or a != b
 
 @coppertop(style=binary)
 def different(a:matrix&darray, b:matrix&darray) -> bool:
-    return bool((a != b).any())
+    return not fitsWithin(typeOf(a), typeOf(b)) or bool((a != b).any())
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def doesNotFitWithin(a, b) -> bool:
@@ -43,11 +43,11 @@ def doesNotFitWithin(a, b) -> bool:
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def equals(a, b) -> bool:
-    return a == b
+    return fitsWithin(typeOf(a), typeOf(b)) and a == b
 
 @coppertop(style=binary, dispatchEvenIfAllTypes=True)
 def equals(a:matrix&darray, b:matrix&darray) -> bool:
-    return bool((a == b).all())
+    return fitsWithin(typeOf(a), typeOf(b)) and bool((a == b).all())
 
 @coppertop(style=binary)
 def ge(a, b) -> bool:

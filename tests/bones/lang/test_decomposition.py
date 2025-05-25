@@ -47,7 +47,7 @@ weaken(named, aliased)
 # and functions) & distinguished.
 #
 #
-# when we do X >> fitsWithin >> Y we partition the two sets into three parts
+# when we do X <: Y we partition the two sets into three parts
 #
 # X intersect Y' - stuff in X but not in Y - anything here then it's not a fit
 # X intersect Y - common stuff, if we only have common stuff then it's an exact fit

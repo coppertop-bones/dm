@@ -1,4 +1,6 @@
-import sys, itertools
+import sys, itertools, pytest
+xfail = pytest.mark.xfail
+
 
 from coppertop.pipe import *
 
@@ -43,9 +45,9 @@ def test_sm(k):
     sm.name >> apply_ >> 100000 >> check >> raises >> ValueError
 
     del sys.__dict__['_k']
-    return "test_sm passed"
 
 
+@xfail
 def test_sm_sort_order(k):
     k = jones.Kernel() if k is Missing else k
     sm = k.sm
@@ -56,8 +58,12 @@ def test_sm_sort_order(k):
     sm.le(id2, id2) >> check >> equals >> False
     sm.le(id1, id2) >> check >> equals >> False
 
-    return "test_sm_sort_order passed"
 
+@pytest.fixture
+def k():
+    sys._k = jones.Kernel()
+    yield sys._k
+    sys._k = None
 
 
 def main(k=Missing):

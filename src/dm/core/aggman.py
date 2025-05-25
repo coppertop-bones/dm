@@ -32,7 +32,7 @@ from coppertop.pipe import *
 from bones import jones
 
 from bones.core.errors import NotYetImplemented, ProgrammerError
-from bones.lang.metatypes import hasT, cacheAndUpdate, fitsWithin
+from bones.lang.metatypes import hasT, fitsWithin
 from bones.lang.structs import tv
 from bones.core.sentinels import Void
 
@@ -43,11 +43,6 @@ from dm.core.types import pylist, pydict, pytuple, pydict_keys, pydict_items, py
 
 dict_keys = type({}.keys())
 dict_values = type({}.values())
-
-def _fitsWithin(a, b):
-    doesFit, ignore, ignore = cacheAndUpdate(fitsWithin(a, b), {})
-    return doesFit
-
 
 array_ = (N**num) & darray
 matrix_ = matrix & darray
@@ -1054,6 +1049,10 @@ def join(s1:txt, s2:txt) -> txt:
     return s1 + s2
 
 @coppertop(style=binary)
+def join(s1:txt[T1], s2:txt[T1], tByT) -> txt[T1]:
+    return s1 + s2
+
+@coppertop(style=binary)
 def join(d1:pydict, d2:pydict) -> pydict:
     answer = dict(d1)
     for k, v in d2.items():
@@ -1086,20 +1085,20 @@ def joinAll(xs:pylist+pytuple) -> txt + ((N**T1)[dseq]) + pylist + pytuple:
     if not xs:
         return ''
     typeOfFirst = typeOf(xs[0])
-    if _fitsWithin(typeOfFirst, txt):
+    if fitsWithin(typeOfFirst, txt):
         return ''.join(xs)
-    elif _fitsWithin(typeOfFirst, (N**T1)[dseq]):
+    elif fitsWithin(typeOfFirst, (N**T1)[dseq]):
         elements = []
         for x in xs:
             # could check the type of each list using metatypes.fitsWithin
             elements.extend(x.data)
         return dseq(xs[0]._t, elements)
-    elif _fitsWithin(typeOfFirst, pylist):
+    elif fitsWithin(typeOfFirst, pylist):
         answer = []
         for e in xs:
             answer += e
         return answer
-    elif _fitsWithin(typeOfFirst, pytuple):
+    elif fitsWithin(typeOfFirst, pytuple):
         answer = ()
         for e in xs:
             answer += e

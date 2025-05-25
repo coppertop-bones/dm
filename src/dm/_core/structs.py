@@ -18,9 +18,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import abc, numpy as np
 from collections import UserList, UserDict
 
-from bones.core.errors import NotYetImplemented, ProgrammerError, PathNotTested
+from bones.core.errors import NotYetImplemented, PathNotTested
 from bones.core.sentinels import Missing, Void
-from bones.lang.metatypes import BType, fitsWithin, cacheAndUpdate
+from bones.lang.metatypes import BType
 from bones.lang.utils import Constructors
 
 

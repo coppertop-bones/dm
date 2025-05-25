@@ -261,8 +261,6 @@ class tvtxt_(builtins.str):
         else:
             raise SyntaxError()
         return instance
-
-
     @property
     def _t(self):
         return self._t_
