@@ -302,6 +302,16 @@ def testAddAndSubtract():
     (A | +square) >> check >> typeOf >> (tmatrix[pylist] & square)
     (A | +square | -tmatrix[pylist]) >> check >> typeOf >> square
 
+    mutable = BTAtom('mutable')
+    maddResult = BTAtom('maddResult')
+    rowmajor = BTAtom('rowmajor')
+    matrix = BType('matrix')
+    dseq = BType('dseq')
+    Matrix = BType('Matrix: matrix & rowmajor & dseq in mem')
+    x = tv(Matrix, 0) | +(mutable & maddResult)
+    actual = x | -(mutable & maddResult)
+    actual >> check >> typeOf >> Matrix
+
 
 @xfail
 @type_system
