@@ -1,21 +1,10 @@
 # **********************************************************************************************************************
-#
-#                             Copyright (c) 2025 David Briant. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
-# with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
-# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for
-# the specific language governing permissions and limitations under the License.
-#
-# Example illustration three key ideas (which are equally applicable to deep copy) for cross langauge transport:
-#   a) 2-step serialisation
-#       step 1 - client is responsible to serialise to generic structures (dict of basic types in this example)
-#       step 2 - framework is responsible for serialising those structures
-#   b) serialisation framework provides generic utils for handling object links
-#   c) the closure of things to be serialised is easiest figured externally to the serialisation itself
-#
+# Copyright 2025 David Briant, https://github.com/coppertop-bones. Licensed under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance with the License. You may obtain a copy of the  License at
+# http://www.apache.org/licenses/LICENSE-2.0. Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY  KIND,
+# either express or implied. See the License for the specific language governing permissions and limitations under the
+# License. See the NOTICE file distributed with this work for additional information regarding copyright ownership.
 # **********************************************************************************************************************
 
 # Python imports
