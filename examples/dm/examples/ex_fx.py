@@ -16,7 +16,7 @@ if getattr(sys, '_TRACE_IMPORTS', False): print(__name__)
 
 
 from coppertop.pipe import *
-from bones.lang.metatypes import S, BType
+from bones.lang.metatypes import BTStruct, BType
 from dm.core.types import T1, T2, tvfloat, pyfunc
 from dm.finance.types import ccy, fx
 from dm.testing import check, raises, equals
@@ -37,8 +37,8 @@ GBP = BType('GBP: GBP & ccy & tvfloat').setCoercer(tvfloat)
 USD = BType('USD: USD & ccy & tvfloat').setCoercer(tvfloat)
 tvccy = ccy & tvfloat
 
-GBPUSD = fx[S(domestic=GBP, foreign=USD)].nameAs('GBPUSD')[tvfloat].setCoercer(tvfloat)
-fxT1T2 = fx[S(domestic=tvccy[T1], foreign=tvccy[T2])] & tvfloat
+GBPUSD = fx[BTStruct(domestic=GBP, foreign=USD)].nameAs('GBPUSD')[tvfloat].setCoercer(tvfloat)
+fxT1T2 = fx[BTStruct(domestic=tvccy[T1], foreign=tvccy[T2])] & tvfloat
 
 
 @coppertop(style=binary)

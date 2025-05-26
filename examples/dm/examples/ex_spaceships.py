@@ -12,8 +12,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BType
-from bones.lang.structs import tv
+from bones.lang.metatypes import BType
 from bones.core.sentinels import Null
 
 from dm.core.types import txt, null
@@ -24,59 +23,60 @@ from dm.pp import PP
 # Inspired by the wikipedia article on multi-dispatch - https://en.wikipedia.org/wiki/Multiple_dispatch
 # Hopefully this is even more readable than Julia
 
-tAsteroid = BTAtom('asteroid').setCoercer(tv)
-tShip = BTAtom('ship').setCoercer(tv)
-tEvent = BTAtom('event').setCoercer(tv)
+asteroid = BType('asteroid: asteroid & txt in mem')
+ship = BType('ship: ship & txt in mem')
+event = BType('event: event & txt in mem')
 
 
 @coppertop
-def collide(a:tAsteroid, b:tAsteroid) -> tEvent:
-    return f'{a._v} split {b._v} (collide<:asteroid,asteroid:>)' | tEvent
+def collide(a:asteroid, b:asteroid) -> event:
+    return f'{a} split {b} (collide<:asteroid,asteroid:>)'
 
 @coppertop
-def collide(a:tShip, b:tAsteroid) -> tEvent:
-    return f'{a._v} tried to ram {b._v} (collide<:ship,asteroid:>)' | tEvent
+def collide(a:ship, b:asteroid) -> event:
+    return f'{a} tried to ram {b} (collide<:ship,asteroid:>)'
 
 @coppertop
-def collide(a:tAsteroid, b:tShip) -> tEvent:
-    return f'{a._v} destroyed {b._v} (collide<:asteroid,ship:>)' | tEvent
+def collide(a:asteroid, b:ship) -> event:
+    return f'{a} destroyed {b} (collide<:asteroid,ship:>)'
 
 @coppertop
-def collide(a:tShip, b:tShip) -> null:
+def collide(a:ship, b:ship) -> null:
     return Null
-#    return f'{a} bounced {b} (collide<:ship,ship:>)' >> to >> tEvent
+#    return f'{a} bounced {b} (collide<:ship,ship:>)' >> to >> event
 
 @coppertop
-def process(e:tEvent) -> txt:
-    return e._v
+def process(e:event) -> txt:
+    return e
 
 @coppertop
 def process(e:null) -> txt:
     return 'nothing happened'
 
 # @coppertop
-# def process(e:tEvent+null) -> txt:
-#     return 'nothing happened' if e._t == null else e._v
+# def process(e:event+null) -> txt:
+#     return 'nothing happened' if e._t == null else e
 
 
-borg = BType('borg: borg & ship').setCoercer(tv)
-
-@coppertop
-def collide(a:borg, b:tShip) -> tEvent:
-    return f'{a._v} subsumes {b._v} (collide<:borg,ship:>)' | tEvent
+borg = BType('borg: borg & ship in mem')
 
 @coppertop
-def collide(a:borg, b:borg) -> tEvent:
-    return f'{a._v} merges with {b._v} (collide<:borg,big:>)' | tEvent
+def collide(a:borg, b:ship) -> event:
+    return f'{a} subsumes {b} (collide<:borg,ship:>)'
+
+@coppertop
+def collide(a:borg, b:borg) -> event:
+    return f'{a} merges with {b} (collide<:borg,borg:>)'
 
 
 
 def testCollide():
-    ship1 = 'ship1' | tShip
-    ship2 = 'ship2' | tShip
-    ast1 = 'big asteroid' | tAsteroid
-    ast2 = 'small asteroid' | tAsteroid
+    ship1 = 'ship1' | ship
+    ship2 = 'ship2' | ship
+    ast1 = 'big asteroid' | asteroid
+    ast2 = 'small asteroid' | asteroid
     b = 'borg' | borg
+    b2 = 'the borg' | borg
 
     ship1 >> collide(_, ship2) >> process >> PP
     ship1 >> collide(_, ast1) >> process >> PP
@@ -86,7 +86,7 @@ def testCollide():
     b >> collide(_, ast1) >> process >> PP
     b >> collide(ast2, _) >> process >> PP
     ship1 >> collide(_, b) >> process >> PP
-    b >> collide(_, b) >> process >> PP
+    b >> collide(_, b2) >> process >> PP
 
     ship1 >> collide(_, ship2) >> process >> check >> equals >> 'nothing happened'
     # 'ship1 tried to ram big asteroid (collide<:ship,asteroid:>)'

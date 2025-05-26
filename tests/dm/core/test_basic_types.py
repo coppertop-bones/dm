@@ -30,5 +30,27 @@ def test_txt():
     safetxt('hello') >> join >> safetxt(' world') >> check >> equals >> 'hello world'
     'hello world' >> check >> different >> safetxt('hello world')
 
+    x = 'hello' | txt
+    y = x | safetxt
+#
+
+# @coppertop(style=binary)
+# def different(a, b) -> bool:
+#     return not fitsWithin(typeOf(a), typeOf(b)) or a != b
+#
+# @coppertop(style=binary, dispatchEvenIfAllTypes=True)
+# def equals(a, b) -> bool:
+#     return fitsWithin(typeOf(a), typeOf(b)) and a == b
+#
+# @coppertop(style=binary)
+# def join(s1:txt, s2:txt) -> txt:
+#     return s1 + s2
+#
+# @coppertop(style=binary)
+# def join(s1:txt[T1], s2:txt[T1], tByT) -> txt[T1]:
+#     return s1 + s2
+
+
+
 
 

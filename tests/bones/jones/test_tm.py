@@ -19,7 +19,7 @@ from bones.jones import BTypeError
 from bones.lang.type_lang import TypeLangInterpreter
 from bones.lang._type_lang.py_type_manager import PyTypeManager
 from bones.lang._type_lang.jones_type_manager import JonesTypeManager
-from bones.lang.core import TLError, bmtnul, bmtatm, bmtint, bmtuni, bmttup, bmtstr, bmtrec, bmtseq, bmtmap, bmtfnc, bmtsvr
+from bones.typing.core import TLError, bmtnul, bmtatm, bmtint, bmtuni, bmttup, bmtstr, bmtrec, bmtseq, bmtmap, bmtfnc, bmtsvr
 
 
 # TODO

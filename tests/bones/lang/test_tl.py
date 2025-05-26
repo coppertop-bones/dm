@@ -14,7 +14,7 @@ from bones.jones import BTypeError
 from dm.utils.testing import assertRaises
 from bones.core.context import context              # needed for conditional break points whilst debugging
 
-from bones.lang.core import TLError, bmtatm
+from bones.typing.core import TLError, bmtatm
 from bones.lang.type_lang import TypeLangInterpreter
 from bones.lang._type_lang.py_type_manager import PyTypeManager
 from bones.lang._type_lang.jones_type_manager import JonesTypeManager

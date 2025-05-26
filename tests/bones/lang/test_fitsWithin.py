@@ -12,7 +12,7 @@ import pytest
 type_system = pytest.mark.type_system
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType, BTAtom, S, weaken, updateSchemaVarsWith, fitsWithin as _fitsWithin
+from bones.lang.metatypes import BType, BTAtom, BTStruct, weaken, updateSchemaVarsWith, fitsWithin as _fitsWithin
 import bones.lang.metatypes
 from dm.testing import check, fitsWithin, doesNotFitWithin, equals
 from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, T4, num, pylist, pydict, litdec
@@ -68,7 +68,7 @@ def testNested():
     num >> check >> fitsWithin >> ccy[T]
 
     num*txt >> check >> fitsWithin >> (num+index)*(txt+GBP)
-    S(a=num, b=num) >> check >> fitsWithin >> S(a=num)
+    BTStruct(a=num, b=num) >> check >> fitsWithin >> BTStruct(a=num)
 
 
 @type_system

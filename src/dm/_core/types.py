@@ -19,9 +19,10 @@
 import sys, builtins
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
+from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.core.errors import ProgrammerError, NotYetImplemented
-from bones.lang.metatypes import BTAtom, BType, weaken, BTypeError
+from bones.lang.metatypes import BTAtom, BType, weaken, extractTypeFromConstructionArgs, _btypeByClass
 from bones.lang.types import *
 import bones.lang.types
 from bones.lang.structs import _tvstruct
@@ -215,65 +216,44 @@ __all__ += ['tvint']
 
 
 # **********************************************************************************************************************
-# classes for the underlying storage of text - for index, count and offset _t is hard-coded to avoid boxing
+# class for the underlying storage of text - as with index, count and offset _t is hard-coded to avoid boxing
 # **********************************************************************************************************************
 
-# littxt is a python str and on assignment is notionally weakened to a txt - in reality we just equate
-# txt and python str
-class txt_(builtins.str):
-    def __new__(cls, t, v, *args, **kwargs):
-        if t == txt:
-            return super(cls, cls).__new__(cls, v)
+class _tvstr(builtins.str):
+    def __new__(cls, *args, **kwargs):
+        t, args = extractTypeFromConstructionArgs(args)
+        if len(args) == 0:
+            raise NotYetImplemented()
+        elif len(args) == 1:
+            instance = super(cls, cls).__new__(cls, args[0])
+            if t != txt:
+                instance._t_ = t
+            return instance
         else:
-            return tvtxt_(t, v, *args, **kwargs)
+            raise SyntaxError(f'Expected 1 argument, got {len(args)}')
     @property
     def _t(self):
-        return txt
+        return getattr(self, '_t_', txt)  # default to txt if not set
     @property
     def _v(self):
         return self
     def __repr__(self):
-        return f'{super().__repr__()}'
-
-class tvtxt_(builtins.str):
-    def __new__(cls, *btypeAndOrArgs, **kwargs):
-        t, args = (btypeAndOrArgs[0][0], btypeAndOrArgs[1:]) if btypeAndOrArgs and isinstance(btypeAndOrArgs[0], Constructors) else (Missing, btypeAndOrArgs)
-        if len(args) == 0:
-            raise NotYetImplemented()
-        elif len(args) == 1:
-            if t:
-                instance = super(cls, cls).__new__(cls, args[0])
-                instance._t_ = t
-            else:
-                raise SyntaxError()
-        elif len(args) == 2:
-            t, v = args
-            if isinstance(t, BType):
-                # darray(t, iterable)
-                try:
-                    instance = super(cls, cls).__new__(cls, v)
-                    instance._t_ = t
-                except Exception as ex:
-                    print(f'{t}    {v} {ex}')
-                    raise ex
-            else:
-                raise SyntaxError()
-        else:
-            raise SyntaxError()
-        return instance
-    @property
-    def _t(self):
-        return self._t_
-    @property
-    def _v(self):
-        return super().__new__(str, self)
-    def __repr__(self):
-        return f'{self._t}("{super().__repr__()}")'
+        return f'txt({super().__repr__()})'
     def _asT(self, t):
         self._t_ = t
         return self
 
-txt = BType('txt: atom in mem').setCoercer(txt_).setConstructor(txt_)
+def _coerceToTxt(t, v):
+    if isinstance(v, _tvstr):
+        return v.asT(t)
+    elif isinstance(v, str):
+        return txt(v)._asT(t)
+    # elif isinstance(v, bytes):
+    #     return txt_(t, v.decode('utf-8'))
+    else:
+        raise TypeError(f'Cannot coerce {v} of type {type(v)} to txt')
+
+txt = BType('txt: atom in mem').setConstructor(_tvstr).setCoercer(_coerceToTxt)
 __all__ += ['txt']
 
 
@@ -294,17 +274,34 @@ __all__ += ['date']
 # types for dealing with python - not needed in a non-python implementation
 # **********************************************************************************************************************
 
-py = BType('py: atom in mem')
 
-pylist = BType('pylist: pylist & py in mem')
-pytuple = BType('pytuple: pytuple & py in mem')
-pydict = BType('pydict: pydict & py in mem')
-pyset = BType('pyset: pyset & py in mem')
-npfloat = BType('npfloat: npfloat & py in mem')
-pydict_keys = BType('pydict_keys: pydict_keys & py in mem')
-pydict_values = BType('pydict_values: pydict_values & py in mem')
-pydict_items = BType('pydict_items: pydict_items & py in mem')
-pyfunc = BType('pyfunc: pyfunc & py in mem')
+def coercer(t, v):
+    tV = typeOf(v)
+    try:
+        fits = fitsWithin(typeOf(v), t)
+    except Exception as ex:
+        fits = (tV == t)
+    if fits:
+        return v
+    else:
+        raise TypeError(f'Cannot coerce {v} of type {type(v)} to {t}')
+
+
+py = BType('py: atom in mem').setCoercer(coercer)
+
+pylist = BType('pylist: pylist & py in mem').setCoercer(coercer)
+pytuple = BType('pytuple: pytuple & py in mem').setCoercer(coercer)
+pydict = BType('pydict: pydict & py in mem').setCoercer(coercer)
+pyset = BType('pyset: pyset & py in mem').setCoercer(coercer)
+npfloat = BType('npfloat: npfloat & py in mem').setCoercer(coercer)
+pydict_keys = BType('pydict_keys: pydict_keys & py in mem').setCoercer(coercer)
+pydict_values = BType('pydict_values: pydict_values & py in mem').setCoercer(coercer)
+pydict_items = BType('pydict_items: pydict_items & py in mem').setCoercer(coercer)
+pyfunc = BType('pyfunc: pyfunc & py in mem').setCoercer(coercer)
+
+
+
+txt = BType('txt: atom in mem').setConstructor(_tvstr).setCoercer(_coerceToTxt)
 
 
 __all__ += [
@@ -417,11 +414,11 @@ dframe = BType('dframe: dframe & frame & py in mem').setConstructor(createDFrame
 # in bones we wouldn't as we would know the structures type
 #
 # we have more than one implementation for the struct - with a common functional interface
-# so full type is struct&dstruct&S(....)
+# so full type is struct&dstruct&BTStruct(....)
 # then
 # def join(struct[T1], struct[T2]) -> struct[T1 and T2] + err:
 #
-# adhoc(S(fred=pyint), fred=1)
+# adhoc(BTStruct(fred=pyint), fred=1)
 # " " ~ " "
 #
 # class fred:

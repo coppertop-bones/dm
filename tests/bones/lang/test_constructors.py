@@ -14,7 +14,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, S, isT
+from bones.lang.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, BTStruct, isT
 from dm.testing import check, equals
 from dm.utils.testing import assertRaises
 from dm.core.aggman import collect, joinAll, sortUsing
@@ -110,14 +110,14 @@ def test_hasT():
     fx = BType('fx')
     GBP = BType('GBP: GBP & ccy')
     USD = BType('USD: USD & ccy')
-    assert fx[S(domestic=GBP, foreign=T1)].hasT
+    assert fx[BTStruct(domestic=GBP, foreign=T1)].hasT
 
     N = BTAtom('N')
     assert (N**T).hasT
     assert ((T*num)^num).hasT
     assert ((num*num)^T).hasT
 
-    assert S(name=T, age=num).hasT
+    assert BTStruct(name=T, age=num).hasT
     assert (T**num).hasT
     assert (num**T).hasT
     assert (num**T).hasT

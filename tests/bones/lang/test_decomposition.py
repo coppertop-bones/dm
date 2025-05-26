@@ -13,7 +13,7 @@ xfail = pytest.mark.xfail
 type_system = pytest.mark.type_system
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, S, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
+from bones.lang.metatypes import BTAtom, BTStruct, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
 import bones.lang.metatypes
 from bones.lang.structs import tv
 from dm.utils.testing import assertRaises
@@ -282,11 +282,11 @@ def testExplicit():
 
 
 @coppertop(style=binary)
-def mul(c:ccy[T1], f:fx[S(d=ccy[T1], f=ccy[T2])], tByT) -> ccy[T2]:
+def mul(c:ccy[T1], f:fx[BTStruct(d=ccy[T1], f=ccy[T2])], tByT) -> ccy[T2]:
     return tv(ccy[tByT[T2]], c._v * f._v)
 
 @coppertop(style=binary)
-def mul(c:ccy[T1], f:fx[S(d=ccy[T2], f=ccy[T1])], tByT) -> ccy[T2]:
+def mul(c:ccy[T1], f:fx[BTStruct(d=ccy[T2], f=ccy[T1])], tByT) -> ccy[T2]:
     return tv(ccy[tByT[T2]], c._v / f._v)
 
 
@@ -324,11 +324,11 @@ def testDrop():
 @xfail
 @type_system
 def testExplicitStructs():
-    # GBPUSD = fx[S(d=GBP, f=USD).setExplicit].setCoercer(tv)
-    GBPUSD = fx[S(d=GBP, f=USD)].setCoercer(tv)
+    # GBPUSD = fx[BTStruct(d=GBP, f=USD).setExplicit].setCoercer(tv)
+    GBPUSD = fx[BTStruct(d=GBP, f=USD)].setCoercer(tv)
     GBPUSD >> check >> doesNotFitWithin >> fx
-    GBPUSD >> check >> doesNotFitWithin >> fx[S(d=T1, f=T2)]        # ccy is not explicit in the rhs
-    GBPUSD >> check >> fitsWithin >> fx[S(d=ccy[T1], f=ccy[T2])]
+    GBPUSD >> check >> doesNotFitWithin >> fx[BTStruct(d=T1, f=T2)]        # ccy is not explicit in the rhs
+    GBPUSD >> check >> fitsWithin >> fx[BTStruct(d=ccy[T1], f=ccy[T2])]
     (100 | GBP) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (130 | USD)
     (130 | USD) >> mul >> (1.30 | GBPUSD) >> check >> equals >> (100 | GBP)
 
@@ -366,7 +366,7 @@ def main():
     print(f'{__file__} has failing tests')
 
 if __name__ == '__main__':
-    t = fx[S(d=ccy[T1], f=ccy[T2])]
+    t = fx[BTStruct(d=ccy[T1], f=ccy[T2])]
     main()
     print('pass')
 

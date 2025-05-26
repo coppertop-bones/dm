@@ -51,8 +51,9 @@ def check(actual, fn, expected):
                     passed, ppAct, ppExp = fn(actual, expected), repr(actual), repr(expected)
         if not passed:
             msg = f"{_getTestTitle()}\n'{fnName}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+            # use assert rather than raising an AssertionError so pytest can report it nicely
             assert actual == expected, msg
-            raise AssertionError(msg)
+            # raise AssertionError(msg)
     return actual
 
 def _getTestTitle():

@@ -43,7 +43,7 @@ def derefIfCow(maybeCow):
 def ppCardSummary(card, player, pad, stats, cfg, cHands):
     t1 = ('' if stats[card].tbi == MAYBE else stats[card].tbi) >> pad_(_, dict(left=cfg.hasWidth))
     t2 = ('' if stats[card].tbi in (YES, NO) else str(cHands - stats[card].noCount)) >> pad_(_, dict(left=cfg.noCountWidth))
-    t3 = (f'S{stats[card].sumMaybeSuggests}' if stats[card].sumMaybeSuggests else '') >> pad_(_, dict(left=cfg.suggestCountWidth))
+    t3 = (f'BTStruct{stats[card].sumMaybeSuggests}' if stats[card].sumMaybeSuggests else '') >> pad_(_, dict(left=cfg.suggestCountWidth))
     t4 = (f'{int(stats[card].mulPriors * 100)}%' if stats[card].mulPriors else '') >> pad_(_, dict(left=cfg.likeWidth))
     return t1 + t2 + t3 + t4
 

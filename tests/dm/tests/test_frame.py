@@ -12,7 +12,7 @@ from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from dm.testing import check, equals
 from dm.core.misc import asideDo
-from bones.lang.metatypes import S
+from bones.lang.metatypes import BTStruct
 from dm.core.frame import sortBy, collect, byRow, total_, mean_, first_, last_, count_, by_, take, collect_, by, \
     gather, where, shape
 from dm.core.types import dframe, count, txt
@@ -32,13 +32,13 @@ def test_construction():
         >> asideDo >> (lambda f: f >> shape >> check >> equals >> (6, 3))
 
     context.testcase = 'dframe construction - type + kwargs'
-    dframe(S(a=count,b=count, c=txt), a=[1, 2, 1, 2, 1, 2], b=[2, 2, 2, 1, 1, 1], c=['a', 'b', 'c', 'd', 'e', 'f']) \
-        >> asideDo >> (lambda f: f >> typeOf >> check >> fitsWithin >> S(a=count,b=count, c=txt)[dframe]) \
+    dframe(BTStruct(a=count,b=count, c=txt), a=[1, 2, 1, 2, 1, 2], b=[2, 2, 2, 1, 1, 1], c=['a', 'b', 'c', 'd', 'e', 'f']) \
+        >> asideDo >> (lambda f: f >> typeOf >> check >> fitsWithin >> BTStruct(a=count,b=count, c=txt)[dframe]) \
         >> asideDo >> (lambda f: f >> shape >> check >> equals >> (6, 3))
 
     context.testcase = 'dframe construction - type no data'
-    dframe(S(a=count,b=count, c=txt)) \
-        >> asideDo >> (lambda f: f >> typeOf >> check >> fitsWithin >> S(a=count,b=count, c=txt)[dframe]) \
+    dframe(BTStruct(a=count,b=count, c=txt)) \
+        >> asideDo >> (lambda f: f >> typeOf >> check >> fitsWithin >> BTStruct(a=count,b=count, c=txt)[dframe]) \
         >> asideDo >> (lambda f: f >> shape >> check >> equals >> (0, 3))
 
 
