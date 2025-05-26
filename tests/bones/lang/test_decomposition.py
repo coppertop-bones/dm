@@ -138,7 +138,6 @@ USD = BType('USD2: USD2 & ccy').setCoercer(tv)
 
 # orthogonal
 # anything including a python class, e.g. tmatrix&darray
-# pylist = BTAtom('pylist', space=mem)
 lol = BTAtom('lol', space=mem)         # the type for a list of lists (regular?), e.g. tmatrix[lol]
 
 # (txt).setConstructor(tv)
@@ -296,10 +295,9 @@ def testMisc():
     tmatrix[square,right] >> check >> fitsWithin >> (tmatrix & right & square)
 
 
-@xfail
 @type_system
 def testAddAndSubtract():
-    tmatrix[pylist].setConstructor(tv)
+    BType('tmatrix & pylist in mem').setConstructor(tv)
     A = tmatrix[pylist]([[1,2],[3,4]])
     (A | +square) >> check >> typeOf >> (tmatrix[pylist] & square)
     (A | +square | -tmatrix[pylist]) >> check >> typeOf >> square
