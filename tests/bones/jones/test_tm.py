@@ -15,14 +15,14 @@ from bones import jones
 from bones.core.sentinels import Missing
 from dm.utils.testing import assertRaises
 from bones.jones import BTypeError
-from bones.lang.type_lang import TypeLangInterpreter
-from bones.lang._type_lang.py_type_manager import PyTypeManager
-from bones.lang._type_lang.jones_type_manager import JonesTypeManager
+from bones.ts.type_lang import TypeLangInterpreter
+from bones.ts._type_lang.py_type_manager import PyTypeManager
+from bones.ts._type_lang.jones_type_manager import JonesTypeManager
 from bones.ts.core import TLError, bmtnul, bmtatm, bmtint, bmtuni, bmttup, bmtstr, bmtrec, bmtseq, bmtmap, bmtfnc, bmtsvr
 
 
 # TODO
-#   once all types can be created rework bones.lang.metatypes
+#   once all types can be created rework bones.ts.metatypes
 #   create the null tuple for functions that take no arguments
 
 # OPEN:

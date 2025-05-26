@@ -10,7 +10,7 @@
 import numpy as np, scipy.stats
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from dm.core.types import N, num, matrix, pytuple, pydict, darray
 from dm.core.aggman import takeRowRemain, hjoin, numRows
 

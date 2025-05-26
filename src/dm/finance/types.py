@@ -11,7 +11,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-from bones.lang.metatypes import BTAtom
+from bones.ts.metatypes import BTAtom
 
 
 ccy = BTAtom('ccy', explicit=True)

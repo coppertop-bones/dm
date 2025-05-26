@@ -17,7 +17,7 @@ from dm.testing import check, equals
 from dm.core import collect, interleave
 from dm.pp import PP
 from dm.core.types import txt, index, num, bool, T1, litint, pylist
-from bones.lang.metatypes import BTAtom
+from bones.ts.metatypes import BTAtom
 from dm._core.structs import tv
 
 from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo

@@ -11,7 +11,7 @@ from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from dm.testing import check, equals
 from dm.core.misc import asideDo
-from bones.lang.metatypes import BTStruct
+from bones.ts.metatypes import BTStruct
 from dm.core.frame import sortBy, collect, byRow, total_, mean_, first_, last_, count_, by_, take, collect_, by, \
     gather, where, shape
 from dm.core.types import dframe, count, txt

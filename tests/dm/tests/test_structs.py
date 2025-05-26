@@ -8,7 +8,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from dm.testing import check, equals
 from dm.core.aggman import append, prepend, prependTo, appendTo, join, drop, at, keys, sort, kvs
 from dm.core.misc import _v, box

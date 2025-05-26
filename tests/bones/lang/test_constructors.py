@@ -13,7 +13,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, BTStruct, isT
+from bones.ts.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, BTStruct, isT
 from dm.testing import check, equals
 from dm.utils.testing import assertRaises
 from dm.core.aggman import collect, joinAll, sortUsing

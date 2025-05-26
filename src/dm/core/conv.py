@@ -16,7 +16,7 @@ from _strptime import _strptime
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from dm.core.datetime import toCTimeFormat
 from dm.core.types import dframe, dmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
     num, npfloat, dtup, dseq, matrix, t, darray

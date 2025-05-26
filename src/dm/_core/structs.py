@@ -16,7 +16,7 @@ from collections import UserList, UserDict
 
 from bones.core.errors import NotYetImplemented, PathNotTested
 from bones.core.sentinels import Missing, Void
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from bones.ts.core import Constructors
 
 

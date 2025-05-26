@@ -12,8 +12,8 @@ xfail = pytest.mark.xfail
 type_system = pytest.mark.type_system
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BTStruct, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
-import bones.lang.metatypes
+from bones.ts.metatypes import BTAtom, BTStruct, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
+import bones.ts.metatypes
 from dm._core.structs import tv
 from dm.utils.testing import assertRaises
 from dm.testing import check, equals, fitsWithin, doesNotFitWithin
@@ -24,7 +24,7 @@ from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq
 from dm.finance.types import ccy, fx
 from dm.linalg.types import square, right
 
-oldWeakenings = bones.lang.metatypes._weakenings
+oldWeakenings = bones.ts.metatypes._weakenings
 
 mem = BType('mem')
 tFred = BTAtom('fred')
@@ -369,4 +369,4 @@ if __name__ == '__main__':
     main()
     print('pass')
 
-bones.lang.metatypes._weakenings = oldWeakenings
+bones.ts.metatypes._weakenings = oldWeakenings

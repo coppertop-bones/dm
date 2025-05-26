@@ -23,7 +23,7 @@ import operator, random, numpy as np, enum, scipy.stats, collections.abc
 
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from dm.core.aggman import both, zipAll, values, keys, select, sort, kvs, collect, interleave, dropSlots, join
 from dm.core.conv import to
 from dm.core.misc import sequence

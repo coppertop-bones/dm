@@ -8,7 +8,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom
+from bones.ts.metatypes import BTAtom
 from dm._core.structs import tv
 
 

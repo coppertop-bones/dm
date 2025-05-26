@@ -18,7 +18,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.core.errors import ProgrammerError, NotYetImplemented
-from bones.lang.metatypes import BTAtom, BType, weaken, extractTypeFromConstructionArgs
+from bones.ts.metatypes import BTAtom, BType, weaken, extractTypeFromConstructionArgs
 from bones.lang.types import *
 import bones.lang.types
 from dm._core.structs import _tvstruct

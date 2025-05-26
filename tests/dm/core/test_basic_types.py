@@ -11,7 +11,7 @@
 # pydict, pylist, pyset, pytuple are
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from dm.core.types import txt, num, count, index, offset, dmap, dseq
 
 from dm.core.aggman import join

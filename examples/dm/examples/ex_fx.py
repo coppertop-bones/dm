@@ -13,7 +13,7 @@ if getattr(sys, '_TRACE_IMPORTS', False): print(__name__)
 
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BTStruct, BType
+from bones.ts.metatypes import BTStruct, BType
 from dm.core.types import T1, T2, tvfloat, pyfunc
 from dm.finance.types import ccy, fx
 from dm.testing import check, raises, equals

@@ -8,7 +8,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from bones.lang.metatypes import BType
+from bones.ts.metatypes import BType
 from bones.core.sentinels import Null
 
 from dm.core.types import txt, null

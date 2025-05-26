@@ -12,7 +12,7 @@
 
 from enum import IntEnum
 
-from bones.lang.metatypes import BTAtom, BTStruct, BType
+from bones.ts.metatypes import BTAtom, BTStruct, BType
 from dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq
 from bones.core.sentinels import Missing
 

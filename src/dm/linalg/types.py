@@ -9,7 +9,7 @@
 
 import numpy as np
 from coppertop.pipe import *
-from bones.lang.metatypes import BTAtom, BType
+from bones.ts.metatypes import BTAtom, BType
 from dm.core.types import matrix, N, num, pytuple, dstruct, darray
 
 

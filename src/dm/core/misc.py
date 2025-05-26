@@ -16,7 +16,7 @@ import builtins, numpy as np
 from coppertop.pipe import *
 from bones.core.sentinels import Missing, dict_keys, dict_values, dict_items, function
 from bones.core.errors import NotYetImplemented
-from bones.lang.metatypes import BTAtom as _BTAtom
+from bones.ts.metatypes import BTAtom as _BTAtom
 from dm.core.aggman import inject
 from dm._core.structs import tv
 from dm.core.types import T, pylist, txt, pydict, pyfunc, T1, T2, py

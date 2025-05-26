@@ -28,7 +28,7 @@ from coppertop.pipe import *
 from bones import jones
 
 from bones.core.errors import NotYetImplemented, ProgrammerError
-from bones.lang.metatypes import hasT, fitsWithin
+from bones.ts.metatypes import hasT, fitsWithin
 from dm._core.structs import tv
 from bones.core.sentinels import Void
 
