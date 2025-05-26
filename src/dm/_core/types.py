@@ -285,7 +285,13 @@ def coercer(t, v):
 
 py = BType('py: atom in mem').setCoercer(coercer)
 
+
 pylist = BType('pylist: pylist & py in mem').setCoercer(coercer)
+@coppertop
+def _const_pylist(t:Constructors, seq) -> pylist:
+    return list(seq)
+pylist.setConstructor(_const_pylist)
+
 pytuple = BType('pytuple: pytuple & py in mem').setCoercer(coercer)
 pydict = BType('pydict: pydict & py in mem').setCoercer(coercer)
 pyset = BType('pyset: pyset & py in mem').setCoercer(coercer)
@@ -383,6 +389,13 @@ t = thing()     # t for types in anticipation of BType namespacing and import co
 t.count = count
 t.index = index
 t.offset = offset
+
+
+
+@coppertop
+def sequence_(n):
+    return range(n)
+offset.sequence_ = sequence_
 
 
 def createDFrame(*args_, **kwargs):
