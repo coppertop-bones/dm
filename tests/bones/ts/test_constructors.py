@@ -20,7 +20,7 @@ from dm.core.aggman import collect, joinAll, sortUsing
 from dm.core.conv import to
 from dm.core.misc import box
 
-from dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruct
+from dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruct, dseq
 from dm.finance.types import ccy, fx
 
 
@@ -82,11 +82,13 @@ def testBTMap():
 
 def testBTFn():
     fn = (tSally+null) ^ (tFred*tJoe)
-    rep = [tSally, null] \
-        >> sortUsing >> (lambda x: x.id) \
-        >> collect >> (lambda x: x >> to >> txt) \
-        >> joinAll(_, ' + ')
-    repr(fn) >> check >> equals >> f'(({rep}) -> (fred * joe))'
+    rep = (([tSally, null]
+        >> sortUsing >> (lambda x: x.id)
+        >> collect >> (lambda x: txt(x))        # OPEN: add unary piping to types so can do x >> txt? is x >> to >> txt a coersion or a conversion?
+        | (N**txt)[dseq])
+        >> joinAll(_, '+')
+    )
+    repr(fn) >> check >> equals >> f'{rep} ^ fred*joe'
     assert isinstance(fn, BTFn)
 
 
