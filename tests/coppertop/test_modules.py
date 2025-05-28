@@ -16,7 +16,7 @@ from dm.utils.testing import assertRaises
 from dm.testing import check, equals
 from dm.core.types import txt, num
 
-from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo
+from coppertop._testing_.int_adders import addOne, eachAddOne, eachAddTwo
 
 
 # test that functions can be patched in a module more than once
@@ -76,7 +76,7 @@ def test_updatingAddOne():
     # # test that redefining a function in either a different python module or a different bone module without the patch
     # # argument throws an error
     # with assertRaises(CoppertopError) as ex:
-    #     from coppertop.tests.int_adders2 import addOne
+    #     from coppertop._testing_.int_adders2 import addOne
 
 
 

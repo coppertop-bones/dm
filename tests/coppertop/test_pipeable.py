@@ -16,8 +16,8 @@ from bones.core.errors import NotYetImplemented
 from bones.ts.metatypes import BTAtom
 from dm.utils.testing import assertRaises
 from dm.testing import check, equals
-from coppertop.tests.take1 import _take
-from _.coppertop.tests.take2 import _take
+from coppertop._testing_.take1 import _take
+from _.coppertop._testing_.take2 import _take
 from dm.core.types import index, pylist, litint, darray
 
 mat = BTAtom("mat2")

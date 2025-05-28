@@ -20,7 +20,7 @@ from dm.core.types import txt, index, num, bool, T1, litint, pylist
 from bones.ts.metatypes import BTAtom
 from dm._core.structs import tv
 
-from coppertop.tests.int_adders import addOne, eachAddOne, eachAddTwo
+from coppertop._testing_.int_adders import addOne, eachAddOne, eachAddTwo
 
 
 A = BTAtom("A")
