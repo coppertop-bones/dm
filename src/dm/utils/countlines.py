@@ -3,7 +3,7 @@ import os
 
 
 def ffn_linecount(ffn, opts, line_excls):
-    count = 0
+    lines = 0
     skipBlanks = "--skipblank" in opts
     try:
         with open(ffn, encoding='utf-8-sig') as f:
@@ -14,23 +14,23 @@ def ffn_linecount(ffn, opts, line_excls):
                         if line.startswith(excl):
                             include = False
                             break
-                    if include:  count += 1
+                    if include:  lines += 1
                 else:
-                    if not skipBlanks:  count += 1
+                    if not skipBlanks:  lines += 1
 
     except Exception as ex:
         if '-oe' in opts:
             print(f'Error reading "{ffn}"')
 
     if '-ofn' in opts:
-        print("%6d lines in %s" % (count, ffn))
-    return count
+        print("%6d lines in %s" % (lines, ffn))
+    return lines
 
 
 def folder_linecount(folder, opts, exts, line_excls, path_excls):
     # derived from https://github.com/mhalitk/line-counter/blob/master/linecounter.py
 
-    count = 0
+    lines, files = 0, 0
     folder = os.path.expanduser(folder)
     for fn in os.listdir(folder):
         ffn = os.path.join(folder, fn)
@@ -42,16 +42,19 @@ def folder_linecount(folder, opts, exts, line_excls, path_excls):
         include = include and (not exts or os.path.splitext(os.path.join(folder, fn))[1] in exts)
         include = include and os.path.isfile(ffn)
         if include:
-            count += ffn_linecount(ffn, opts, line_excls)
-    if count and '-of' in opts: print("%6d lines in %s" % (count, folder))
+            lines += ffn_linecount(ffn, opts, line_excls)
+            files += 1
+    if lines and '-of' in opts: print("%6d lines, %4d files, in %s" % (lines, files, folder))
 
     if "-r" in opts:
         for cf in os.listdir(folder):
             cf = os.path.join(folder, cf)
             if os.path.isdir(cf):
-                count += folder_linecount(cf, opts, exts, line_excls, path_excls)
+                l, f = folder_linecount(cf, opts, exts, line_excls, path_excls)
+                lines += l
+                files += f
 
-    return count
+    return lines, files
 
 
 def print_my_stuff():
@@ -61,7 +64,7 @@ def print_my_stuff():
 
     dm_all = folder_linecount('~/arwen/dm', opts, ['.py'], py_comments, [])
     dm_src = folder_linecount('~/arwen/dm/src', ['-r', '--skipblank'], ['.py'], py_comments, [])
-    print(f'----------------- src: {dm_src} tests: {dm_all-dm_src}')
+    print(f'----------------- src: {dm_src} tests: {dm_all[0]-dm_src[0], dm_all[1]-dm_src[1]}')
 
     cp = folder_linecount('~/arwen/coppertop/src', opts, ['.py', '.g4'], py_comments, ['TypeLang', 'pygments'])
     print(f'----------------- {cp}')
@@ -91,7 +94,7 @@ def print_my_stuff():
     cproc = folder_linecount('~/arwen/IR/cproc', opts, ['.c', '.h'], c_comments, [])
     print(f'----------------- {cproc}')
 
-    print('dm_src: ', dm_src, 'dm_tests:', dm_all - dm_src)
+    print('dm_src: ', dm_src, 'dm_tests:', (dm_all[0]-dm_src[0], dm_all[1]-dm_src[1]))
     print('cp', cp)
     print('bones', bones)
     print('mybones', mybones)
