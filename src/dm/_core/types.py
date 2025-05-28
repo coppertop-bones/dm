@@ -412,11 +412,14 @@ def createDFrame(*args_, **kwargs):
     return x
 
 
+def _coerceToDseq(t, v):
+    return dseq(t, v)
+
 dtup = BType('dtup: dtup & py in mem').setConstructor(_tvarray)                     # OPEN change from _tvarray to _tvtuple once implemented
 dstruct = BType('dstruct: dstruct & py in py').setConstructor(_tvstruct)
-dseq = BType('dseq: dseq & py in py').setConstructor(_tvseq)                        # & N**T
-dmap = BType('dmap: dmap & py in py').setConstructor(_tvmap)                        # & T1**T2
-dframe = BType('dframe: dframe & frame & py in mem').setConstructor(createDFrame)   # & N**BTStruct(...)
+dseq = BType('dseq: dseq & py in py').setConstructor(_tvseq).setCoercer(_coerceToDseq)  # & N**T
+dmap = BType('dmap: dmap & py in py').setConstructor(_tvmap)                            # & T1**T2
+dframe = BType('dframe: dframe & frame & py in mem').setConstructor(createDFrame)       # & N**BTStruct(...)
 
 
 # in python we need a super type for dynamic programming

@@ -1075,6 +1075,10 @@ def joinAll(xs:N**txt) -> txt:
     return ''.join(xs)
 
 @coppertop
+def joinAll(xs:N**txt, sep:txt) -> txt:
+    return sep.join(xs)
+
+@coppertop
 def joinAll(xs:pylist+pytuple) -> txt + ((N**T1)[dseq]) + pylist + pytuple:
     # could be a list of strings or a list of (N**T1) & dseq
     # answer a string if no elements
