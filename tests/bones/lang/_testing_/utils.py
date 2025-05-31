@@ -14,9 +14,9 @@ from bones.lang.core import GLOBAL, SCRATCH
 from bones.lang.symbol_table import SymTab
 from bones.lang.lex import LINE_COMMENT
 from bones.lang.execute import TCInterpreter
-from dm.testing import check, equals, raises, same
-from dm.pp import PP, TT, DD, HH
-from dm.core.types import txt
+from coppertop.dm.testing import check, equals, raises, same
+from coppertop.dm.pp import PP, TT, DD, HH
+from coppertop.dm.core.types import txt
 from bones.lang import lex
 from bones.core.errors import GroupError
 from bones.lang.parse_groups import parseStructure, TUPLE_NULL, TUPLE_OR_PAREN, TUPLE_2D, TUPLE_0_EMPTY, TUPLE_1_EMPTY, \

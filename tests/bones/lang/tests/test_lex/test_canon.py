@@ -10,7 +10,7 @@
 from glob import glob
 import os
 from bones.lang import lex
-from dm.pp import PP
+from coppertop.dm.pp import PP
 
 
 def test_canon():

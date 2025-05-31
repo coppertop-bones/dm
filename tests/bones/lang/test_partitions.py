@@ -18,12 +18,12 @@ import bones.lang.symbol_table
 # from bones.lang.infer import InferenceLogger
 
 from bones.lang._testing_.utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, newKernel
-from dm.testing import check
-from dm.core import startsWith, drop
-# from dm.core import equals
+from coppertop.dm.testing import check
+from coppertop.dm.core import startsWith, drop
+# from coppertop.dm.core import equals
 
-import dm.pp, dm.testing
-from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
+import coppertop.dm.pp, coppertop.dm.testing
+from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
 from _ import *
 
 bones.lang.symbol_table.PYCHARM = True
@@ -31,7 +31,7 @@ bones.lang.symbol_table.PYCHARM = True
 
 @xfail(reason='needs love')
 @bones_lang
-def test_partition(**ctx):
+def test_partitionExample(**ctx):
     k = newKernel()
 
     src = r'''

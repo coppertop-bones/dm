@@ -15,9 +15,9 @@ from bones import jones
 from bones.core.sentinels import Missing
 from bones.core.errors import NotYetImplemented
 
-from dm.core.types import pylist, pytuple
-from dm.testing import check, raises, equals, gt, different
-from dm.pp import PP
+from coppertop.dm.core.types import pylist, pytuple
+from coppertop.dm.testing import check, raises, equals, gt, different
+from coppertop.dm.pp import PP
 
 
 @coppertop(style=binary)

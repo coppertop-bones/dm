@@ -14,15 +14,15 @@ type_system = pytest.mark.type_system
 from coppertop.pipe import *
 from bones.ts.metatypes import BTAtom, BTStruct, _partitionIntersectionTLs, weaken, BTypeError, BTReserved, BType
 import bones.ts.metatypes
-from dm._core.structs import tv
-from dm.utils.testing import assertRaises
-from dm.testing import check, equals, fitsWithin, doesNotFitWithin
-from dm.core.misc import _v
-from dm.core.conv import to
-from dm.core.aggman import drop
-from dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq
-from dm.finance.types import ccy, fx
-from dm.linalg.types import square, right
+from coppertop.dm._core.structs import tv
+from coppertop.dm.utils.testing import assertRaises
+from coppertop.dm.testing import check, equals, fitsWithin, doesNotFitWithin
+from coppertop.dm.core.misc import _v
+from coppertop.dm.core.conv import to
+from coppertop.dm.core.aggman import drop
+from coppertop.dm.core.types import txt, N, T, T1, T2, T3, num, pylist, dtup, dseq
+from coppertop.dm.finance.types import ccy, fx
+from coppertop.dm.linalg.types import square, right
 
 oldWeakenings = bones.ts.metatypes._weakenings
 

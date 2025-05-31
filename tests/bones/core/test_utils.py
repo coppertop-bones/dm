@@ -12,7 +12,7 @@ import sys
 
 
 from bones.core.utils import HookStdOutErrToLines
-from dm.utils.testing import assertRaises
+from coppertop.dm.utils.testing import assertRaises
 
 def testStdoutHooker():
     with HookStdOutErrToLines() as outerr:
