@@ -14,14 +14,14 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from bones.ts.metatypes import BTAtom, BType, BTSeq, BTMap, BTFn, BTStruct, isT
-from dm.testing import check, equals
-from dm.utils.testing import assertRaises
-from dm.core.aggman import collect, joinAll, sortUsing
-from dm.core.conv import to
-from dm.core.misc import box
+from coppertop.dm.testing import check, equals
+from coppertop.dm.utils.testing import assertRaises
+from coppertop.dm.core.aggman import collect, joinAll, sortUsing
+from coppertop.dm.core.conv import to
+from coppertop.dm.core.misc import box
 
-from dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruct, dseq
-from dm.finance.types import ccy, fx
+from coppertop.dm.core.types import index, count, offset, num, txt, N, null, T, T1, dstruct, dseq
+from coppertop.dm.finance.types import ccy, fx
 
 
 

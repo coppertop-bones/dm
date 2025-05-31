@@ -8,7 +8,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from dm.core.types import index, pylist
+from coppertop.dm.core.types import index, pylist
 
 
 @coppertop

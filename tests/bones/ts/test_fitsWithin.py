@@ -13,10 +13,10 @@ type_system = pytest.mark.type_system
 from coppertop.pipe import *
 from bones.ts.metatypes import BType, BTAtom, BTStruct, weaken, updateSchemaVarsWith, fitsWithin as _fitsWithin
 import bones.ts.metatypes
-from dm.testing import check, fitsWithin, doesNotFitWithin, equals
-from dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, T4, num, pylist, pydict, litdec
-from dm.finance.types import ccy
-from dm.core.aggman import atAll
+from coppertop.dm.testing import check, fitsWithin, doesNotFitWithin, equals
+from coppertop.dm.core.types import index, count, num, txt, N,  T, T1, T2, T3, T4, num, pylist, pydict, litdec
+from coppertop.dm.finance.types import ccy
+from coppertop.dm.core.aggman import atAll
 
 
 oldWeakenings = bones.ts.metatypes._weakenings

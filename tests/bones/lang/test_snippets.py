@@ -26,10 +26,10 @@ from bones.lang.execute import TCInterpreter
 from bones.lang._testing_.utils import dropFirstNL
 
 
-from dm.testing import check, equals, raises
-from dm.core import startsWith, underride, withCtx, drop
-from dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
-from dm.pp import PP
+from coppertop.dm.testing import check, equals, raises
+from coppertop.dm.core import startsWith, underride, withCtx, drop
+from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
+from coppertop.dm.pp import PP
 
 
 bones.lang.symbol_table.PYCHARM = True

@@ -10,10 +10,10 @@
 import time
 
 from coppertop.pipe import *
-from dm.core.types import pylist, index
-from dm.testing import check, equals
-from dm.core import first, count, drop, collect, prependTo, join, joinAll, take, sum, unpack
-from dm.pp import PP
+from coppertop.dm.core.types import pylist, index
+from coppertop.dm.testing import check, equals
+from coppertop.dm.core import first, count, drop, collect, prependTo, join, joinAll, take, sum, unpack
+from coppertop.dm.pp import PP
 
 
 @coppertop(style=binary)

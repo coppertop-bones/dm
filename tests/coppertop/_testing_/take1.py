@@ -11,7 +11,7 @@ import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
-from dm.core.types import pylist, pytuple, index
+from coppertop.dm.core.types import pylist, pytuple, index
 
 ellipsis = type(...)
 

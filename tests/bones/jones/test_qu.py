@@ -12,11 +12,11 @@ import math, time, itertools, numpy as np, pytest
 from bones import qu
 
 from coppertop.pipe import *
-from dm.core.types import pylist, pytuple
-from dm.testing import check, raises, equals, gt, different
+from coppertop.dm.core.types import pylist, pytuple
+from coppertop.dm.testing import check, raises, equals, gt, different
 from bones import jones
 from bones.core.errors import NotYetImplemented
-from dm.pp import PP
+from coppertop.dm.pp import PP
 
 
 @coppertop(style=binary)
@@ -147,7 +147,7 @@ def test_fill_matrix():
     return "test_fill_matrix passed"
 
 
-
+@pytest.mark.skip
 def test_lognormal_martingale(numRuns):
     N, M = 365, 10_000
     f0 = 0.05

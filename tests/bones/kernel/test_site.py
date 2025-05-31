@@ -7,7 +7,7 @@
 # License. See the NOTICE file distributed with this work for additional information regarding copyright ownership.
 # **********************************************************************************************************************
 
-from dm.testing import check, equals
+from coppertop.dm.testing import check, equals
 from bones.core.errors import ErrSite
 from bones.kernel._testing_.fred import Fred
 
