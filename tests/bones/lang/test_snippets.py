@@ -103,7 +103,6 @@ def test_overload_fail(**ctx):
         src >> withCtx >> ctx >> check >> pace_(k, _) >> raises >> TypeError
 
 
-@xfail
 @bones_lang
 def test_overload(**ctx):
     k = _newKernel()
@@ -119,6 +118,7 @@ def test_overload(**ctx):
 
     with context(**ctx):
         res = k.pace(src) >> evalPyInComments
+        assert res.result == '"1.0""One"'       # OPEN: need to fix the quotes
         types = [e[1] for e in res.types]
         for i, (a, b) in enumerate(zip(types, res.commentTypes)):
             if a != b:
