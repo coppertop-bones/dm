@@ -20,8 +20,12 @@ from bones.ts.metatypes import BType
 from bones.ts.core import Constructors
 
 
-__all__ = ['tv', '_tvarray', '_tvseq', '_tvmap', '_tvstruct']
+__all__ = ['tv', '_tvarray', '_tvseq', '_tvmap', '_tvstruct', '_tvtuple', '_tvdate', '_tvtime', '_tvdatetime']
 
+
+class _tvdate: pass
+class _tvtime: pass
+class _tvdatetime: pass
 
 
 class tv:
@@ -418,7 +422,8 @@ class _tvstruct:
             kvs = {f: self[f] for f in fOrFs}
             return _tvstruct(self._t, kvs)
         else:
-            return super().__getattribute__('_pub').__getitem__(fOrFs)
+            _pub = super().__getattribute__('_pub')
+            return _pub.__getitem__(fOrFs)
 
     def __setitem__(self, f, v):
         if isinstance(f, str):

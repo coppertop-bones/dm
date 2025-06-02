@@ -16,7 +16,7 @@ def getTupleType(x):
     return x.phrases[0][0].tupleType
 
 
-def test():
+def test_tuple_type():
     k = newKernel()
     group = oldgroup(_, k)
     group_ = oldgroup_(_, k)
