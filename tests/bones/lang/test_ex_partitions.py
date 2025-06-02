@@ -17,7 +17,7 @@ from bones.lang.symbol_table import SymTab
 import bones.lang.symbol_table
 # from bones.lang.infer import InferenceLogger
 
-from bones.lang._testing_.utils import dropFirstNL, pace, evalPyInComments, errorMsg, pace_, newKernel
+from bones.lang._testing_.utils import stripSrc, pace, evalPyInComments, errorMsg, pace_, newKernel
 from coppertop.dm.testing import check
 from coppertop.dm.core import startsWith, drop
 # from coppertop.dm.core import equals
@@ -31,14 +31,14 @@ bones.lang.symbol_table.PYCHARM = True
 
 @xfail(reason='needs love')
 @bones_lang
-def test_partitionExample(**ctx):
+def test_ex_partitions(**ctx):
     k = newKernel()
 
     src = r'''
-        load dm.core, dm.testing, dm.core.bones2
-        from dm.core import sum, count, isEmpty, first, collect, joinAll, prependTo, to, takeDrop, join, equals
-        from dm.core.bones2 import ifTrue:
-        from dm.testing import check
+        load coppertop.dm.core, coppertop.dm.testing, coppertop.dm.core.bones2
+        from coppertop.dm.core import sum, count, isEmpty, first, collect, joinAll, prependTo, to, takeDrop, join, equals
+        from coppertop.dm.core.bones2 import ifTrue:
+        from coppertop.dm.testing import check
         
         partitions: {{[xs, sizes]
             sizes sum check equals (xs count)
@@ -62,7 +62,7 @@ def test_partitionExample(**ctx):
               join
               _combRest(s2, s2 count, m) collect { (a, .s1 join b) }      // #2
         }
-    ''' >> dropFirstNL
+    ''' >> stripSrc
 
     if context.analyse:
         context.testcase = 'overload fail - static'
@@ -84,7 +84,7 @@ def main():
     debug = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False)#, tt=InferenceLogger())
     debugNoRun = dict(showSrc=True, showGroups=False, showTc=True, RESTRICT_NOTES=False, ALL=False, run=False)#, tt=InferenceLogger())
 
-    test_partition()
+    test_partitionExample()
 
 
 

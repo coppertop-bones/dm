@@ -21,8 +21,7 @@ from bones.core.errors import ProgrammerError, NotYetImplemented
 from bones.ts.metatypes import BTAtom, BType, weaken, extractTypeFromConstructionArgs
 from bones.lang.types import *
 import bones.lang.types
-from coppertop.dm._core.structs import _tvstruct
-from coppertop.dm._core.structs import _tvarray, _tvseq, _tvmap
+from coppertop.dm._core.structs import _tvstruct, _tvarray, _tvseq, _tvmap
 from bones.ts.core import Constructors
 
 

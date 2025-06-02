@@ -11,7 +11,7 @@ from bones.lang._testing_.utils import group_ as oldgroup_, group as oldgroup, _
 from bones.lang._testing_.utils import *
 
 
-def test():
+def test_group_load():
     k = newKernel()
     group = oldgroup(_, k)
     group_ = oldgroup_(_, k)

@@ -16,16 +16,18 @@ from bones.lang.lex import LINE_COMMENT
 from bones.lang.execute import TCInterpreter
 from coppertop.dm.testing import check, equals, raises, same
 from coppertop.dm.pp import PP, TT, DD, HH
-from coppertop.dm.core.types import txt
+from coppertop.dm.core.types import txt, dframe
+from coppertop.dm.core.structs import _tvstruct, _tvtuple, _tvdate
 from bones.lang import lex
 from bones.core.errors import GroupError
 from bones.lang.parse_groups import parseStructure, TUPLE_NULL, TUPLE_OR_PAREN, TUPLE_2D, TUPLE_0_EMPTY, TUPLE_1_EMPTY, \
     TUPLE_2_EMPTY, TUPLE_3_EMPTY, TUPLE_4_PLUS_EMPTY, SnippetGroup
 from bones.core.sentinels import function, Missing
 
+
 def newKernel():
     sm = psm.PythonStorageManager()
-    k = BonesKernel(sm)
+    k = BonesKernel(sm, litdateCons=_tvdate, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
     k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx
@@ -35,8 +37,8 @@ def newKernel():
     return k
 
 @coppertop
-def dropFirstNL(s):
-    return s[1:] if s[0:1] == '\n' else s
+def stripSrc(s):
+    return (s[1:] if s[0:1] == '\n' else s).rstrip()
 
 class Res: pass
 
@@ -64,12 +66,12 @@ def errorMsg(res):
     return res.error.args[0]
 
 @coppertop
-def pace(k, src):
-    return k.pace(src)
+def pace(k, src, stopAtLine):
+    return k.pace(src, stopAtLine)
 
 @coppertop
-def pace_(k, src):
-    return lambda : k.pace(src)
+def pace_(k, src, stopAtLine):
+    return lambda : k.pace(src, stopAtLine)
 
 @coppertop
 def group(src:txt, k):

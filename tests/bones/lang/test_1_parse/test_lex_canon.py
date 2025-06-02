@@ -13,7 +13,7 @@ from bones.lang import lex
 from coppertop.dm.pp import PP
 
 
-def test_canon():
+def test_lex_canon():
     # home = os.path.expanduser('~/arwen/bones/canon')
     home = os.path.abspath(os.path.join(lex.__file__, '../../../../canon'))
     pfns = glob('**/*.b', root_dir=home, recursive=True)
@@ -25,7 +25,7 @@ def test_canon():
 
 
 def main():
-    test_canon()
+    test_lex_canon()
 
 
 if __name__ == '__main__':
