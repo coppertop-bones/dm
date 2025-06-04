@@ -35,7 +35,6 @@ from coppertop.dm.pp import PP
 bones.lang.symbol_table.PYCHARM = True
 
 
-@skip
 @bones_lang
 def test_MAndMs(**ctx):
     k = newKernel()

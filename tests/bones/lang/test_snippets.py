@@ -28,7 +28,9 @@ from bones.lang._testing_.utils import stripSrc
 
 from coppertop.dm.testing import check, equals, raises
 from coppertop.dm.core import startsWith, underride, withCtx, drop
-from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
+from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, \
+    pylist, dframe
+from coppertop.dm.core.structs import _tvstruct, _tvtuple, _tvdate
 from coppertop.dm.pp import PP
 
 
@@ -37,7 +39,7 @@ bones.lang.symbol_table.PYCHARM = True
 
 def _newKernel():
     sm = psm.PythonStorageManager()
-    k = BonesKernel(sm)
+    k = BonesKernel(sm, litdateCons=_tvdate, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
     k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx
