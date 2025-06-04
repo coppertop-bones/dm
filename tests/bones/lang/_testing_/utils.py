@@ -76,7 +76,7 @@ def pace_(k, src, stopAtLine):
 @coppertop
 def group(src:txt, k):
     tokens, lines = lex.lexBonesSrc(0, src)
-    return parseStructure(tokens, k.scratch)
+    return parseStructure(tokens, k.scratch, src)
 
 @coppertop
 def group_(src:txt, k) -> function:
