@@ -11,7 +11,7 @@ import builtins
 
 from coppertop.pipe import *
 from coppertop.dm._core.structs import tv
-from coppertop.dm.core.types import num, index, txt, bool, litint, litdec, littxt, T1, T2, N
+from coppertop.dm.core.types import num, index, txt, bool, litint, litnum, littxt, T1, T2, N
 
 true = tv(bool, True)
 false = tv(bool, False)
@@ -65,7 +65,7 @@ def add(a:litint, b:litint) -> litint:
     return a + b
 
 @coppertop(style=binary, name='+')
-def add(a:litdec, b:litdec) -> litdec:
+def add(a:litnum, b:litnum) -> litnum:
     return a + b
 
 
@@ -74,7 +74,15 @@ def add(a:litdec, b:litdec) -> litdec:
 def sub(a:num, b:num) -> num:
     return a - b
 
+fred = tv(litint, 1)
 
+@coppertop(style=binary, name='*')
+def mul(a: litint, b: litint) -> litint:
+    return a * b
+
+@coppertop(style=binary, name='*')
+def mul(a:litnum, b:litnum) -> litnum:
+    return a * b
 
 @coppertop(style=binary, name='*')
 def mul(a:num, b:num) -> num:
@@ -82,14 +90,6 @@ def mul(a:num, b:num) -> num:
 
 @coppertop(style=binary, name='*')
 def mul(a:index, b:index) -> index:
-    return a * b
-
-@coppertop(style=binary, name='*')
-def mul(a:litint, b:litint) -> litint:
-    return a * b
-
-@coppertop(style=binary, name='*')
-def mul(a:litdec, b:litdec) -> litdec:
     return a * b
 
 
@@ -121,7 +121,7 @@ def eq(a:litint, b:litint) -> bool:
     return a == b
 
 @coppertop(style=binary, name='==')
-def eq(a:litdec, b:litdec) -> bool:
+def eq(a:litnum, b:litnum) -> bool:
     return a == b
 
 

@@ -24,6 +24,8 @@ import operator, random, numpy as np, enum, scipy.stats, collections.abc
 from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.ts.metatypes import BType
+from bones.lang.types import litstruct
+from bones.kernel.sym import Sym
 from coppertop.dm.core.aggman import both, zipAll, values, keys, select, sort, kvs, collect, interleave, dropSlots, join
 from coppertop.dm.core.conv import to
 from coppertop.dm.core.misc import sequence
@@ -45,13 +47,19 @@ def _makeDF(cs, *args, **kwargs):
         return dstruct(cs, fn_=dmap(arg), **kwargs)
     elif isinstance(arg, list):
         for k, v in arg:
-            if not isinstance(k, (int, float)): raise TypeError(f'k must be an int or float but got {k} which is a {type(k)}')
-            if not isinstance(v, (int, float)): raise TypeError(f'v must be an int or float but got {v} which is a {type(v)}')
+            if not isinstance(k, (int, float, str, Sym)): raise TypeError(f'k must be an int or float but got {k} which is a {type(k)}')
+            if not isinstance(v, (int, float, str, Sym)): raise TypeError(f'v must be an int or float but got {v} which is a {type(v)}')
         return dstruct(cs, fn_=dmap(arg), **kwargs)
     elif fitsWithin(typeOf(arg), DF):
         assert len(kwargs) == 0
         answer = dstruct(cs, arg)
         answer.fn_ = dmap(answer.fn_)
+        return answer
+    elif fitsWithin(typeOf(arg), litstruct):
+        assert len(kwargs) == 0
+        # d = {k: v for k, v in arg}
+        answer = dstruct(cs, arg)
+        answer.fn_ = dmap(arg)
         return answer
     else:
         raise NotYetImplemented()
@@ -59,11 +67,10 @@ def _makeDF(cs, *args, **kwargs):
 def _makePmf(cs, *args, **kwargs):
     answer = _makeDF(cs, *args, **kwargs)
     if answer: answer = _normaliseInPlace(answer)
-    return answer
+    return answer | PMF
 
 def _makeCmf(cs, *args, **kwargs):
     # OPEN: check 0 < all values <= 1 and last v == 1
-
     answer = _makeDF(cs, *args, **kwargs)
     return answer | CMF
 
@@ -88,16 +95,16 @@ CMF.__module__ = __name__
 def formatDF(df, name, keysFormat, valuesFormat, sep):
     def formatKv(kv):
         k, v = kv
-        k = k if isinstance(k, (str, enum.Enum)) else format(k, keysFormat)
-        v = v if isinstance(v, (str, enum.Enum)) else format(v, valuesFormat)
+        k = k if isinstance(k, (str, enum.Enum, Sym)) else format(k, keysFormat)
+        v = v if isinstance(v, (str, enum.Enum, Sym)) else format(v, valuesFormat)
         return f'{k}: {v}'
     fnStrs = list(df.fn_ >> kvs) >> collect >> formatKv
     attributeStrs = list(df >> dropSlots >> ['fn_', 'cmf_'] >> kvs) >> collect >> formatKv
     return f'{name}({fnStrs >> join >> attributeStrs >> interleave >> sep})'
 
 
-formatPmf = formatDF(_, 'DF', '.3f', '.3f', ', ')
-formatDf = formatDF(_, 'PMF', '.3f', '.3f', ', ')
+formatPmf = formatDF(_, 'PMF', '.3f', '.3f', ', ')
+formatDf = formatDF(_, 'DF', '.3f', '.3f', ', ')
 formatL = formatDF(_, 'L', '.3f', '.3f', ', ')
 formatCmf = formatDF(_, 'CMF', '.3f', '.3f', ', ')
 
@@ -153,6 +160,7 @@ def to(pmf:PMF, t:CMF) -> CMF:
     answer.cmf_ = np.array(list(df.items()))
     #answer._cmf[:, 1] = np.cumsum(answer._cmf[:, 1])
     return answer
+
 
 
 # **********************************************************************************************************************
@@ -215,7 +223,7 @@ def sample(cmf:CMF, n:index) -> matrix[darray]:
 def sample(kde:scipy.stats.kde.gaussian_kde, n:index) -> matrix[darray]:
     return kde.resample(n).flatten()
 
-@coppertop(style=binary)
+@coppertop(style=binary, name='*')
 def pmfMul(lhs:DF, rhs:DF) -> DF:
     # lhs kvs both {(x.k, x.v*(y.v)} (rhs kvs) normalise <:pmf>
     return DF(

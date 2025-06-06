@@ -24,7 +24,7 @@ from coppertop.dm.core import startsWith, drop
 # from coppertop.dm.core import equals
 
 import coppertop.dm.pp, coppertop.dm.testing
-from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, \
+from coppertop.dm.core.types import litint, littxt, void, litnum, num, index, txt, T1, T2, T3, T4, T5, bool, count, \
     pylist
 from _ import *
 

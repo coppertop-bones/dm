@@ -13,7 +13,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from coppertop.dm.core.types import litint, litdec, num, count as tCount, err, T, T1, T2
+from coppertop.dm.core.types import litint, litnum, num, count as tCount, err, T, T1, T2, index, txt
 from bones.core.errors import NotYetImplemented
 
 
@@ -23,19 +23,23 @@ from bones.core.errors import NotYetImplemented
 # **********************************************************************************************************************
 
 @coppertop(style=binary, name='+')
-def add_(a:num, b:num) -> num:
+def _add(a:index, b:index) -> index:
     return a + b
 
 @coppertop(style=binary, name='+')
-def add_(a:litint, b:litint) -> litint:
+def _add(a:num, b:num) -> num:
     return a + b
 
 @coppertop(style=binary, name='+')
-def add_(a:litdec, b:litdec) -> litdec:
+def _add(a:litint, b:litint) -> litint:
     return a + b
 
 @coppertop(style=binary, name='+')
-def add_(a:tCount, b:tCount) -> tCount:
+def _add(a:litnum, b:litnum) -> litnum:
+    return a + b
+
+@coppertop(style=binary, name='+')
+def _add(a:tCount, b:tCount) -> tCount:
     return a + b
 
 # @coppertop(style=binary, name='+')
@@ -56,31 +60,35 @@ def add_(a:tCount, b:tCount) -> tCount:
 # **********************************************************************************************************************
 
 @coppertop(style=binary, name='-')
-def sub_(a:num, b:num) -> num:
+def sub(a:index, b:index) -> index:
     return a - b
 
 @coppertop(style=binary, name='-')
-def sub_(a:litint, b:litint) -> litint:
+def _sub(a:num, b:num) -> num:
     return a - b
 
 @coppertop(style=binary, name='-')
-def sub_(a:litdec, b:litdec) -> litdec:
+def _sub(a:litint, b:litint) -> litint:
     return a - b
 
 @coppertop(style=binary, name='-')
-def sub_(a:tCount, b:tCount) -> tCount:
+def _sub(a:litnum, b:litnum) -> litnum:
     return a - b
 
 @coppertop(style=binary, name='-')
-def sub_(a:err&T1, b:T2) -> err&T1:
+def _sub(a:tCount, b:tCount) -> tCount:
+    return a - b
+
+@coppertop(style=binary, name='-')
+def _sub(a:err&T1, b:T2) -> err&T1:
     raise NotYetImplemented()
 
 @coppertop(style=binary, name='-')
-def sub_(a:T1, b:err&T2) -> err&T2:
+def _sub(a:T1, b:err&T2) -> err&T2:
     raise NotYetImplemented()
 
 @coppertop(style=binary, name='-')
-def sub_(a:err&T1, b:err&T1) -> err&T1:
+def _sub(a:err&T1, b:err&T1) -> err&T1:
     raise NotYetImplemented()
 
 
@@ -89,28 +97,32 @@ def sub_(a:err&T1, b:err&T1) -> err&T1:
 # **********************************************************************************************************************
 
 @coppertop(style=binary, name='*')
-def mul_(a:num, b:num) -> num:
+def _mul(a:num, b:num) -> num:
     return a * b
 
 @coppertop(style=binary, name='*')
-def mul_(a:litint, b:litint) -> litint:
+def _mul(a:litint, b:litint) -> litint:
     return a * b
 
 @coppertop(style=binary, name='*')
-def mul_(a:litdec, b:litdec) -> litdec:
+def _mul(a:litnum, b:litnum) -> litnum:
     return a * b
 
 @coppertop(style=binary, name='*')
-def mul_(a:err&T1, b:T2) -> err&T1:
+def _mul(a:err&T1, b:T2) -> err&T1:
     raise NotYetImplemented()
 
 @coppertop(style=binary, name='*')
-def mul_(a:T1, b:err&T2) -> err&T2:
+def _mul(a:T1, b:err&T2) -> err&T2:
     raise NotYetImplemented()
 
 @coppertop(style=binary, name='*')
-def mul_(a:err&T1, b:err&T1) -> err&T1:
+def _mul(a:err&T1, b:err&T1) -> err&T1:
     raise NotYetImplemented()
+
+@coppertop(style=binary, name='*')
+def _mul(a:index, b:index) -> index:
+    return a * b
 
 
 # **********************************************************************************************************************
@@ -118,19 +130,54 @@ def mul_(a:err&T1, b:err&T1) -> err&T1:
 # **********************************************************************************************************************
 
 @coppertop(style=binary, name='/')
-def div_(a:num, b:num) -> num + err&T:
+def _div(a:num, b:num) -> num:
     return a / b
 
-@coppertop(style=binary, name='/')
-def div_(a:err&T1, b:T2) -> err&T1:
-    raise NotYetImplemented()
+# @coppertop(style=binary, name='/')
+# def _div(a:err&T1, b:T2) -> err&T1:
+#     raise NotYetImplemented()
+#
+# @coppertop(style=binary, name='/')
+# def _div(a:T1, b:err&T2) -> err&T2:
+#     raise NotYetImplemented()
+#
+# @coppertop(style=binary, name='/')
+# def _div(a:err&T1, b:err&T1) -> err&T1:
+#     raise NotYetImplemented()
 
-@coppertop(style=binary, name='/')
-def div_(a:T1, b:err&T2) -> err&T2:
-    raise NotYetImplemented()
-
-@coppertop(style=binary, name='/')
-def div_(a:err&T1, b:err&T1) -> err&T1:
-    raise NotYetImplemented()
 
 
+
+
+
+
+@coppertop(style=binary, name='==')
+def _eq(a:num, b:num) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:index, b:index) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:txt, b:txt) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:bool, b:bool) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:litint, b:litint) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:litnum, b:litnum) -> bool:
+    return a == b
+
+
+
+
+@coppertop(style=binary, name='<')
+def lt(a:num, b:num) -> bool:
+    return a < b

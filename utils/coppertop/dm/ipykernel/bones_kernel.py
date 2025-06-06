@@ -25,8 +25,9 @@ from bones.kernel.bones import BonesKernel
 from bones.lang.execute import TCInterpreter
 from bones.lang.core import GLOBAL, SCRATCH
 from bones.lang.symbol_table import SymTab
+from bones.lang.types import litsym, litdate
 from coppertop.dm.core.types import dframe
-from coppertop.dm.core.structs import _tvstruct, _tvtuple, _tvdate
+from coppertop.dm.core.structs import _tvstruct, _tvtuple
 
 
 from traitlets import Any, Bool, Instance, List, Type, observe, observe_compat
@@ -49,7 +50,7 @@ _groupCommands = ['restartAll']
 
 def _newKernel():
     sm = psm.PythonStorageManager()
-    k = BonesKernel(sm, litdateCons=_tvdate, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
+    k = BonesKernel(sm, litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
     k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx
