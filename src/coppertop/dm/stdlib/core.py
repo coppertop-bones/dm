@@ -37,10 +37,6 @@ def count(a:txt) -> num:
     return len(a)
 
 @coppertop
-def toBool(a:txt) -> bool:
-    return builtins.bool(a) | bool
-
-@coppertop
 def toTxt(a:litint) -> txt:
     return str(a) | txt
 

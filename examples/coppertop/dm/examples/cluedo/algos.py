@@ -33,7 +33,7 @@ a = 1
 @coppertop(style=binary)
 def figureKnown(bag:cluedo_bag, events) -> cluedo_bag:
     _.pad = bag.pad
-    bag.pad = Missing
+    bag.pad = Missing   # pass ownership of bag to _
     handId = bag.handId
     _.handIds = bag.sizeByHandId >> keys
 

@@ -7,6 +7,10 @@
 # License. See the NOTICE file distributed with this work for additional information regarding copyright ownership.
 # **********************************************************************************************************************
 
+# load the modules
+from coppertop.dm.stdlib.core import *
+from coppertop.dm.stdlib.ops import *
 
-from coppertop.dm._stdlib.core import *
-from coppertop.dm._stdlib.ops import *
+# get the functions (with overloads) into this module
+from _.coppertop.dm.stdlib.core import *
+from _.coppertop.dm.stdlib.ops import *

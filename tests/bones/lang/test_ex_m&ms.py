@@ -42,8 +42,8 @@ def test_MAndMs(**ctx):
     pace = _pace(k, _, _)
 
     src = r'''
-        load coppertop.dm._stdlib.ops, coppertop.dm.pmf
-        from coppertop.dm._stdlib.ops import *
+        load coppertop.dm.stdlib, coppertop.dm.pmf
+        from coppertop.dm.stdlib import *
         from coppertop.dm.pmf import to, PMF, L, normalise, PP, *
         
         bag1994: {Brown:30, Yellow:20, Red:20, Green:10, Orange:10, Tan:10}

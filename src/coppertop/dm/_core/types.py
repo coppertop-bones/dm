@@ -279,12 +279,18 @@ py = BType('py: atom in mem').setCoercer(coercer)
 
 pylist = BType('pylist: pylist & py in mem').setCoercer(coercer)
 @coppertop
-def _const_pylist(t:Constructors, seq) -> pylist:
-    return list(seq)
+def _const_pylist(t:Constructors, x) -> pylist:
+    return list(x)
 pylist.setConstructor(_const_pylist)
 
 pytuple = BType('pytuple: pytuple & py in mem').setCoercer(coercer)
+
 pydict = BType('pydict: pydict & py in mem').setCoercer(coercer)
+def _pydictCons(*args) -> pydict:
+    t, args = extractTypeFromConstructionArgs(args)
+    return dict(args[0])
+pydict.setConstructor(_pydictCons)
+
 pyset = BType('pyset: pyset & py in mem').setCoercer(coercer)
 npfloat = BType('npfloat: npfloat & py in mem').setCoercer(coercer)
 pydict_keys = BType('pydict_keys: pydict_keys & py in mem').setCoercer(coercer)

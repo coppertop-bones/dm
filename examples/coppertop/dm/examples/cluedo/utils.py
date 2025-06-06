@@ -59,7 +59,7 @@ def cardIds(cards):
     return [c.value for c in cards]
 
 @coppertop(style=binary)
-def to(p:tPair, t:pydict) -> pydict:
+def to(p:tPair[dstruct], t:pydict) -> pydict:
     return dict(zip(p.a, p.b))
 
 @coppertop(style=binary)
