@@ -94,7 +94,7 @@ def _ols(Y:matrix&darray, X:matrix&darray, options) -> OLSResult:
     # so until we've made np.array's +, - etc type safe we'll answer a column matrix
     # recalling that we answer xHat in A.xHat = b + e
     betaHat = (matrix&darray)(betaHat)
-    # TODO in the future treat np.float64 as litdec (which weakens to num)
+    # TODO in the future treat np.float64 as litnum (which weakens to num)
     # the type system whilst not preventing us from making mistakes it does constrain us to thoughtful architecture
     SSres = float(SSres)
     # YHat = X @ betaHat

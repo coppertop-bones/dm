@@ -30,17 +30,17 @@ def test_dtup():
     #     # inferring type of more than 2d is ambiguous - should a nested list be a subarray or a pylist?
     #     dtup(((1, 2), "hello"))
 
-    fred = dtup(str**(str*index), [[1,2]])
+    fred = dtup(N**(N**index), [[1,2]])
 
 
 def test_dstruct():
-    fred = dstruct(str**(str*index), [[1,2]])
+    fred = dstruct(N**(N**index), [[1,2]])
     fred.a = 1
     fred.b = 2
     fred['a'] >> PP
     fred['a'] = 5
     fred._fred = 1
-    fred = fred | str**(str*index)
+    fred = fred | N**(N**index)
     fred._fred >> PP
     repr(fred) >> PP
     str(fred) >> PP

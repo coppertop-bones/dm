@@ -14,10 +14,11 @@ from bones.lang.core import GLOBAL, SCRATCH
 from bones.lang.symbol_table import SymTab
 from bones.lang.lex import LINE_COMMENT
 from bones.lang.execute import TCInterpreter
+from bones.lang.types import litsym, litdate
 from coppertop.dm.testing import check, equals, raises, same
 from coppertop.dm.pp import PP, TT, DD, HH
 from coppertop.dm.core.types import txt, dframe
-from coppertop.dm.core.structs import _tvstruct, _tvtuple, _tvdate
+from coppertop.dm.core.structs import _tvstruct, _tvtuple
 from bones.lang import lex
 from bones.core.errors import GroupError
 from bones.lang.parse_groups import parseStructure, TUPLE_NULL, TUPLE_OR_PAREN, TUPLE_2D, TUPLE_0_EMPTY, TUPLE_1_EMPTY, \
@@ -27,7 +28,7 @@ from bones.core.sentinels import function, Missing
 
 def newKernel():
     sm = psm.PythonStorageManager()
-    k = BonesKernel(sm, litdateCons=_tvdate, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
+    k = BonesKernel(sm, litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
     k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx

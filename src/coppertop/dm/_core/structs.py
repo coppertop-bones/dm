@@ -295,7 +295,7 @@ class _tvmap(UserDict):
         return self
 
 
-class _tvtuple:
+class _tvtuple(UserList):
     def __init__(self):
         raise NotYetImplemented
 
@@ -479,5 +479,6 @@ class _tvstruct:
             return False
 
     def __iter__(self):
-        return iter(super().__getattribute__('_pub').values())
+        # iter on public name value pairs
+        return iter(super().__getattribute__('_pub').items())
 

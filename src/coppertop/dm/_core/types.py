@@ -60,19 +60,14 @@ __all__ += ['bool']
 # classes for the underlying storage of floats - for num _t is hard-coded to avoid boxing
 # **********************************************************************************************************************
 
-# litfloat is parsed in the SM to a storage format of a python float and on assignment is notionally weakened to
-# a num - in reality we just equate num and python float
 class num_(float):
     def __new__(cls, t, v, *args, **kwargs):
         return super(cls, cls).__new__(cls, v)
-
     @property
     def _t(self):
         return num
-
     def _v(self):
         return self
-
     def __repr__(self):
         return f'n{super().__repr__()}'
 num = BType('num: num & f64 in mem').setCoercer(num_)
@@ -192,18 +187,15 @@ __all__ += ['offset']
 class tvint_(int):
     def __new__(cls, t, v, *args, **kwargs):
         instance = super(cls, cls).__new__(cls, v)
-        instance._t_ = t
+        instance._t = t
         return instance
     @property
-    def _t(self):
-        return self._t_
-    @property
     def _v(self):
-        return super().__new__(int, self)
+        return self #super().__new__(int, self)
     def __repr__(self):
         return f'{self._t}{super().__repr__()}'
     def _asT(self, t):
-        self._t_ = t
+        self._t = t
         return self
 tvint = BType('tvint: tvint & inty in mem').setConstructor(tvint_)
 __all__ += ['tvint']
@@ -276,7 +268,7 @@ def coercer(t, v):
         fits = fitsWithin(typeOf(v), t)
     except Exception as ex:
         fits = (tV == t)
-    if fits:
+    if fits or t == py:
         return v
     else:
         raise TypeError(f'Cannot coerce {v} of type {type(v)} to {t}')
@@ -300,13 +292,14 @@ pydict_values = BType('pydict_values: pydict_values & py in mem').setCoercer(coe
 pydict_items = BType('pydict_items: pydict_items & py in mem').setCoercer(coercer)
 pyfunc = BType('pyfunc: pyfunc & py in mem').setCoercer(coercer)
 
+pyint = BType('pyint: pyint & py in mem')
 
 
 txt = BType('txt: atom in mem').setConstructor(_tvstr).setCoercer(_coerceToTxt)
 
 
 __all__ += [
-    'py', 'pylist', 'pytuple', 'pydict', 'pyset', 'npfloat', 'pydict_keys', 'pydict_values', 'pydict_items', 'pyfunc',
+    'py', 'pyint', 'pylist', 'pytuple', 'pydict', 'pyset', 'npfloat', 'pydict_keys', 'pydict_values', 'pydict_items', 'pyfunc',
     'matrix', 'vec'
 ]
 
@@ -446,15 +439,15 @@ def _init():
     from bones.core.sentinels import dict_keys, dict_items, dict_values, function
 
     weaken(litint, (offset, num, count, index))
-    weaken(litdec, (num,))
+    weaken(litnum, (num,))
     weaken(type(None), (null, void))
     weaken(littxt, (txt,))
 
     _btypeByClass.update({
-        builtins.int: litint,
+        builtins.int: pyint,
         builtins.str: txt,
         datetime.date: date,
-        builtins.float: litdec,
+        builtins.float: num,
         builtins.bool: bool,
         builtins.tuple: pytuple,
         builtins.list: pylist,

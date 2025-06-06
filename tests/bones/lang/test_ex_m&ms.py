@@ -24,11 +24,12 @@ from bones.lang.lex import LINE_COMMENT, BREAKOUT
 from bones.lang.execute import TCInterpreter
 from bones.lang.infer import InferenceLogger
 from bones.lang._testing_.utils import stripSrc, pace as _pace, newKernel
+from bones.ts.metatypes import BType
 
 
 from coppertop.dm.testing import check, equals, raises
 from coppertop.dm.core import startsWith, underride, withCtx, drop
-from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
+from coppertop.dm.core.types import litint, littxt, void, litnum, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
 from coppertop.dm.pp import PP
 
 
@@ -41,38 +42,30 @@ def test_MAndMs(**ctx):
     pace = _pace(k, _, _)
 
     src = r'''
-        load dm.pmf
-        load tbone.core
-        from tbone.core import +, *
-        load dm.core
-        //from dm.pmf import toPMF, toL, normalise
-        from dm.kitchen_sink import PP, *, /
-        bag1994: {Brown:30, Yellow:20, Red:20, Green:10, Orange:10, Tan:10} toPMF PP
-        bag1996: {Brown:13, Yellow:14, Red:13, Green:20, Orange:16, Blue:24} toPMF PP.
-        prior: {hypA:0.5, hypB:0.5} toPMF PP
-
+        load coppertop.dm._stdlib.ops, coppertop.dm.pmf
+        from coppertop.dm._stdlib.ops import *
+        from coppertop.dm.pmf import to, PMF, L, normalise, PP, *
+        
+        bag1994: {Brown:30, Yellow:20, Red:20, Green:10, Orange:10, Tan:10}
+        bag1996: {Brown:13, Yellow:14, Red:13, Green:20, Orange:16, Blue:24}
+        
+        prior: {hypA:0.5, hypB:0.5} to <:PMF> PP
         likelihood: {
             hypA:bag1994.Yellow * bag1996.Green, 
             hypB:bag1994.Green * bag1996.Yellow
-        } toL PP
+        } to <:L> PP
         
         post: prior * likelihood normalise PP
-
     ''' >> stripSrc
 
-    src = r'''
-        id: {x}
-        bag1994: {Brown:30, Yellow:20, Red:20, Green:10, Orange:10, Tan:10} id
-        bag1996: {Brown:13, Yellow:14, Red:13, Green:20, Orange:16, Blue:24} id.
-        bag1994.Yellow :numYellow1994
-    ''' >> stripSrc
-
+    # OPEN: what's the best way to overload mul(name='*') - insist that python name and bones name pairs must be consistent?
 
     with context(**ctx):
         res = pace(src, 3)
         if res.error: raise res.error
-        assert res.result._v == 20
-        res.result >> typeOf >> check >> equals >> litint
+
+        DF = BType('DF')
+        res.result >> typeOf >> fitsWithin >> DF
 
 
 

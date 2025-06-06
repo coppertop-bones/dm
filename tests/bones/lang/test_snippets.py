@@ -24,13 +24,14 @@ from bones.lang.lex import LINE_COMMENT, BREAKOUT
 from bones.lang.execute import TCInterpreter
 from bones.lang.infer import InferenceLogger
 from bones.lang._testing_.utils import stripSrc
+from bones.lang.types import litdate, litsym
 
 
 from coppertop.dm.testing import check, equals, raises
 from coppertop.dm.core import startsWith, underride, withCtx, drop
-from coppertop.dm.core.types import litint, littxt, void, litdec, num, index, txt, T1, T2, T3, T4, T5, bool, count, \
+from coppertop.dm.core.types import litint, littxt, void, litnum, num, index, txt, T1, T2, T3, T4, T5, bool, count, \
     pylist, dframe
-from coppertop.dm.core.structs import _tvstruct, _tvtuple, _tvdate
+from coppertop.dm.core.structs import _tvstruct, _tvtuple
 from coppertop.dm.pp import PP
 
 
@@ -39,7 +40,7 @@ bones.lang.symbol_table.PYCHARM = True
 
 def _newKernel():
     sm = psm.PythonStorageManager()
-    k = BonesKernel(sm, litdateCons=_tvdate, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
+    k = BonesKernel(sm, litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
     k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
     k.scratch = scratchCtx
@@ -87,10 +88,10 @@ def test_overload_fail(**ctx):
     k = _newKernel()
 
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         b: (true ifTrue: "1.0" ifFalse: 1)      // litint + littxt
-        addOne: {x + 1}                         // litint + litdec + num + index + count) ^ (litint + litdec + num + index + count)
+        addOne: {x + 1}                         // litint + litnum + num + index + count) ^ (litint + litnum + num + index + count)
         addOne(b)
     ''' >> stripSrc
 
@@ -110,12 +111,12 @@ def test_overload(**ctx):
     k = _newKernel()
 
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         b: (true ifTrue: "1.0" ifFalse: 1)      // litint + littxt
-        addOne: {x + 1}                         // (litint + litdec + num + index) ^ (litint + litdec + num + index)
-        addOne: {x join "One"}                  // (txt^txt) & ((litint + litdec + num + index) ^ (litint + litdec + num + index))
-        addOne(b)                               // litint + litdec + txt + num + index      # really this should be litint + txt (as littxt is weakened to txt)
+        addOne: {x + 1}                         // (litint + litnum + num + index) ^ (litint + litnum + num + index)
+        addOne: {x join "One"}                  // (txt^txt) & ((litint + litnum + num + index) ^ (litint + litnum + num + index))
+        addOne(b)                               // litint + litnum + txt + num + index      # really this should be litint + txt (as littxt is weakened to txt)
     ''' >> stripSrc
 
     with context(**ctx):
@@ -133,8 +134,8 @@ def test_overload(**ctx):
 def test_SO1(**ctx):
     k = _newKernel()
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         id: {x}                                         // T1 ^ T1
         a: (true ifTrue: id("1.0") ifFalse: id(1))      // litint + littxt
     ''' >> stripSrc
@@ -151,8 +152,8 @@ def test_SO1(**ctx):
 @bones_lang
 def test_SO2(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         id: {x}                                 // T1 ^ T1
         foo: {x ifTrue: f(y) ifFalse: f(z)}     // (((T1^T2)&(T3^T4)) * bool * T1 * T3) ^ (T2+T4)
         result: foo(id, true, 1, "hi")          // litint + littxt
@@ -170,12 +171,12 @@ def test_SO2(**ctx):
 @bones_lang
 def test_unionThenOverload(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         a: (true ifTrue: "1.0" ifFalse: 1)      // litint + littxt
-        addTwo: {x + 2}                         // (litint + litdec + num + index) ^ (litint + litdec + num + index)
-        addTwo: {x join "Two"}                  // (txt ^ txt) & ((litint + litdec + num + index) ^ (litint + litdec + num + index))
-        a addTwo                                // litint + litdec + txt + num + index
+        addTwo: {x + 2}                         // (litint + litnum + num + index) ^ (litint + litnum + num + index)
+        addTwo: {x join "Two"}                  // (txt ^ txt) & ((litint + litnum + num + index) ^ (litint + litnum + num + index))
+        a addTwo                                // litint + litnum + txt + num + index
     ''' >> stripSrc
     with context(**ctx):
         res = pace(src)
@@ -190,8 +191,8 @@ def test_unionThenOverload(**ctx):
 @bones_lang
 def test_polymorphic1(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import toTxt, join
+        load bones.tstlib.core
+        from bones.tstlib.core import toTxt, join
         thing: {join(f(x), f(y))}               // (((T1^txt) & (T2^txt)) * T1 * T2) ^ txt
         thing(toTxt, 1, "two")                  // txt
     ''' >> stripSrc
@@ -210,12 +211,12 @@ def test_polymorphic1(**ctx):
 @bones_lang
 def test_polymorphic2(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
         id: {x}                             // T1 ^ T1
-        addTwo: {{f(x) + 2}}                // ((T1 ^ (litint + litdec + num + index)) * T1) ^ (litint + litdec + num + index)
-        addTwo: {{f(x) join "Two"}}         // (((T1 ^ (litint + litdec + num + index)) * T1) ^ (litint + litdec + num + index)) & (((T1 ^ txt) * T1) ^ txt)
-        addTwo(id, 2)                       // (litint + litdec + num + index + txt)    # unrestricted version
+        addTwo: {{f(x) + 2}}                // ((T1 ^ (litint + litnum + num + index)) * T1) ^ (litint + litnum + num + index)
+        addTwo: {{f(x) join "Two"}}         // (((T1 ^ (litint + litnum + num + index)) * T1) ^ (litint + litnum + num + index)) & (((T1 ^ txt) * T1) ^ txt)
+        addTwo(id, 2)                       // (litint + litnum + num + index + txt)    # unrestricted version
     ''' >> stripSrc
     with context(**ctx):
         res = pace(src)
@@ -231,24 +232,24 @@ def test_polymorphic2(**ctx):
 @bones_lang
 def test_polymorphicInFn(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +, isString, addOne
-        add: {x+y}                                  // ((litint+litdec+num+index) * (litint+litdec+num+index)) ^ (litint+litdec+num+index)
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +, isString, addOne
+        add: {x+y}                                  // ((litint+litnum+num+index) * (litint+litnum+num+index)) ^ (litint+litnum+num+index)
         id: {x}                                     // T1 ^ T1
         mapOne: {f(x)}                              // ((T1^T2) * T1) ^ T2
         foo: {x ifTrue: f(1) ifFalse: f("hi")}      // (((litint^T1) & (littxt^T2)) * bool) ^ (T1+T2)
         fooer: {x ifTrue: f(y) ifFalse: f(z)}       // (((T1^T2) & (T3^T4)) * bool * T1 * T3) ^ (T2+T4)
-        addOne: {x + 1}                             // (txt^txt) & (index^index) & ((litint+litdec+num+index) ^ (litint+litdec+num+index))
-        addOne: {join(x, "One")}                    // (txt^txt) & (index^index) & ((litint+litdec+num+index) ^ (litint+litdec+num+index))
+        addOne: {x + 1}                             // (txt^txt) & (index^index) & ((litint+litnum+num+index) ^ (litint+litnum+num+index))
+        addOne: {join(x, "One")}                    // (txt^txt) & (index^index) & ((litint+litnum+num+index) ^ (litint+litnum+num+index))
         id(2)                                       // litint
         id("too")                                   // littxt
         mapOne(id, 2)                               // litint
         mapOne(id, "Two")                           // littxt
-        mapOne(addOne, 2)                           // litint+litdec+txt+num+index
+        mapOne(addOne, 2)                           // litint+litnum+txt+num+index
         foo(id, true)                               // litint+littxt
-        foo(addOne, true)                           // litint+litdec+txt+num+index
+        foo(addOne, true)                           // litint+litnum+txt+num+index
         fooer(id, true, 1, "Two")                   // litint+littxt
-        fooer(addOne, true, 1, "Two")               // litint+litdec+txt+num+index
+        fooer(addOne, true, 1, "Two")               // litint+litnum+txt+num+index
     ''' >> stripSrc
 
     with context(**ctx):
@@ -266,8 +267,8 @@ def test_polymorphicInFn(**ctx):
 def test_polymorphicInFn2(**ctx):
     src = r'''
         // https://stackoverflow.com/questions/36587571/confusing-about-haskell-type-inference
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
 
         hoo: {x ifTrue: f(y) ifFalse: f(z)}
         addOne: {x + 1}
@@ -294,8 +295,8 @@ def test_polymorphicInFn2(**ctx):
 def test_polymorphicInFn3(**ctx):
     src = r'''
         // https://stackoverflow.com/questions/36587571/confusing-about-haskell-type-inference
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
 
         fxAddTwo: {f(x) + 2}
         fxAddTwo: {f(x) join "Two"}
@@ -324,8 +325,8 @@ def test_polymorphicInFn3(**ctx):
 @bones_lang
 def test_polymorphicInFn4(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, true, false, join, +
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, true, false, join, +
 
         fxAddTwo: {f(x) + 2}
         fxAddTwo: {f(x) join "Two"}
@@ -352,8 +353,8 @@ def test_polymorphicInFn4(**ctx):
 @bones_lang
 def test_recursive(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, <, ==, count, +, *, PP, true, false, ID, toIndex, join
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, <, ==, count, +, *, PP, true, false, ID, toIndex, join
         range: {
             addAndDec: {if x == 0 addAndDec(acc + x}; x - 1
             addAndDec(x, x-1)
@@ -378,8 +379,8 @@ def test_recursive(**ctx):
 @bones_lang
 def prog5(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import ifTrue:ifFalse:, <, ==, count, +, *, PP, true, false, toIndex, join
+        load bones.tstlib.core
+        from bones.tstlib.core import ifTrue:ifFalse:, <, ==, count, +, *, PP, true, false, toIndex, join
         a = (id 1, id True)
         foo f a b = (f a, f b)
         result = foo id 1 True
@@ -403,8 +404,8 @@ def prog5(**ctx):
 @bones_lang
 def test_compile(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import +
+        load bones.tstlib.core
+        from bones.tstlib.core import +
         // add will expose a single overload which is the upper bound of all the overloads of +
         add: {{x + y}}      
         // add2 will expose the 
@@ -432,9 +433,9 @@ def test_compile(**ctx):
 @bones_lang
 def test_current(**ctx):
     src = r'''
-        load tbone.core
-        from tbone.core import +, *, ifTrue:ifFalse:, true, false, ==, join
-        x: 1 + 1                        // litint+litdec+num+index
+        load bones.tstlib.core
+        from bones.tstlib.core import +, *, ifTrue:ifFalse:, true, false, ==, join
+        x: 1 + 1                        // litint+litnum+num+index
         y: 2                            // index
         x * y
         1 == 1 ifTrue: x + 1 ifFalse: y + 1
@@ -447,22 +448,22 @@ def test_current(**ctx):
     ''' >> stripSrc
 
     src = r'''
-        load tbone.core
-        from tbone.core import +, *, ifTrue:ifFalse:, true, false, ==, join
+        load bones.tstlib.core
+        from bones.tstlib.core import +, *, ifTrue:ifFalse:, true, false, ==, join
         foo: {g(x, f(x))}         // ((T1^T2) * ((T3*T2) ^ T4) * (T1&T3)) ^ T4
     ''' >> stripSrc
 
     src = r'''
-        load tbone.core
-        from tbone.core import +, *, ifTrue:ifFalse:, true, false, ==, join
+        load bones.tstlib.core
+        from bones.tstlib.core import +, *, ifTrue:ifFalse:, true, false, ==, join
         hoo: {f(y, x)}                  // (((T1*T2)^T3) * T2 * T1) ^ T3
         woo: {g(hoo, f(hoo))}           // ((((T1*T2 ^ T3) * T2 * T1) ^ T3)^T4 * (((((T1*T2 ^ T3) * T2 * T1) ^ T3) * T4) ^ T5)) ^ T5
     ''' >> stripSrc
 
     src = r'''
         load dm.pmf
-        load tbone.core
-        from tbone.core import +, *
+        load bones.tstlib.core
+        from bones.tstlib.core import +, *
         load dm.core
         //from dm.pmf import toPMF, toL, normalise
         from dm.kitchen_sink import PP, *, /
