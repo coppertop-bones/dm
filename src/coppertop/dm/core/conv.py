@@ -18,8 +18,8 @@ from coppertop.pipe import *
 from bones.core.errors import NotYetImplemented
 from bones.ts.metatypes import BType
 from coppertop.dm.core.datetime import toCTimeFormat
-from coppertop.dm.core.types import dframe, dmap, txt, pylist, pydict, T1, N, pytuple, pydict_keys, pydict_values, date, index, \
-    num, npfloat, dtup, dseq, matrix, t, darray
+from coppertop.dm.core.types import dframe, dmap, txt, pylist, pydict, T, T1, T2, N, pytuple, pydict_keys, pydict_values, \
+    date, index, num, npfloat, dtup, dseq, matrix, t, darray
 
 
 array_ = (N**num)&darray
@@ -33,32 +33,23 @@ _defaultDateFmt = toCTimeFormat('YYYY.MM.DD')
 # **********************************************************************************************************************
 
 @coppertop(style=binary)
-def to(x:pydict+pylist, t:dmap) -> dmap:
-    return t(x)
-
-@coppertop(style=binary)
-def to(x, t):
-    if isinstance(t, BType):
+def to(x:T1, t:T2, tByT) -> T2:
+    if tByT[T1] == tByT[T2]:
+        return x
+    elif isinstance(t, BType):
         return t(x)
-    try:
-        return t(x)
-    except Exception as ex:
-        raise TypeError(f'Catch all can\'t convert {repr(x)} to {repr(t)} - {ex}')
-
-@coppertop(style=binary)
-def to(x:pydict_keys+pydict_values, t:pylist) -> pylist:
-    return list(x)
-
-@coppertop(style=binary)
-def to(x, t:pylist) -> pylist:
-    return list(x)
+    else:
+        try:
+            return t(x)
+        except Exception as ex:
+            raise TypeError(f'Catch all can\'t convert {repr(x)} to {repr(t)} - {ex}')
 
 @coppertop(style=binary)
 def to(x:dmap, t:pydict) -> pydict:
     return dict(x.items())
 
 @coppertop(style=binary)
-def to(x, t:pydict) -> pydict:
+def to(x:T, t:pydict) -> pydict:
     return dict(x)
 
 
@@ -82,24 +73,6 @@ def to(d:date, t_:t.count) -> t.count:
 @coppertop(style=binary)
 def to(greg:t.count+index, t:date) -> date:
     return datetime.date.fromordinal(greg)
-
-
-
-@coppertop(style=binary)
-def to(x, t:txt) -> txt:
-    return str(x)
-
-@coppertop(style=binary)
-def to(v:T1, t:T1) -> T1:
-    return v
-
-@coppertop(style=binary)
-def to(x, t:index) -> index:
-    return int(x)
-
-@coppertop(style=binary)
-def to(x, t:num) -> num:
-    return float(x)
 
 @coppertop(style=binary)
 # def to(x:pylist, t:matrix&darray) -> matrix&darray:
