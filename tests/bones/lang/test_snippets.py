@@ -83,6 +83,7 @@ def pace_(k, src):
     return lambda : k.pace(src)
 
 
+
 @bones_lang
 def test_overload_fail(**ctx):
     k = _newKernel()
@@ -104,6 +105,42 @@ def test_overload_fail(**ctx):
     else:
         context.testcase = 'overload fail - dynamic'
         src >> withCtx >> ctx >> check >> pace_(k, _) >> raises >> TypeError
+
+
+@bones_lang
+def test_fun(**ctx):
+    k = _newKernel()
+
+    src = r'''
+        // dynamic dispatch
+        
+        load coppertop.dm.stdlib, coppertop.dm.core.aggman, coppertop.dm.testing
+        from coppertop.dm.stdlib import *, ifTrue:ifFalse:, true, false, join, +, ==
+        from coppertop.dm.core.aggman import collect
+        from coppertop.dm.testing import check, equals
+        
+        addOne: {[x:litint] <:litint> x + 1}                            // type info needed here since we are overloading addOne and in dynamic dispatch mode
+        addOne: {[x:littxt] <:littxt> x join "One"}
+          
+        (1, "Two ") to <:pylist> :fred collect {x addOne} :joe PP
+        
+        sally: fred collect {                                           // since there is no overload [x:litint + littxt] <:litint + littxt>  is not needed here
+            x typeOf == <:litint> ifTrue: {
+                x + 1
+            } ifFalse: {
+                x join "One"
+            }
+        }
+        joe check equals sally
+        
+    ''' >> stripSrc
+
+    # ctx['showGroups'] = True
+    ctx['EE'] = print
+    with context(**ctx):
+        res = k.pace(src)
+        res.result >> typeOf >> check >> equals >> bool
+        res.result._v >> check >> equals >> True
 
 
 @bones_lang
@@ -523,7 +560,7 @@ def main():
 
     # test_current(debug)
     # test_compile()
-
+    test_fun(**debug)
     test_overload_fail(analyse=False)
     test_overload_fail(analyse=True)
     test_overload(**debug)
