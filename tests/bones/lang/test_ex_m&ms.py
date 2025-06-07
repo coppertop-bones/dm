@@ -14,23 +14,12 @@ skip = pytest.mark.skip
 
 
 from coppertop.pipe import *
-from bones.core.sentinels import Missing
-from bones.kernel import psm
-from bones.kernel.bones import BonesKernel
-from bones.lang.core import GLOBAL, SCRATCH
+from bones.lang.core import GLOBAL
 from bones.lang.symbol_table import SymTab
 import bones.lang.symbol_table
-from bones.lang.lex import LINE_COMMENT, BREAKOUT
-from bones.lang.execute import TCInterpreter
 from bones.lang.infer import InferenceLogger
 from bones.lang._testing_.utils import stripSrc, pace as _pace, newKernel
 from bones.ts.metatypes import BType
-
-
-from coppertop.dm.testing import check, equals, raises
-from coppertop.dm.core import startsWith, underride, withCtx, drop
-from coppertop.dm.core.types import litint, littxt, void, litnum, num, index, txt, T1, T2, T3, T4, T5, bool, count, pylist
-from coppertop.dm.pp import PP
 
 
 bones.lang.symbol_table.PYCHARM = True

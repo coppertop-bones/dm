@@ -24,13 +24,21 @@ def test_dtup():
     # inferred type one level and 1D only
     # dtup() >> typeOf >> check >> equals >> null
 
-    dtup((1,2,"hello")) >> typeOf >> check >> equals >> litint*litint*littxt
+    a = dtup(litint*litint*littxt, (1, 2, 'hello'))
+    a >> typeOf >> check >> equals >> litint*litint*littxt
+    a[0] = 2
+    a[0] >> check >> equals >> 2
+
+    fred = dtup(N**(N**index), [[1,2]])
+
+    # test inference of type from construction
+    # dtup((1,2,"hello")) >> typeOf >> check >> equals >> litint*litint*littxt
 
     # with assertRaises(NotYetImplemented):
     #     # inferring type of more than 2d is ambiguous - should a nested list be a subarray or a pylist?
     #     dtup(((1, 2), "hello"))
 
-    fred = dtup(N**(N**index), [[1,2]])
+
 
 
 def test_dstruct():
@@ -141,7 +149,7 @@ def test_nd_():
 
 
 def main():
-    # test_dtup()
+    test_dtup()
     test_dstruct()
     test_dseq()
     test_dmap()

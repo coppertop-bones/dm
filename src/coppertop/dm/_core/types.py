@@ -18,10 +18,10 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from bones.core.errors import ProgrammerError, NotYetImplemented
-from bones.ts.metatypes import BTAtom, BType, weaken, extractTypeFromConstructionArgs
+from bones.ts.metatypes import BTAtom, BType, weaken, extractConstructors
 from bones.lang.types import *
 import bones.lang.types
-from coppertop.dm._core.structs import _tvstruct, _tvarray, _tvseq, _tvmap
+from coppertop.dm._core.structs import _tvtuple, _tvstruct, _tvarray, _tvseq, _tvmap
 from bones.ts.core import Constructors
 
 
@@ -207,14 +207,14 @@ __all__ += ['tvint']
 # **********************************************************************************************************************
 
 class _tvstr(builtins.str):
-    def __new__(cls, *args, **kwargs):
-        t, args = extractTypeFromConstructionArgs(args)
+    def __new__(cls, *args_, **kwargs_):
+        constr, args, kwargs = extractConstructors(args_, kwargs_)
         if len(args) == 0:
             raise NotYetImplemented()
         elif len(args) == 1:
             instance = super(cls, cls).__new__(cls, args[0])
-            if t != txt:
-                instance._t_ = t
+            if constr != txt:
+                instance._t_ = constr
             return instance
         else:
             raise SyntaxError(f'Expected 1 argument, got {len(args)}')
@@ -286,8 +286,8 @@ pylist.setConstructor(_const_pylist)
 pytuple = BType('pytuple: pytuple & py in mem').setCoercer(coercer)
 
 pydict = BType('pydict: pydict & py in mem').setCoercer(coercer)
-def _pydictCons(*args) -> pydict:
-    t, args = extractTypeFromConstructionArgs(args)
+def _pydictCons(*args_, **kwargs_) -> pydict:
+    constr, args, kwargs = extractConstructors(args_, kwargs_)
     return dict(args[0])
 pydict.setConstructor(_pydictCons)
 
@@ -413,7 +413,7 @@ def createDFrame(*args_, **kwargs):
 def _coerceToDseq(t, v):
     return dseq(t, v)
 
-dtup = BType('dtup: dtup & py in mem').setConstructor(_tvarray)                     # OPEN change from _tvarray to _tvtuple once implemented
+dtup = BType('dtup: dtup & py in mem').setConstructor(_tvtuple)
 dstruct = BType('dstruct: dstruct & py in py').setConstructor(_tvstruct)
 dseq = BType('dseq: dseq & py in py').setConstructor(_tvseq).setCoercer(_coerceToDseq)  # & N**T
 dmap = BType('dmap: dmap & py in py').setConstructor(_tvmap)                            # & T1**T2
