@@ -114,9 +114,9 @@ def test_fun(**ctx):
     src = r'''
         // dynamic dispatch
         
-        load coppertop.dm.stdlib, coppertop.dm.core.aggman, coppertop.dm.testing
-        from coppertop.dm.stdlib import *, ifTrue:ifFalse:, true, false, join, +, ==
-        from coppertop.dm.core.aggman import collect
+        load coppertop.dm.stdlib, coppertop.dm.core, coppertop.dm.testing
+        from coppertop.dm.stdlib import *, ifTrue:ifFalse:, true, false, join, +, ==, PP, typeOf
+        from coppertop.dm.core import collect, to
         from coppertop.dm.testing import check, equals
         
         addOne: {[x:litint] <:litint> x + 1}                            // type info needed here since we are overloading addOne and in dynamic dispatch mode

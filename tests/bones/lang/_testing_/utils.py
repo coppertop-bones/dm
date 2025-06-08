@@ -22,7 +22,7 @@ from coppertop.dm.core.structs import _tvstruct, _tvtuple
 from bones.lang import lex
 from bones.core.errors import GroupError
 from bones.lang.parse_groups import parseStructure, TUPLE_NULL, TUPLE_OR_PAREN, TUPLE_2D, TUPLE_0_EMPTY, TUPLE_1_EMPTY, \
-    TUPLE_2_EMPTY, TUPLE_3_EMPTY, TUPLE_4_PLUS_EMPTY, SnippetGroup
+    TUPLE_2_EMPTY, TUPLE_3_EMPTY, TUPLE_4_PLUS_EMPTY, SnippetGp
 from bones.core.sentinels import function, Missing
 
 
@@ -84,7 +84,7 @@ def group_(src:txt, k) -> function:
     return lambda : src >> group(_, k)
 
 @coppertop
-def bb(g:SnippetGroup) -> txt:
+def bb(g:SnippetGp) -> txt:
     return g.PPGroup
 
 @coppertop
