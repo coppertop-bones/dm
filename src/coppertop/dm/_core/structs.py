@@ -20,62 +20,7 @@ from bones.ts.metatypes import BType, extractConstructors
 from bones.ts.core import Constructors
 
 
-__all__ = ['tv', '_tvarray', '_tvseq', '_tvmap', '_tvstruct', '_tvtuple', '_tvdate', '_tvtime', '_tvdatetime']
-
-
-
-# **********************************************************************************************************************
-# general purpose box with type and value
-# **********************************************************************************************************************
-
-class tv:
-    __slots__ = ['_t_', '_v_', '_hash']
-    def __init__(self, *args_, **kwargs_):
-        constr, args, kwargs = extractConstructors(args_, kwargs_)
-        if constr:
-            assert isinstance(constr, (BType, type))
-            self._t_ = constr
-            self._v_ = args[0]
-            self._hash = Missing
-        else:
-            if len(args) == 2:
-                # tv(type, value)
-                self._t_ = args[0]
-                assert isinstance(self._t_, (BType, type))
-                self._v_ = args[1]
-                self._hash = Missing
-            else:
-                raise SyntaxError(f'tv(...) must be of form tv(type, value), tv(BType, value)')
-    def __setattr__(self, key, value):
-        if key in ('_t_', '_v_', '_hash'):
-            tv.__dict__[key].__set__(self, value)
-        else:
-            raise AttributeError()
-    @property
-    def _t(self):
-        return self._t_
-    @property
-    def _v(self):
-        return self._v_
-    @property
-    def _tv(self):
-        return (self._t_, self._v_)
-    def _asT(self, _t):
-        return tv(_t, self._v)
-    def __repr__(self):
-        return f'tv({self._t_},{self._v_})'
-    def __str__(self):
-        return f'<{self._t_}:{self._v_}>'
-    def __eq__(self, other):
-        if not isinstance(other, tv):
-            return False
-        else:
-            return (self._t_ == other._t_) and (self._v_ == other._v_)
-    def __hash__(self):
-        # tv will be hashable if it's type and value are hashable
-        if self._hash is Missing:
-            self._hash = hash((self._t, self._v))
-        return self._hash
+__all__ = ['_tvarray', '_tvseq', '_tvmap', '_tvstruct', '_tvtuple', '_tvdate', '_tvtime', '_tvdatetime']
 
 
 
@@ -90,7 +35,7 @@ class _tvdatetime: pass
 
 
 # **********************************************************************************************************************
-# product types (each element has a specific known type) - _tvtuple and _tvstruct
+# structs for implementing product types (each element has a specific known type)
 # **********************************************************************************************************************
 
 class _tvtuple(list):
@@ -315,7 +260,7 @@ class _tvstruct:
 
 
 # **********************************************************************************************************************
-# exponential types (elements are of same type) - _tvseq, _tvmap, _tvarray
+# structs for implementing exponential types (elements are of same type) - _tvseq, _tvmap, _tvarray
 # **********************************************************************************************************************
 
 class _tvseq(UserList):
@@ -457,6 +402,16 @@ class _tvmap(UserDict):
         return self
 
 
+
+# remove the >> operators from numpy.ndarray so can use >> piping
+
+class _nd(np.ndarray):
+    def __rrshift__(self, arg):
+        return NotImplemented
+    def __rshift__(self, arg):
+        return NotImplemented
+
+
 # naming - array or tensor?
 # see https://en.wikipedia.org/wiki/Tensor
 # https://medium.com/@quantumsteinke/whats-the-difference-between-a-matrix-and-a-tensor-4505fbdc576c
@@ -481,15 +436,7 @@ class _tvmap(UserDict):
 
 # a tensor is therefore not a data structure but a data structure with a context
 
-
-class nd_(np.ndarray):
-    def __rrshift__(self, arg):  # so doesn't get in the way of arg >> func
-        return NotImplemented
-    def __rshift__(self, arg):  # so doesn't get in the way of func >> arg
-        return NotImplemented
-
-
-class _tvarray(nd_):
+class _tvarray(_nd):
 
     def __new__(cls, *args_, **kwargs_):
         constr, args, kwargs = extractConstructors(args_, kwargs_)

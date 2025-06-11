@@ -33,5 +33,5 @@ from _.coppertop.dm.core.stats import *
 from _.coppertop.dm.core.text import *
 from _.coppertop.dm.core.types import *
 
-import dm
-dm.__version__ = "2023.03.21"
+import coppertop.dm
+coppertop.dm.__version__ = "2025.6.8"

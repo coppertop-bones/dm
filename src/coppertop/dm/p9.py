@@ -9,10 +9,10 @@
 
 from coppertop.pipe import *
 from bones.ts.metatypes import BTAtom
-from coppertop.dm._core.structs import tv
+from bones.lang.types import _tv
 
 
-P9 = BTAtom('P9').setCoercer(tv)
+P9 = BTAtom('P9').setCoercer(_tv)
 
 @coppertop
 def PP(p: P9) -> P9:

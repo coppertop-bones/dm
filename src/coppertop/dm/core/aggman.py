@@ -29,7 +29,7 @@ from bones import jones
 
 from bones.core.errors import NotYetImplemented, ProgrammerError
 from bones.ts.metatypes import hasT, fitsWithin
-from coppertop.dm._core.structs import tv
+from bones.lang.types import _tv
 from bones.core.sentinels import Void
 
 from coppertop.dm.core.types import pylist, pydict, pytuple, pydict_keys, pydict_items, pydict_values, pyfunc, pyset, \
@@ -610,7 +610,7 @@ def drop(xs:(N**T1)[pylist], ks:(N**T2)[pylist]) -> (N**T1)[pylist]:
     # for x in xs._v:
     #     if x not in ks._v:
     #         answer.append(x)
-    # return tv(xs._t, answer)
+    # return _tv(xs._t, answer)
 
 @coppertop(style=binary)
 def drop(xs:(N**T1)[dseq][T2], n:t.count, tByT) -> (N**T1)[dseq][T2]:
@@ -1137,7 +1137,7 @@ def keys(x: dmap[T1]) -> pylist:
 
 @coppertop
 def keys(x:(T1**T2)[dmap][T3]) -> (N**T1)[pylist]:
-    return tv(
+    return _tv(
         (N**x._t.parent.parent.indexType)[pylist],
         list(x._keys())
     )
@@ -1147,7 +1147,7 @@ def keys(f:dframe) -> pylist:
     return list(f._keys())
 
 @coppertop
-def keys(s:(dstruct & T1)+dstruct) -> list: #(N**txt)[pydict_keys]: needs a tvmap_keys!!!
+def keys(s:(dstruct & T1)+dstruct) -> list: #(N**txt)[pydict_keys]: needs a _tvmap_keys!!!
     return list(s._keys())
 
 
@@ -1940,7 +1940,7 @@ def underride(a:pydict, b:pydict) -> pydict:
 
 @coppertop
 def values(x:(T1**T2)[dstruct][T3]) -> (N**T2)[pylist]:
-    return tv(
+    return _tv(
         (N**x._t.parent.parent.mappedType)[pylist],
         list(x._values())
     )

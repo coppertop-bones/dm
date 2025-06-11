@@ -61,6 +61,7 @@ __all__ += ['bool']
 # **********************************************************************************************************************
 
 class num_(float):
+    # unboxed float
     def __new__(cls, t, v, *args, **kwargs):
         return super(cls, cls).__new__(cls, v)
     @property
@@ -75,6 +76,7 @@ __all__ += ['num']
 
 
 class tvfloat_(float):
+    # a boxed float
     def __new__(cls, *args_, **kwargs):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         t, v = args

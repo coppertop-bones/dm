@@ -18,7 +18,7 @@ from bones.core.sentinels import Missing, dict_keys, dict_values, dict_items, fu
 from bones.core.errors import NotYetImplemented
 from bones.ts.metatypes import BTAtom as _BTAtom
 from coppertop.dm.core.aggman import inject
-from coppertop.dm._core.structs import tv
+from bones.lang.types import _tv
 from coppertop.dm.core.types import T, pylist, txt, pydict, pyfunc, T1, T2, py
 
 
@@ -26,11 +26,11 @@ _SBT = _BTAtom('ShouldBeTyped')      # temporary type to allow"  'DE000762534' >
 
 @coppertop
 def box(v) -> _SBT:
-    return tv(_SBT, v)
+    return _tv(_SBT, v)
 
 @coppertop
 def box(v, t:T) -> T:
-    return tv(t, v)
+    return _tv(t, v)
 
 @coppertop
 def getAttr(x, name):
