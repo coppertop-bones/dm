@@ -49,6 +49,11 @@ def toIndex(a:litint) -> index:
     return a | index
 
 @coppertop
+def PP(x):
+    print(x)
+    return x
+
+@coppertop
 def PP(x:txt) -> txt:
     print(x)
     return x

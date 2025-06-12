@@ -22,9 +22,9 @@ from bones.core.errors import ProgrammerError, BonesError
 from ipykernel.kernelbase import Kernel
 from bones.kernel import psm
 from bones.kernel.bones import BonesKernel
-from bones.lang.execute import TCInterpreter
-from bones.lang.core import GLOBAL, SCRATCH
-from bones.lang.symbol_table import SymTab
+from bones.execute.tc_interpreter import TCInterpreter
+from bones.kernel.core import GLOBAL_CTX, SCRATCH_CTX
+from bones.kernel.symbol_table import SymbolTable
 from bones.lang.types import litsym, litdate
 from coppertop.dm.core.types import dframe
 from coppertop.dm.core.structs import _tvstruct, _tvtuple
@@ -51,12 +51,12 @@ _groupCommands = ['restartAll']
 def _newKernel():
     sm = psm.PythonStorageManager()
     k = BonesKernel(sm, litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
-    k.ctxs[GLOBAL] = SymTab(k, Missing, Missing, Missing, Missing, GLOBAL)
-    k.ctxs[SCRATCH] = scratchCtx = SymTab(k, Missing, Missing, Missing, k.ctxs[GLOBAL], SCRATCH)
+    k.ctxs[GLOBAL_CTX] = SymbolTable(k, Missing, Missing, Missing, Missing, GLOBAL_CTX)
+    k.ctxs[SCRATCH_CTX] = scratchCtx = SymbolTable(k, Missing, Missing, Missing, k.ctxs[GLOBAL_CTX], SCRATCH_CTX)
     k.scratch = scratchCtx
     k.tcrunner = TCInterpreter(k, scratchCtx)
-    sm.framesForSymTab(k.ctxs[GLOBAL])
-    sm.framesForSymTab(k.ctxs[SCRATCH])
+    sm.framesForSymTab(k.ctxs[GLOBAL_CTX])
+    sm.framesForSymTab(k.ctxs[SCRATCH_CTX])
     return k
 
 

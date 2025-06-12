@@ -13,8 +13,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
-from coppertop.dm.core.types import litint, litnum, num, count as tCount, err, T, T1, T2, index, txt
+from coppertop.dm.core.types import litint, litnum, num, count as tCount, err, T, T1, T2, index, txt, btype, pytype
 from bones.core.errors import NotYetImplemented
+from bones.ts.metatypes import BType, BTUnion
 
 
 
@@ -172,6 +173,10 @@ def _eq(a:litint, b:litint) -> bool:
 
 @coppertop(style=binary, name='==')
 def _eq(a:litnum, b:litnum) -> bool:
+    return a == b
+
+@coppertop(style=binary, name='==')
+def _eq(a:btype+pytype, b:btype+pytype) -> bool:
     return a == b
 
 

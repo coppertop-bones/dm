@@ -436,9 +436,17 @@ dframe = BType('dframe: dframe & frame & py in mem').setConstructor(createDFrame
 # class fred:
 #     def __
 
+
 __all__ += [
     'dtup', 'dstruct', 'dseq', 'dmap', 'dframe', 'darray'
 ]
+
+pytype = BType('pytype: pytype & py in mem')
+
+__all__ += [
+    'pytype'
+]
+
 
 def _init():
     # easiest way to keep namespace a little cleaner
@@ -465,9 +473,8 @@ def _init():
         dict_items: pydict_items,
         dict_values: pydict_values,
         function: pyfunc,
+        type: pytype,
     })
-
-
 
 
 
