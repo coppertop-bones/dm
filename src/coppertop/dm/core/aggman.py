@@ -480,7 +480,7 @@ def _collectHelper(xs:(N**T1)[dseq], f:T1^T2, tByT) -> dict:
         tArgs = tuple(tArgs)
     else:
         tArgs = (t1,)
-    fn, tByT_f, hasValue = f.d.selectFn(tArgs)
+    fn, tByT_f, hasValue = f.d.getOverload(len(tArgs)).selectFunction(*tArgs)
     t2 = fn.tRet
     if hasT(t2):
         raise NotYetImplemented()
