@@ -28,6 +28,10 @@ def _ifTrueIfFalse(cond:bool, x:T1, y:T2) -> T1 + T2:
     else:
         return y
 
+@coppertop(name='collect:')
+def _collect(xs, f):
+    return [f(x) for x in xs]
+
 @coppertop(style=binary)
 def join(a:txt, b:txt) -> txt:
     return a + b

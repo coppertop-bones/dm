@@ -187,3 +187,13 @@ def _eq(a:btype+pytype, b:btype+pytype) -> bool:
 @coppertop(style=binary, name='<')
 def lt(a:num, b:num) -> bool:
     return a < b
+
+
+# **********************************************************************************************************************
+# less than or equal
+# **********************************************************************************************************************
+
+@coppertop(style=binary, name='<=')
+def le(a:btype, b:btype) -> bool:
+    return fitsWithin(a, b)
+

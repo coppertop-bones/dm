@@ -60,7 +60,7 @@ def _finishCheckWhenF2(rootActual, actual, f2, expected):
     passed, ppAct, ppExp = f2(actual, expected), repr(actual), repr(expected)
     if not passed:
         f2Name = f2.name if hasattr(f2, 'name') else (f2.d.name if isinstance(f2, jones._fn) else f2.__name__)
-        msg = f"{_getTestTitle()}\n'{f2Name}' failed the following\nactual:   {ppAct}\nexpected: {ppExp}"
+        msg = f'{_getTestTitle()}\n"{f2Name}" failed the following\nactual:   {ppAct}\nexpected: {ppExp}'
         raise AssertionError(msg)
     return rootActual
 

@@ -55,8 +55,8 @@ def _newKernel():
     k.ctxs[SCRATCH_CTX] = scratchCtx = SymbolTable(k, Missing, Missing, Missing, k.ctxs[GLOBAL_CTX], SCRATCH_CTX)
     k.scratch = scratchCtx
     k.tcrunner = TCInterpreter(k, scratchCtx)
-    sm.framesForSymTab(k.ctxs[GLOBAL_CTX])
-    sm.framesForSymTab(k.ctxs[SCRATCH_CTX])
+    sm.frameForSymTab(k.ctxs[GLOBAL_CTX])
+    sm.frameForSymTab(k.ctxs[SCRATCH_CTX])
     return k
 
 
