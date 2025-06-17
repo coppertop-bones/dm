@@ -49,14 +49,13 @@ _groupCommands = ['restartAll']
 
 
 def _newKernel():
-    sm = psm.PythonStorageManager()
-    k = BonesKernel(sm, litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
+    k = BonesKernel(litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
     k.ctxs[GLOBAL_CTX] = SymbolTable(k, Missing, Missing, Missing, Missing, GLOBAL_CTX)
     k.ctxs[SCRATCH_CTX] = scratchCtx = SymbolTable(k, Missing, Missing, Missing, k.ctxs[GLOBAL_CTX], SCRATCH_CTX)
     k.scratch = scratchCtx
     k.tcrunner = TCInterpreter(k, scratchCtx)
-    sm.frameForSymTab(k.ctxs[GLOBAL_CTX])
-    sm.frameForSymTab(k.ctxs[SCRATCH_CTX])
+    k.sm.frameForSymTab(k.ctxs[GLOBAL_CTX])
+    k.sm.frameForSymTab(k.ctxs[SCRATCH_CTX])
     return k
 
 
