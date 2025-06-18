@@ -441,10 +441,8 @@ __all__ += [
     'dtup', 'dstruct', 'dseq', 'dmap', 'dframe', 'darray'
 ]
 
-pytype = BType('pytype: pytype & py in mem')
-
 __all__ += [
-    'pytype'
+    'pytype', 'btype'
 ]
 
 
@@ -473,7 +471,6 @@ def _init():
         dict_items: pydict_items,
         dict_values: pydict_values,
         function: pyfunc,
-        type: pytype,
     })
 
 
