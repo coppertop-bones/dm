@@ -18,13 +18,10 @@ import sys, logging, traceback, ast, datetime
 from coppertop.pipe import *
 from bones.core.utils import HookStdOutErrToLines
 from bones.core.sentinels import Missing, Void
-from bones.core.errors import ProgrammerError, BonesError
+from bones.core.errors import ProgrammerError
+from bones.kernel.errors import BonesError
 from ipykernel.kernelbase import Kernel
-from bones.kernel import psm
-from bones.kernel.bones import BonesKernel
-from bones.execute.tc_interpreter import TCInterpreter
-from bones.kernel.core import GLOBAL_CTX, SCRATCH_CTX
-from bones.kernel.symbol_table import SymbolTable
+from bones.kernel.core import BonesKernel
 from bones.lang.types import litsym, litdate
 from coppertop.dm.core.types import dframe
 from coppertop.dm.core.structs import _tvstruct, _tvtuple
@@ -50,12 +47,6 @@ _groupCommands = ['restartAll']
 
 def _newKernel():
     k = BonesKernel(litdateCons=litdate, litsymCons=litsym, littupCons=_tvtuple, litstructCons=_tvstruct, litframeCons=dframe)
-    k.ctxs[GLOBAL_CTX] = SymbolTable(k, Missing, Missing, Missing, Missing, GLOBAL_CTX)
-    k.ctxs[SCRATCH_CTX] = scratchCtx = SymbolTable(k, Missing, Missing, Missing, k.ctxs[GLOBAL_CTX], SCRATCH_CTX)
-    k.scratch = scratchCtx
-    k.tcrunner = TCInterpreter(k, scratchCtx)
-    k.sm.frameForSymTab(k.ctxs[GLOBAL_CTX])
-    k.sm.frameForSymTab(k.ctxs[SCRATCH_CTX])
     return k
 
 
