@@ -516,20 +516,20 @@ def collectV(a:dmap, fn1) -> pylist:
 
 @coppertop
 def count(x:dstruct) -> t.count:
-    return len(x._keys())
+    return len(x._keys()) | t.count
 
 @coppertop
 def count(x) -> t.count:
-    return len(x)
+    return len(x) | t.count
 
 @coppertop
 def count(x:txt+pylist+pytuple+pyset+pydict_keys+pydict_values) -> t.count:
-    return len(x)
+    return len(x) | t.count
 
 @coppertop
 def count(m:matrix&darray) -> t.count:
     nr, nc = m.shape
-    return nr
+    return nr | t.count
 
 @coppertop
 def count(a:array_) -> t.count:
