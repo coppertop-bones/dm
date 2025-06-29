@@ -8,12 +8,12 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from coppertop.dm.core.types import txt, pydict, dseq, dstruct
+from coppertop.dm.core.types import txt, pydict, dseq, dstruct, T1, btype, pytuple
 from coppertop.dm.core.aggman import count, collect
 from coppertop.dm.pp import PP
 from coppertop.dm.core import pad, max
 
-from coppertop.dm.examples.cluedo.core import display_table, tPair
+from coppertop.dm.examples.cluedo.core import display_table
 
 
 
@@ -59,12 +59,17 @@ def cardIds(cards):
     return [c.value for c in cards]
 
 @coppertop(style=binary)
-def to(p:tPair[dstruct], t:pydict) -> pydict:
-    return dict(zip(p.a, p.b))
+def construct(args:T1, t:btype):
+    return t(args)
+
+# @coppertop(style=binary)
+# def construct(args:pytuple, t:pydict) -> pydict:
+#     k, v = args
+#     1/0
 
 @coppertop(style=binary)
-def pair(a, b) -> tPair[dstruct]:
-    return dstruct(tPair[dstruct], a=a, b=b)
+def pair(a, b) -> pytuple:
+    return (a, b)
 
 @coppertop(style=binary)
 def bucket(t, n):

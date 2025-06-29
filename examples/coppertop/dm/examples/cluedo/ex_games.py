@@ -203,7 +203,7 @@ def game5():
 def main():
     # game1()
     t1 = datetime.datetime.now()
-    game5()
+    game4()
     t2 = datetime.datetime.now()
     f'\n{(t2 - t1).microseconds / 1000}ms' >> PP
 

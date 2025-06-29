@@ -13,7 +13,7 @@
 from enum import IntEnum
 
 from bones.ts.metatypes import BTAtom, BTStruct, BType
-from coppertop.dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq
+from coppertop.dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq, dmap
 from bones.core.sentinels import Missing
 
 __all__ = [
@@ -108,16 +108,50 @@ rooms = [Ba, Bi, Co, Di, Ha, Ki, Li, Lo, St]
 NS_TO_S = 1 / 1_000_000_000
 
 
-card = BTAtom('card')
-handId = BTAtom('handId')
-ndmap = BTAtom('ndmap')
-pad_element = BTStruct(has=txt, suggestions=count, like=count)
-cluedo_pad = ((card * handId) ** pad_element)[ndmap] & BTAtom('cluedo_pad')
-cluedo_pad = pydict  # & BTAtom('cluedo_pad') once we have dmap we can do this
-cluedo_bag = BType('cluedobag: cluedobag & dstruct in mem')
+card = BType('card: atom')
+handId = BType('handId: atom')
+possibleHand = BType('possibleHand: possibleHand & (N ** card)')
 
-tPair = BTAtom('pair')
-display_table = (N ** txt)[dseq][BTAtom('table')].setCoercer(dseq)
+ndmap = BTAtom('ndmap')
+
+handTracker = BType('''
+    handTracker: 
+        {
+            ys: N ** card,
+            ns: N ** card,
+            ms: N ** card,
+            combs: N ** possibleHand,
+            prior: (N ** txt) ** num,
+            posterior: (N ** txt) ** num
+        }
+''')
+
+cell = BType('''
+    cell: 
+        {
+            state: txt,
+            suggestions: pylist,
+            prior: num,
+            posterior: num
+        }
+''')
+
+cluedo_pad = BType('cluedo_pad: cluedo_pad & (card ** (handId ** cell)) & dmap in mem')
+
+cluedo_bag = BType('''
+    cluedo_bag: 
+        {
+            handid: handId, 
+            hand: N ** card,
+            sizeByHandId: handId ** count,
+            pad: cluedo_pad,
+            trackerByHandId: handId ** handTracker,
+            otherHandIds: N ** handId
+        }  & dstruct in mem
+''')
+
+display_table = BType('display_table: display_table & (N ** txt) & dseq in mem')      # a seq of txt
+
 
 YES = 'X'
 NO = '-'
@@ -137,27 +171,4 @@ class HasOne:
 
 one = HasOne()
 
-# SHOULDDO these are currently ficticious and need implementing
-possibleHand = BType('possibleHand: possibleHand & (N ** txt) & pyset')
-cell = BTStruct(
-    state=txt,
-    suggestions=pylist,
-    prior=num,
-    posterior=num
-)
-handTracker = BTStruct(
-    ys=(N ** txt)[pyset],
-    ns=(N ** txt)[pyset],
-    ms=(N ** txt)[pyset],
-    combs=N ** possibleHand,  # this is a shame - {{1,2},{1,3}} -> TypeError: unhashable type: 'set'
-    prior=(N ** txt) ** (num),
-    posterior=(N ** txt) ** (num),
-)
-_cluedo_bag = BTStruct(
-    handId=txt,
-    hand=(N ** txt)[pylist],
-    sizeByHandId=(txt ** index)[pydict],
-    pad=(txt ** (txt ** cell))[ndmap],
-    trackerByHandId=(txt ** handTracker)[pydict],
-    otherHandIds=(N ** txt)[pylist],
-)
+

@@ -11,14 +11,15 @@ from coppertop.pipe import *
 from bones.core.errors import ProgrammerError, UnhappyWomble
 from bones.core.sentinels import Missing, Void
 
-from coppertop.dm.core.types import void, pylist, pydict, dstruct
+from coppertop.dm.core.types import void, pylist, pydict, dstruct, T1, btype
 import coppertop.dm.pmf, coppertop.dm.pp
 from coppertop.dm.core import *
 from _ import collect, keys, join, drop, do, select, count, without, PP, combinations, atPut, to, \
     joinAll, asideDo, soleElement, minus, countIf, intersects
 
-from coppertop.dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne
-from coppertop.dm.examples.cluedo.utils import pair
+from coppertop.dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne, \
+    cluedo_pad
+from coppertop.dm.examples.cluedo.utils import pair, construct
 
 
 
@@ -215,8 +216,8 @@ def processResponses(bag:cluedo_bag, events:pylist) -> cluedo_bag:
         #         if c in combs:
         #             p += _.trackerByHandId[hId].posterior[comb]
         #     _.pad[c][hId].prior = p
-        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> to >> pydict
-        _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
+        _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
 
     bag.pad = _.pad
     bag.trackerByHandId = _.trackerByHandId
@@ -265,8 +266,8 @@ def processSuggestions(bag:cluedo_bag, events:pylist, like:pydict) -> cluedo_bag
                 if c in comb:
                     p += _.trackerByHandId[hId].posterior[comb]
             _.pad[c][hId].posterior = p #>> PP
-        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> to >> pydict
-        # _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
+        # _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
 
     bag.pad = _.pad
     bag.trackerByHandId = _.trackerByHandId
@@ -315,15 +316,15 @@ def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag
 
     @coppertop
     def newRow(c, hIds):
-        return hIds >> pair >> (hIds >> collect >> newPadCell(c, _)) >> to >> pydict
+        return hIds >> pair >> (hIds >> collect >> newPadCell(c, _)) >> construct >> pydict
 
     cards = (people, weapons, rooms) >> joinAll
-    pad = cards >> pair >> (cards >> collect >> newRow(_, handsToTrack)) >> to >> pydict
+    pad = cards >> pair >> (cards >> collect >> newRow(_, handsToTrack)) >> construct >> cluedo_pad
     # in bones we should certainly be able to tell the difference between a list of tuples and a tuple of lists (i.e. a
     # product of exponentials and a exponential of products) even if we can't in python very easily
 
     otherHandIds = otherHandSizesById >> keys
-    trackerByHandId = otherHandIds >> pair >> (otherHandIds >> collect >> newHandTracker) >> to >> pydict
+    trackerByHandId = otherHandIds >> pair >> (otherHandIds >> collect >> newHandTracker) >> construct >> pydict
 
     return dstruct(cluedo_bag,
         handId=handId,
@@ -333,5 +334,6 @@ def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag
         trackerByHandId=trackerByHandId,
         otherHandIds=otherHandIds,
     )
+
 
 cluedo_bag.setConstructor(createBag)

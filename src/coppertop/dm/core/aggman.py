@@ -896,7 +896,7 @@ def first(x:pylist+pytuple):
     return x[0]
 
 @coppertop
-def first(xs:pydict_values+pydict_keys+pydict_items):
+def first(xs:pydict_values+pydict_keys+pydict_items + collections.abc.ValuesView+collections.abc.KeysView+collections.abc.ItemsView):
     # https://stackoverflow.com/questions/30362391/how-do-you-find-the-first-key-in-a-dictionary
     for x in xs:
         return x
@@ -1955,11 +1955,11 @@ def values_(x:pydict) -> pydict_values:
 
 @coppertop
 def values(x:dmap) -> pytuple:
-    return tuple(x._values())
+    return tuple(x.values())
 
 @coppertop
 def values_(x:dmap[T1]) -> pydict_values:
-    return x._values()
+    return x.values()
 
 @coppertop
 def values(a:dframe) -> pytuple:

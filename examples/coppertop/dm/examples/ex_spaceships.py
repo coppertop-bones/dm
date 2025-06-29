@@ -26,15 +26,15 @@ event = BType('event: event & txt in mem')
 
 @coppertop
 def collide(a:asteroid, b:asteroid) -> event:
-    return f'{a} split {b} (collide<:asteroid,asteroid:>)'
+    return f'{a} split {b} (collide<:asteroid,asteroid:>)' | event
 
 @coppertop
 def collide(a:ship, b:asteroid) -> event:
-    return f'{a} tried to ram {b} (collide<:ship,asteroid:>)'
+    return f'{a} tried to ram {b} (collide<:ship,asteroid:>)' | event
 
 @coppertop
 def collide(a:asteroid, b:ship) -> event:
-    return f'{a} destroyed {b} (collide<:asteroid,ship:>)'
+    return f'{a} destroyed {b} (collide<:asteroid,ship:>)' | event
 
 @coppertop
 def collide(a:ship, b:ship) -> null:
@@ -51,18 +51,18 @@ def process(e:null) -> txt:
 
 # @coppertop
 # def process(e:event+null) -> txt:
-#     return 'nothing happened' if e._t == null else e
+#     return 'nothing happened' if typeOf(e) == null else e
 
 
 borg = BType('borg: borg & ship in mem')
 
 @coppertop
 def collide(a:borg, b:ship) -> event:
-    return f'{a} subsumes {b} (collide<:borg,ship:>)'
+    return f'{a} subsumes {b} (collide<:borg,ship:>)' | event
 
 @coppertop
 def collide(a:borg, b:borg) -> event:
-    return f'{a} merges with {b} (collide<:borg,borg:>)'
+    return f'{a} merges with {b} (collide<:borg,borg:>)' | event
 
 
 

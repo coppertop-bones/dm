@@ -273,7 +273,7 @@ def coercer(t, v):
     if fits or t == py:
         return v
     else:
-        raise TypeError(f'Cannot coerce {v} of type {type(v)} to {t}')
+        raise TypeError(f'Cannot type {type(v)} to {t} - {v}')
 
 
 py = BType('py: atom in mem').setCoercer(coercer)
@@ -290,6 +290,25 @@ pytuple = BType('pytuple: pytuple & py in mem').setCoercer(coercer)
 pydict = BType('pydict: pydict & py in mem').setCoercer(coercer)
 def _pydictCons(*args_, **kwargs_) -> pydict:
     constr, args, kwargs = extractConstructors(args_, kwargs_)
+    if len(args) == 0:
+        return dict()
+    elif len(args) == 1:
+        arg = args[0]
+        if isinstance(arg, tuple):     # a pair of ks and values
+            if len(arg) == 2:
+                ks, vs = arg
+                assert len(ks) == len(vs), f'Keys and values must be the same length, got {len(ks)} and {len(vs)}'
+                return dict(zip(ks, vs))
+            else:
+                raise NotYetImplemented()
+        return dict(arg)
+    elif len(args) == 2:
+        ks, vs = args[0]
+        return dict(zip(ks, vs))
+    else:
+        raise NotYetImplemented()
+
+
     return dict(args[0])
 pydict.setConstructor(_pydictCons)
 

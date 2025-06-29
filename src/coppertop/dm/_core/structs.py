@@ -13,6 +13,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 import abc, numpy as np, typing
 from collections import UserList, UserDict
+from coppertop.pipe import fitsWithin
 
 from bones.core.errors import NotYetImplemented, PathNotTested
 from bones.core.sentinels import Missing, Void
@@ -332,43 +333,49 @@ class _tvmap(UserDict):
     def __new__(cls, *args_, **kwargs):
         constr, args = (args_[0][0], args_[1:]) if args_ and isinstance(args_[0], Constructors) else (Missing, args_)
         if len(args) == 0:
-            if not kwargs:
-                # dmap()
-                instance = super().__new__(cls)
-                instance.data = {}
-                instance._t = constr  # maybe use TBI in the future
-            else:
+            if kwargs:
                 # dmap(a=1, b=2)
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
                 instance.update(kwargs)
                 # raise PathNotTested()
+            else:
+                # dmap()
+                instance = super().__new__(cls)
+                instance.data = {}
+                instance._t = constr  # maybe use TBI in the future
         elif len(args) == 1:
-            arg1 = args[0]
-            if not kwargs:
-                if isinstance(arg1, BType):
-                    # dmap(t)
+            arg = args[0]
+            if isinstance(arg, tuple):
+                if len(arg) == 2:
+                    ks, vs = arg
                     instance = super().__new__(cls)
-                    instance.data = {}
-                    instance._t = arg1
-                    raise PathNotTested()
-                else:
-                    # assume arg1 can be used as a dictionary
+                    instance.data = dict(zip(ks, vs))
+                    instance._t = constr
+            elif kwargs:
+                if isinstance(arg, BType):
+                    # assume arg can be used as a dictionary
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = constr  # maybe use TBI in the future
-                    instance.update(arg1)
+                    instance.update(arg)
+                else:
+                    # dmap(t)
+                    instance = super().__new__(cls)
+                    instance.data = {}
+                    instance._t = arg
+                    raise PathNotTested()
             else:
-                if isinstance(arg1, BType):
+                if isinstance(arg, BType):
                     # dmap(t, a=1, b=2)
                     instance = super().__new__(cls)
                     instance.data = {}
-                    instance._t = arg1
+                    instance._t = arg
                     instance.update(kwargs)
                 else:
                     raise PathNotTested()
-                    raise SyntaxError(f'if kwargs are given and just one arg then it must be a BType - got {arg1} instead')
+                    raise SyntaxError(f'if kwargs are given and just one arg then it must be a BType - got {arg} instead')
         elif len(args) == 2:
             arg1, arg2 = args
             if not kwargs:
@@ -400,6 +407,11 @@ class _tvmap(UserDict):
     def _asT(self, t):
         self._t = t
         return self
+
+    def __repr__(self):
+        superRepr = super().__repr__()
+        rep = f'{self._t}({superRepr})'
+        return rep
 
 
 

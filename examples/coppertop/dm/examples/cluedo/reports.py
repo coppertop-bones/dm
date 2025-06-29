@@ -114,7 +114,7 @@ def ppFnOfCard(fn, sep) -> display_table:
 
 
 @coppertop
-def genStats(pad:pydict, handId) -> dstruct:
+def genStats(pad:cluedo_pad, handId) -> dstruct:
     stats = dstruct()
     handIds = pad >> values_ >> first >> keys
     for c in pad >> keys:
