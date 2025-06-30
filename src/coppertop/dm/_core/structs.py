@@ -340,11 +340,13 @@ class _tvmap(UserDict):
                 instance._t = constr  # maybe use TBI in the future
                 instance.update(kwargs)
                 # raise PathNotTested()
+                return instance
             else:
                 # dmap()
                 instance = super().__new__(cls)
                 instance.data = {}
                 instance._t = constr  # maybe use TBI in the future
+                return instance
         elif len(args) == 1:
             arg = args[0]
             if isinstance(arg, tuple):
@@ -353,6 +355,21 @@ class _tvmap(UserDict):
                     instance = super().__new__(cls)
                     instance.data = dict(zip(ks, vs))
                     instance._t = constr
+                    return instance
+                else:
+                    raise NotYetImplemented()
+            elif isinstance(arg, (dict, list)):
+                # dmap(dict) or dmap(list)
+                instance = super().__new__(cls)
+                instance.data = dict(arg)
+                instance._t = constr
+                return instance
+            elif isinstance(arg, _tvmap):
+                # dmap(_tvmap)
+                instance = super().__new__(cls)
+                instance.data = dict(arg)
+                instance._t = constr
+                return instance
             elif kwargs:
                 if isinstance(arg, BType):
                     # assume arg can be used as a dictionary
@@ -360,22 +377,24 @@ class _tvmap(UserDict):
                     instance.data = {}
                     instance._t = constr  # maybe use TBI in the future
                     instance.update(arg)
+                    return instance
                 else:
                     # dmap(t)
                     instance = super().__new__(cls)
                     instance.data = {}
                     instance._t = arg
                     raise PathNotTested()
+                    return instance
+            elif isinstance(arg, BType):
+                # dmap(t, a=1, b=2)
+                instance = super().__new__(cls)
+                instance.data = {}
+                instance._t = arg
+                instance.update(kwargs)
+                return instance
             else:
-                if isinstance(arg, BType):
-                    # dmap(t, a=1, b=2)
-                    instance = super().__new__(cls)
-                    instance.data = {}
-                    instance._t = arg
-                    instance.update(kwargs)
-                else:
-                    raise PathNotTested()
-                    raise SyntaxError(f'if kwargs are given and just one arg then it must be a BType - got {arg} instead')
+                raise PathNotTested()
+                raise SyntaxError(f'if kwargs are given and just one arg then it must be a BType - got {arg} instead')
         elif len(args) == 2:
             arg1, arg2 = args
             if not kwargs:
@@ -386,6 +405,7 @@ class _tvmap(UserDict):
                     instance._t = arg1
                     instance.update(arg2)
                     raise PathNotTested()
+                    return instance
                 else:
                     raise PathNotTested()
                     raise SyntaxError("do a better error message")
@@ -395,7 +415,7 @@ class _tvmap(UserDict):
             # too many args
             raise PathNotTested()
             raise SyntaxError("too many args")
-        return instance
+
 
     def __init__(self, *args, **kwargs):
         pass  # we handle construction in __new__

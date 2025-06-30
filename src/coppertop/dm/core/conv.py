@@ -19,7 +19,7 @@ from bones.core.errors import NotYetImplemented
 from bones.ts.metatypes import BType
 from coppertop.dm.core.datetime import toCTimeFormat
 from coppertop.dm.core.types import dframe, dmap, txt, pylist, pydict, T, T1, T2, N, pytuple, pydict_keys, pydict_values, \
-    date, index, num, npfloat, dtup, dseq, matrix, t, darray
+    date, index, num, npfloat, dtup, dseq, matrix, t, darray, btype, py
 
 
 array_ = (N**num)&darray
@@ -32,8 +32,13 @@ _defaultDateFmt = toCTimeFormat('YYYY.MM.DD')
 # to
 # **********************************************************************************************************************
 
-@coppertop(style=binary)
-def to(x:T1, t:T2, tByT) -> T2:
+def _toHelper(x:T1, t:btype + py, tByT) -> pydict:
+    tByT = dict(tByT)
+    tByT[T2] = t
+    return tByT
+
+@coppertop(style=binary, typeHelper=_toHelper)
+def to(x:T1, t:btype + py, tByT) -> T2:
     if tByT[T1] == tByT[T2]:
         return x
     elif isinstance(t, BType):
@@ -51,8 +56,6 @@ def to(x:dmap, t:pydict) -> pydict:
 @coppertop(style=binary)
 def to(x:T, t:pydict) -> pydict:
     return dict(x)
-
-
 
 @coppertop(style=binary)
 def to(x:txt, t:date, f:txt) -> date:
