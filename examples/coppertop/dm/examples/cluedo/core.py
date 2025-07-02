@@ -123,7 +123,7 @@ handTracker = BType('''
             combs: N ** possibleHand,
             prior: (N ** txt) ** num,
             posterior: (N ** txt) ** num
-        }
+        } & dstruct in mem
 ''')
 
 cell = BType('''
@@ -133,13 +133,13 @@ cell = BType('''
             suggestions: pylist,
             prior: num,
             posterior: num
-        }
+        } & dstruct in mem
 ''')
 
 cluedo_pad = BType('cluedo_pad: cluedo_pad & (card ** (handId ** cell)) & dmap in mem')
 
-cluedo_bag = BType('''
-    cluedo_bag: 
+cluedo_helper = BType('''
+    cluedo_helper: 
         {
             handid: handId, 
             hand: N ** card,

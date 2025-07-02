@@ -490,10 +490,11 @@ def _collectHelper(xs:(N**T1)[dseq], f:T1^T2, tByT) -> dict:
 
 @coppertop(style=binary, typeHelper=_collectHelper)
 def collect(xs:(N**T1)[dseq], f:T1^T2, tByT) -> (N**T2)[dseq]:
-    return dseq((N**tByT[T2])[dseq], [f(x) for x in xs])
+    fxs = [f(x) for x in xs]
+    return dseq((N**tByT[T2])[dseq], fxs)
 
 @coppertop(style=binary, typeHelper=_collectHelper)
-def collect(xs:(N**T1)[dseq, T3], f:T1^T2, tByT) -> (N**T2)[dseq, T3]:
+def collect(xs:(N**T1)[dseq][T3], f:T1^T2, tByT) -> (N**T2)[dseq][T3]:
     fxs = [f(x) for x in xs]
     return dseq((N**tByT[T2])[dseq, tByT[T3]], fxs)
 

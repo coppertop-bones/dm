@@ -17,9 +17,9 @@ from coppertop.dm.core import *
 from _ import collect, keys, join, drop, do, select, count, without, PP, combinations, atPut, to, \
     joinAll, asideDo, soleElement, minus, countIf, intersects
 
-from coppertop.dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_bag, YES, NO, MAYBE, HasOne, \
+from coppertop.dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_helper, YES, NO, MAYBE, HasOne, \
     cluedo_pad
-from coppertop.dm.examples.cluedo.utils import pair, construct
+from coppertop.dm.examples.cluedo.utils import pair, to
 
 
 
@@ -32,18 +32,18 @@ from coppertop.dm.examples.cluedo.utils import pair, construct
 a = 1
 
 @coppertop(style=binary)
-def figureKnown(bag:cluedo_bag, events) -> cluedo_bag:
-    _.pad = bag.pad
-    bag.pad = Missing   # pass ownership of bag to _
-    handId = bag.handId
-    _.handIds = bag.sizeByHandId >> keys
+def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
+    _.pad = helper.pad
+    helper.pad = Missing   # pass ownership of pad to _
+    handId = helper.handId
+    _.handIds = helper.sizeByHandId >> keys
 
     # extract everything known from history (starting with this players hand which we convert into event format)
     _.suggestionId = 1
 
     hId, pe, we, ro = Missing, Missing, Missing, Missing
 
-    for ev in bag.hand >> collect >> (lambda c: [handId, c]) >> join >> events:
+    for ev in helper.hand >> collect >> (lambda c: [handId, c]) >> join >> events:
 
         if isinstance(ev, list) and len(ev) == 4:
             hId, pe, we, ro = ev            # the current suggestion state
@@ -93,9 +93,9 @@ def figureKnown(bag:cluedo_bag, events) -> cluedo_bag:
                     yesCount += 1
                     if hId != TBI:
                         _.allYesCardsNotInTBI.append(c)
-            if yesCount == bag.sizeByHandId[hId]:
+            if yesCount == helper.sizeByHandId[hId]:
                 _.pad >> keys >> do >> ensureDefinitely(_, hId, NO)
-            elif yesCount > bag.sizeByHandId[hId]:
+            elif yesCount > helper.sizeByHandId[hId]:
                 raise UnhappyWomble()
 
         # for each card check if all hands but one have NO - in which case the remaining one must be a YES
@@ -127,11 +127,11 @@ def figureKnown(bag:cluedo_bag, events) -> cluedo_bag:
 
         del _.allYesCardsNotInTBI
 
-    bag.pad = _.pad
+    helper.pad = _.pad
     del _.pad
     del _.handIds
     del _.changed
-    return bag
+    return helper
 
 
 @coppertop
@@ -160,18 +160,18 @@ def ensureDefinitely(c, hId, knownState) -> void: # * ctx(changed=bool, pad=clue
 
 
 @coppertop(style=binary)
-def processResponses(bag:cluedo_bag, events:pylist) -> cluedo_bag:
+def processResponses(helper:cluedo_helper, events:pylist) -> cluedo_helper:
     # we can figure a prior from the responses where a player shows another player a held card
-    _.pad = bag.pad
-    _.trackerByHandId = bag.trackerByHandId
-    bag.pad = Missing
-    bag.trackerByHandId = Missing
-    handId = bag.handId
+    _.pad = helper.pad
+    _.trackerByHandId = helper.trackerByHandId
+    helper.pad = Missing
+    helper.trackerByHandId = Missing
+    handId = helper.handId
 
-    for hId in bag.otherHandIds:
+    for hId in helper.otherHandIds:
         ys, ns, ms = _.pad >> yesNoMaybesFor(_, hId)
         # (ys, ns, ms) >> collect >> count >> PP
-        numUnknowns = bag.sizeByHandId[hId] - (ys >> count) #>> PP
+        numUnknowns = helper.sizeByHandId[hId] - (ys >> count) #>> PP
         _.trackerByHandId[hId].combs = ms >> combinations >> numUnknowns
         _.trackerByHandId[hId].ys = ys
         _.trackerByHandId[hId].ns = ns
@@ -207,7 +207,7 @@ def processResponses(bag:cluedo_bag, events:pylist) -> cluedo_bag:
                     _.trackerByHandId[respondant].combs = newCombs
 
     # as a temporary stop gap let's put the prob into the score - later we'll do the prior and update the PP code
-    for hId in bag.otherHandIds:
+    for hId in helper.otherHandIds:
         combs = _.trackerByHandId[hId].combs
         nCombs = combs >> count
         # for c in _.pad >> keys:
@@ -216,27 +216,27 @@ def processResponses(bag:cluedo_bag, events:pylist) -> cluedo_bag:
         #         if c in combs:
         #             p += _.trackerByHandId[hId].posterior[comb]
         #     _.pad[c][hId].prior = p
-        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
-        _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
+        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+        _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> to >> pydict
 
-    bag.pad = _.pad
-    bag.trackerByHandId = _.trackerByHandId
+    helper.pad = _.pad
+    helper.trackerByHandId = _.trackerByHandId
     del _.pad
     del _.trackerByHandId
-    return bag
+    return helper
 
 
 @coppertop(style=binary)
-def processSuggestions(bag:cluedo_bag, events:pylist, like:pydict) -> cluedo_bag:
-    _.pad = bag.pad
-    _.trackerByHandId = bag.trackerByHandId
-    bag.pad = Missing
-    bag.trackerByHandId = Missing
+def processSuggestions(helper:cluedo_helper, events:pylist, like:pydict) -> cluedo_helper:
+    _.pad = helper.pad
+    _.trackerByHandId = helper.trackerByHandId
+    helper.pad = Missing
+    helper.trackerByHandId = Missing
 
     for ev in events:
         if isinstance(ev, list) and len(ev) == 4:
             accuser, pe, we, ro = ev
-            if accuser != bag.handId:
+            if accuser != helper.handId:
                 suggestion = set([pe, we, ro])
                 combs = _.trackerByHandId[accuser].combs
                 for comb in combs:
@@ -245,7 +245,7 @@ def processSuggestions(bag:cluedo_bag, events:pylist, like:pydict) -> cluedo_bag
                         _.trackerByHandId[accuser].posterior[comb] * like[len(overlap)] #>> PP
 
     # divide by P(data)
-    for hId in bag.otherHandIds:
+    for hId in helper.otherHandIds:
         sum = 0
         for comb in _.trackerByHandId[hId].combs:
             sum += _.trackerByHandId[hId].posterior[comb]
@@ -257,7 +257,7 @@ def processSuggestions(bag:cluedo_bag, events:pylist, like:pydict) -> cluedo_bag
         # _.trackerByHandId[hId].posterior >> PPPost
 
     # as a temporary stop gap let's put the prob into the score - later we'll do the prior and update the PP code
-    for hId in bag.otherHandIds:
+    for hId in helper.otherHandIds:
         combs = _.trackerByHandId[hId].combs
         nCombs = combs >> count
         for c in _.pad >> keys:
@@ -266,15 +266,15 @@ def processSuggestions(bag:cluedo_bag, events:pylist, like:pydict) -> cluedo_bag
                 if c in comb:
                     p += _.trackerByHandId[hId].posterior[comb]
             _.pad[c][hId].posterior = p #>> PP
-        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
-        # _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> construct >> pydict
+        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+        # _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> to >> pydict
 
-    bag.pad = _.pad
-    bag.trackerByHandId = _.trackerByHandId
+    helper.pad = _.pad
+    helper.trackerByHandId = _.trackerByHandId
     del _.pad
     del _.trackerByHandId
 
-    return bag
+    return helper
 
 @coppertop
 def PPPost(pByComb):
@@ -298,7 +298,7 @@ def yesNoMaybesFor(pad, hId):
 
 
 @coppertop
-def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag:
+def createHelper(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_helper:
 
     sizeByHandId = {TBI:3} \
         >> atPut >> handId >> (hand >> count) \
@@ -316,17 +316,17 @@ def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag
 
     @coppertop
     def newRow(c, hIds):
-        return hIds >> pair >> (hIds >> collect >> newPadCell(c, _)) >> construct >> pydict
+        return hIds >> pair >> (hIds >> collect >> newPadCell(c, _)) >> to >> pydict
 
     cards = (people, weapons, rooms) >> joinAll
-    pad = cards >> pair >> (cards >> collect >> newRow(_, handsToTrack)) >> construct >> cluedo_pad
+    pad = cards >> pair >> (cards >> collect >> newRow(_, handsToTrack)) >> to >> cluedo_pad
     # in bones we should certainly be able to tell the difference between a list of tuples and a tuple of lists (i.e. a
     # product of exponentials and a exponential of products) even if we can't in python very easily
 
     otherHandIds = otherHandSizesById >> keys
-    trackerByHandId = otherHandIds >> pair >> (otherHandIds >> collect >> newHandTracker) >> construct >> pydict
+    trackerByHandId = otherHandIds >> pair >> (otherHandIds >> collect >> newHandTracker) >> to >> pydict
 
-    return dstruct(cluedo_bag,
+    return dstruct(cluedo_helper,
         handId=handId,
         hand=hand,
         sizeByHandId=sizeByHandId,
@@ -336,4 +336,4 @@ def createBag(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_bag
     )
 
 
-cluedo_bag.setConstructor(createBag)
+cluedo_helper.setConstructor(createHelper)

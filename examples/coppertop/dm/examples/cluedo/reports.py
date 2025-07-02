@@ -17,7 +17,7 @@ from coppertop.dm.core.types import txt, N, pylist, pydict, dseq, dstruct
 
 from coppertop.dm.examples.cluedo.utils import hjoin, PP
 from coppertop.dm.examples.cluedo.core import Card, people, weapons, rooms, TBI, cluedo_pad, YES, NO, MAYBE, display_table, \
-    cluedo_bag
+    cluedo_helper
 
 
 # coercers - # OPEN: can these b§e sensibly defaulted in metatypes or templated?
@@ -39,7 +39,7 @@ def derefIfCow(maybeCow):
 def ppCardSummary(card, player, pad, stats, cfg, cHands):
     t1 = ('' if stats[card].tbi == MAYBE else stats[card].tbi) >> pad_(_, dict(left=cfg.hasWidth))
     t2 = ('' if stats[card].tbi in (YES, NO) else str(cHands - stats[card].noCount)) >> pad_(_, dict(left=cfg.noCountWidth))
-    t3 = (f'BTStruct{stats[card].sumMaybeSuggests}' if stats[card].sumMaybeSuggests else '') >> pad_(_, dict(left=cfg.suggestCountWidth))
+    t3 = (f'{stats[card].sumMaybeSuggests}' if stats[card].sumMaybeSuggests else '') >> pad_(_, dict(left=cfg.suggestCountWidth))
     t4 = (f'{int(stats[card].mulPriors * 100)}%' if stats[card].mulPriors else '') >> pad_(_, dict(left=cfg.likeWidth))
     return t1 + t2 + t3 + t4
 
@@ -48,17 +48,14 @@ def ppCardSummary(card, player, pad, stats, cfg, cHands):
 def rep1(pad:cluedo_pad, handId:Card) -> display_table:
     cfg = dstruct(nameWidth=17, cellWidth=12, hasWidth=2, noCountWidth=5, suggestCountWidth=3, likeWidth=7)
 
-    handIds = (pad >> values_ >> first >> keys >> to >> pylist | (N ** Card)[dseq]) >> without >> TBI
+    handIds = (pad >> values_ >> first >> keys | (N ** Card)[dseq]) >> without >> TBI
 
     titlesPadding = ' ' * (cfg.nameWidth + cfg.hasWidth + cfg.noCountWidth + cfg.suggestCountWidth + cfg.likeWidth)
-    tTitle = [titlesPadding + (
-        handIds
-            >> collect >> ((lambda hId: ('Me' if hId == handId else repr(hId)) >> pad_(_, dict(left=cfg.cellWidth))) | Card^txt)
-            >> joinAll
-    )] | display_table
+    colNames = handIds >> collect >> ((lambda hId: ('Me' if hId == handId else repr(hId)) >> pad_(_, dict(left=cfg.cellWidth))) | Card^txt)
+    titleRow = [titlesPadding + (colNames >> joinAll)] | display_table
 
-    tNames = (people, weapons, rooms)  \
-        >> collect >> (lambda cards: cards >> collect >> str) \
+    namesCol = (people, weapons, rooms)  \
+        >> collect >> (lambda cards: cards >> collect >> txt) \
         >> interleave >> ['----']  \
         >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth))) | display_table
 
@@ -66,15 +63,16 @@ def rep1(pad:cluedo_pad, handId:Card) -> display_table:
     stats = genStats(pad, handId)
 
     cHands = handIds >> count   # i.e. the number of players in the game, the number of hands less the TBI hand
-    tSummary = (people, weapons, rooms)  \
+    tSummary = ((people, weapons, rooms)
         >> collect >> (lambda g: g
             >> collect >> (lambda c: c
                 >> ppCardSummary(_, handId, pad, stats, cfg, cHands)
             )
-        )  \
-        >> interleave >> ['']  \
-        >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth)))  \
+        )
+        >> interleave >> ['']
+        >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth)))
         | display_table
+    )
 
     tHands = (people, weapons, rooms)  \
         >> collect >> (lambda g: g
@@ -90,14 +88,14 @@ def rep1(pad:cluedo_pad, handId:Card) -> display_table:
         | display_table
 
 
-    a = (tTitle >> join >> (tNames >> hjoin >> tSummary >> hjoin >> tHands)) | display_table
+    a = (titleRow >> join >> (namesCol >> hjoin >> tSummary >> hjoin >> tHands)) | display_table
     return a
 
 
 @coppertop
-def PP(bag:cluedo_bag) -> cluedo_bag:
-    bag.pad >> rep1(_, bag.handId) >> PP
-    return bag
+def PP(helper:cluedo_helper) -> cluedo_helper:
+    helper.pad >> rep1(_, helper.handId) >> PP
+    return helper
 
 @coppertop
 def ppFnOfCard(fn) -> display_table:

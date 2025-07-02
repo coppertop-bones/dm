@@ -59,11 +59,11 @@ def cardIds(cards):
     return [c.value for c in cards]
 
 @coppertop(style=binary)
-def construct(args:T1, t:btype):
+def to(args:T1, t:btype):
     return t(args)
 
 # @coppertop(style=binary)
-# def construct(args:pytuple, t:pydict) -> pydict:
+# def to(args:pytuple, t:pydict) -> pydict:
 #     k, v = args
 #     1/0
 

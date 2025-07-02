@@ -12,7 +12,7 @@ import datetime
 from coppertop.pipe import *
 from coppertop.dm.examples.cluedo.core import *
 from coppertop.dm.examples.cluedo.core import one
-from coppertop.dm.examples.cluedo.algos import createBag, figureKnown, processResponses, processSuggestions
+from coppertop.dm.examples.cluedo.algos import createHelper, figureKnown, processResponses, processSuggestions
 from coppertop.dm.examples.cluedo.reports import PP
 
 
@@ -56,11 +56,10 @@ def game1():
     handsByPlayer = {Me: [Ha, Co, Sc], Pe: 3, Pl: 3, Gr: 3, Mu: 3, Or: 3}
 
 
-    createBag(Me, handsByPlayer)  \
+    createHelper(Me, handsByPlayer)  \
         >> figureKnown >> events  \
         >> processResponses >> events  \
         >> PP
-
 
 
 def game2():
@@ -90,10 +89,11 @@ def game2():
 
     ]
 
-    createBag(Me, [Gr, Ro, Lo], {Gr: 3, Mu: 3, Or: 3, Sc: 3, Pe: 3})  \
+    createHelper(Me, [Gr, Ro, Lo], {Gr: 3, Mu: 3, Or: 3, Sc: 3, Pe: 3})  \
         >> figureKnown >> events  \
         >> processResponses >> events  \
         >> PP
+
 
 def game3():
     Me = Pl
@@ -117,10 +117,11 @@ def game3():
 
     ]
 
-    createBag(Me, [St, Li, Di, Wr, Sc], {Gr: 5, Or: 4, Pe: 4})  \
+    createHelper(Me, [St, Li, Di, Wr, Sc], {Gr: 5, Or: 4, Pe: 4})  \
         >> figureKnown >> events  \
         >> processResponses >> events  \
         >> PP
+
 
 def game4():
     Me = Pl
@@ -142,7 +143,7 @@ def game4():
 
     ]
 
-    createBag(Me, [Lo, Wr, Pe, Mu, Gr], {Gr: 5, Or: 4, Pe: 4})  \
+    createHelper(Me, [Lo, Wr, Pe, Mu, Gr], {Gr: 5, Or: 4, Pe: 4})  \
         >> figureKnown >> events  \
         >> processResponses >> events  \
         >> PP
@@ -172,6 +173,7 @@ def game4():
     # Lounge           -                   X           -           -           -
     # Dining Room        2    S1 L1     2  -        1  -           -        1  ? L1
 
+
 def game5():
     Me = Pl
     events = [
@@ -193,17 +195,51 @@ def game5():
     ]
 
     like = {0:100, 1:10, 2:5, 3:0}
-    bag = createBag(Me, [Ki, Di, Le, Da, Ca], {Gr: 5, Or: 4, Pe: 4}) \
+    helper = createHelper(Me, [Ki, Di, Le, Da, Ca], {Gr: 5, Or: 4, Pe: 4}) \
         >> figureKnown >> events \
         >> processResponses >> events \
         >> processSuggestions(_, _, like) >> events
-    bag >> PP;
+    helper >> PP;
+
+
+def game6():
+    Me = Pl
+    events = [
+        [Pe, Wr],
+        [Mu, Ha],
+        [Or, Sc],
+
+        [Pe, Sc, Ro, Ki], Pl, Gr - one,
+        [Pl, Mu, Re, St], Gr, [Mu, Re],
+        [Gr, Gr, Ca, Ba], Mu, Or, Pe, [Pl, Ba],
+        [Mu, Pe, Wr, Li], Or - one,
+        [Or, Or, Da, Di], Pl, Gr - one,
+
+        [Pe, Pe, Le, Bi], [Pl, Pe],
+        [Pl, Gr, Ca, Li], Gr, Mu, Or, [Pe, Li],
+        [Gr, Sc, Ca, Bi], Mu, Or - one,
+        [Mu, Sc, Ca, Bi], Or - one,
+        [Or, Gr, Ca, Ha], Pl, Gr, Mu - one,
+
+        [Pe, Gr, Ca, Li], Pl, Gr, Or,
+        [Pl, Pe, Ca, St], Gr, Mu, Or, [Pe, St],
+        [Gr, Gr, Ro, Bi], Mu, Or, Pe, Pl,           # won
+    ]
+
+    like = {0:100, 1:10, 2:5, 3:0}
+    helper = createHelper(Me, [Ba, Pl, Pe, Mu], {Gr: 4, Mu: 4, Or: 3, Pe:3}) \
+        >> figureKnown >> events \
+        >> processResponses >> events \
+        >> processSuggestions(_, _, like) >> events
+    helper >> PP;
+
+# if someone suggests a card that I know they have it increases the likelihood of them not having the other two cards
 
 
 def main():
     # game1()
     t1 = datetime.datetime.now()
-    game4()
+    game6()
     t2 = datetime.datetime.now()
     f'\n{(t2 - t1).microseconds / 1000}ms' >> PP
 
