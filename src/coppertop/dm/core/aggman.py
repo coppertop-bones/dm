@@ -694,7 +694,13 @@ def drop(xs:pylist, ss:pytuple) -> pylist:
 
 @coppertop(style=binary)
 def drop(d:pydict, ks: pylist) -> pydict:
-    return {k:d[k] for k in d.keys() if k not in ks}
+    return {k:k for k, v in d.items() if k not in ks}
+
+@coppertop(style=binary)
+def drop(d:pydict, k) -> pydict:
+    answer = dict(d)
+    del answer[k]
+    return answer
 
 @coppertop(style=binary)
 def drop(d:pydict, k:txt) -> pydict:
