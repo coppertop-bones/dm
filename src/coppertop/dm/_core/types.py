@@ -166,7 +166,7 @@ class count_(int):
     def _v(self):
         return self
     def __repr__(self):
-        return f'c{super().__repr__()}'
+        return f'{super().__repr__()}'
 count = BType('count: atom in mem').setCoercer(count_)
 __all__ += ['count']
 
@@ -181,7 +181,7 @@ class offset_(int):
     def _v(self):
         return self
     def __repr__(self):
-        return f'o{super().__repr__()}'
+        return f'{super().__repr__()}'
 offset = BType('offset: offset & indexy in indexy').setCoercer(offset_)
 __all__ += ['offset']
 

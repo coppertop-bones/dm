@@ -12,14 +12,15 @@ import datetime
 from coppertop.pipe import *
 from coppertop.dm.examples.cluedo.core import *
 from coppertop.dm.examples.cluedo.core import one
-from coppertop.dm.examples.cluedo.algos import createHelper, figureKnown, processResponses, processSuggestions
-from coppertop.dm.examples.cluedo.reports import PP
+from coppertop.dm.examples.cluedo.algos import createHelper, figureKnown, processResponses, processSuggestions1, \
+    processSuggestions2
+from coppertop.dm.examples.cluedo.reports import PP, rep2
 
 
 
 def game1():
-    Me = Sc
 
+    Me = Sc
     events = [
         [Or, Bi],
         [Or, Mu],
@@ -198,14 +199,14 @@ def game5():
     helper = createHelper(Me, [Ki, Di, Le, Da, Ca], {Gr: 5, Or: 4, Pe: 4}) \
         >> figureKnown >> events \
         >> processResponses >> events \
-        >> processSuggestions(_, _, like) >> events
+        >> processSuggestions1(_, _, like) >> events
     helper >> PP;
 
 
 def game6():
     Me = Pl
     events = [
-        [Pe, Wr],
+        [Or, Wr],
         [Mu, Ha],
         [Or, Sc],
 
@@ -230,8 +231,41 @@ def game6():
     helper = createHelper(Me, [Ba, Pl, Pe, Mu], {Gr: 4, Mu: 4, Or: 3, Pe:3}) \
         >> figureKnown >> events \
         >> processResponses >> events \
-        >> processSuggestions(_, _, like) >> events
-    helper >> PP;
+        >> processSuggestions2(_, _, like) >> events
+    helper >> rep2 >> PP
+
+
+def game7():
+    Me = Pl
+    events = [
+        [Pe, Ha],
+        [Pe, Or],
+        [Mu, Wr],
+
+        [Pl, Gr, Da, Ha], [Gr, Gr],
+        [Gr, Mu, Wr, Ha], Mu - one,
+        [Mu, Sc, Ro, Lo], Or, Pe, Pl, Gr-one,
+        [Or, Pl, Re, Li], Pe-one,
+        [Pe, Gr, Ca, St], [Pl, Ca],
+
+        [Pl, Sc, Ro, Li], [Gr, Ro],
+        [Gr, Or, Da, St], Mu, Or, Pe-one,
+        [Mu, Sc, Ca, Ha], Or, Pe-one,
+        [Or, Gr, Wr, Li], Pe, Pl, Gr-one,
+
+        [Pe, Pe, Re, Ki], Pl, Gr-one,
+        [Pl, Sc, Wr, Bi], [Gr, Sc],
+        [Gr, Mu, Le, Li], Mu-one,
+        [Mu, Sc, Da, Bi], Or, Pe, Pl, Gr-one,
+        [Or, Mu, Da, Bi], Pe, Pl, Gr, Mu,           # won
+    ]
+
+    like = {0:100, 1:10, 2:5, 3:0}
+    helper = createHelper(Me, [St, Di, Co, Ca], {Gr: 4, Mu: 4, Or: 3, Pe:3}) \
+        >> figureKnown >> events \
+        >> processResponses >> events \
+        >> processSuggestions2(_, _, like) >> events
+    helper >> rep2 >> PP
 
 # if someone suggests a card that I know they have it increases the likelihood of them not having the other two cards
 
@@ -239,7 +273,7 @@ def game6():
 def main():
     # game1()
     t1 = datetime.datetime.now()
-    game6()
+    game7()
     t2 = datetime.datetime.now()
     f'\n{(t2 - t1).microseconds / 1000}ms' >> PP
 

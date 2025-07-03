@@ -92,6 +92,75 @@ def rep1(pad:cluedo_pad, handId:Card) -> display_table:
     return a
 
 
+
+@coppertop
+def rep2(helper:cluedo_helper) -> display_table:
+    cfg = dstruct(nameWidth=17, cellWidth=14, hasWidth=2, noCountWidth=5, suggestCountWidth=3, likeWidth=7)
+
+    handIds = (helper.pad >> values_ >> first >> keys | (N ** Card)[dseq]) >> without >> TBI
+
+    titlesPadding = ' ' * (cfg.nameWidth + cfg.hasWidth + cfg.noCountWidth + cfg.suggestCountWidth + cfg.likeWidth)
+
+    @coppertop
+    def title(handId:Card) -> txt:
+        if handId == helper.handId:
+            answer = f'Me {int(helper.sizeByHandId[handId])}'
+        else:
+            answer = f'{handId} {helper.sizeByHandId[handId]}'
+
+        return answer >> pad_(_, dict(center=cfg.cellWidth))
+
+    colNames = handIds >> collect >> title
+    titleRow = [titlesPadding + (colNames >> joinAll)] | display_table
+
+    namesCol = (people, weapons, rooms)  \
+        >> collect >> (lambda cards: cards >> collect >> txt) \
+        >> interleave >> ['----']  \
+        >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth))) | display_table
+
+    # show TBI, countHands - noCount, sum priors, sum suggests
+    stats = genStats(helper.pad, helper.handId)
+
+    summarySection = ((people, weapons, rooms)
+        >> collect >> (lambda g: g
+            >> collect >> (lambda c: c
+                >> ppCardSummary(_, helper.handId, helper.pad, stats, cfg, handIds >> count)
+            )
+        )
+        >> interleave >> ['']
+        >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth)))
+        | display_table
+    )
+
+    handsSection = (people, weapons, rooms)  \
+        >> collect >> (lambda grp: grp
+            >> collect >> (lambda c: handIds  \
+                >> collect >> ((lambda hId:  \
+                    helper.pad[c][hId] >> ppCell2(_, stats[c], cfg)
+                ) | Card^txt)
+                >> joinAll
+            )
+        )  \
+        >> interleave >> ['']  \
+        >> collect >> (lambda c: c >> pad_(_, dict(left=cfg.nameWidth)))  \
+        | display_table
+
+
+    a = (titleRow >> join >> (namesCol >> hjoin >> summarySection >> hjoin >> handsSection)) | display_table
+    return a
+
+
+@coppertop
+def ppCell2(cell, stat, cfg):
+    lhWidth = int((cfg.cellWidth) / 2)
+
+    # txtSuggest = ('' if stat.tbi != MAYBE else ''.join(cell.suggestions)) >> pad_(_, dict(left=lhWidth))
+    txtSuggest = ''.join(cell.suggestions) >> pad_(_, dict(right=lhWidth))
+    txtState = cell.state
+    txtHaveOnes = ''.join(cell.haveOnes)
+    return f'{txtSuggest} {txtState} {txtHaveOnes}' >> pad_(_, dict(left=cfg.cellWidth))
+
+
 @coppertop
 def PP(helper:cluedo_helper) -> cluedo_helper:
     helper.pad >> rep1(_, helper.handId) >> PP

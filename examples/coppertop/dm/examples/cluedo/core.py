@@ -111,6 +111,40 @@ NS_TO_S = 1 / 1_000_000_000
 card = BType('card: atom')
 handId = BType('handId: atom')
 possibleHand = BType('possibleHand: possibleHand & (N ** card)')
+event = BType('event: atom')
+turnId = BType('turnId: atom')
+
+suggestion = BType('''suggestion: suggestion & 
+    {
+        player: handId,
+        who: card,
+        weapon: card,
+        room: card
+    } & event in mem
+''')
+noneOf = BType('''noneOf: noneOf & 
+    {
+        player: handId,
+        who: card,
+        weapon: card,
+        room: card
+    } & event in mem
+''')
+oneOf = BType('''oneOf: oneOf & 
+    {
+        player: handId,
+        who: card,
+        weapon: card,
+        room: card
+    } & event in mem
+''')
+showsOne = BType('''showsOne: showsOne & 
+    {
+        player: handId,
+        what: card
+    } & event in mem
+''')
+
 
 ndmap = BTAtom('ndmap')
 
@@ -121,6 +155,7 @@ handTracker = BType('''
             ns: N ** card,
             ms: N ** card,
             combs: N ** possibleHand,
+            suggestions: N ** (N ** card),
             prior: (N ** txt) ** num,
             posterior: (N ** txt) ** num
         } & dstruct in mem
@@ -129,8 +164,9 @@ handTracker = BType('''
 cell = BType('''
     cell: 
         {
-            state: txt,
-            suggestions: pylist,
+            state: txt,                 // 'X', '-', '?' for yes, no, maybe
+            suggestions: N**turnId,
+            haveOnes: N**turnId,
             prior: num,
             posterior: num
         } & dstruct in mem
@@ -144,9 +180,10 @@ cluedo_helper = BType('''
             handid: handId, 
             hand: N ** card,
             sizeByHandId: handId ** count,
-            pad: cluedo_pad,
-            trackerByHandId: handId ** handTracker,
-            otherHandIds: N ** handId
+            pad: cluedo_pad,                            // a grid of cells
+            trackerByHandId: handId ** handTracker,     // a tracker for each handId
+            otherHandIds: N ** handId,
+            turnId: turnId
         }  & dstruct in mem
 ''')
 

@@ -18,7 +18,7 @@ from _ import collect, keys, join, drop, do, select, count, without, PP, combina
     joinAll, asideDo, soleElement, minus, countIf, intersects
 
 from coppertop.dm.examples.cluedo.core import people, weapons, rooms, Card, TBI, cluedo_helper, YES, NO, MAYBE, HasOne, \
-    cluedo_pad
+    cluedo_pad, cell
 from coppertop.dm.examples.cluedo.utils import pair, to
 
 
@@ -29,7 +29,7 @@ from coppertop.dm.examples.cluedo.utils import pair, to
 #  - the hand of each opponent
 # we track suggestions and responses as lists in each hand (i.e. without aggregating them)
 
-a = 1
+
 
 @coppertop(style=binary)
 def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
@@ -39,7 +39,9 @@ def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
     _.handIds = helper.sizeByHandId >> keys
 
     # extract everything known from history (starting with this players hand which we convert into event format)
-    _.suggestionId = 1
+    _.iSuggest = 0
+    turnId = Missing
+    off = ord('a') - 1
 
     hId, pe, we, ro = Missing, Missing, Missing, Missing
 
@@ -47,19 +49,25 @@ def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
 
         if isinstance(ev, list) and len(ev) == 4:
             hId, pe, we, ro = ev            # the current suggestion state
-            _.pad[pe][hId].suggestions.append(_.suggestionId)
-            _.pad[we][hId].suggestions.append(_.suggestionId)
-            _.pad[ro][hId].suggestions.append(_.suggestionId)
-            _.suggestionId += 1
+            _.iSuggest += 1;  turnId = chr(_.iSuggest + off)
+            _.pad[pe][hId].suggestions.append(turnId)
+            _.pad[we][hId].suggestions.append(turnId)
+            _.pad[ro][hId].suggestions.append(turnId)
 
         elif ev >> typeOf == HasOne:
-            pass  # leave for second pass
+            _.pad[pe][ev.handId].haveOnes.append(turnId)
+            _.pad[we][ev.handId].haveOnes.append(turnId)
+            _.pad[ro][ev.handId].haveOnes.append(turnId)
 
         # if a card location is known to be YES in one handId it must be NO in all other handIds
         elif isinstance(ev, list) and len(ev) == 2:
             hId, c = ev
             ensureDefinitely(c, hId, YES)
             _.handIds >> drop >> hId >> do >> ensureDefinitely(c, _, NO)        # mark other hands as definite NOs
+            if pe and we and ro:
+                _.pad[pe][hId].haveOnes.append(turnId)
+                _.pad[we][hId].haveOnes.append(turnId)
+                _.pad[ro][hId].haveOnes.append(turnId)
 
         elif isinstance(ev, int) and type(ev) is not Card:
             # a tag to create a pad - ignore for now
@@ -70,8 +78,8 @@ def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
             hId = ev
             (pe, we, ro) >> do >> ensureDefinitely(_, hId, NO)
 
-
-    del _.suggestionId       # pop ctx
+    helper.turnId = turnId
+    del _.iSuggest
 
     hId, pe, we, ro = Missing, Missing, Missing, Missing
 
@@ -166,7 +174,6 @@ def processResponses(helper:cluedo_helper, events:pylist) -> cluedo_helper:
     _.trackerByHandId = helper.trackerByHandId
     helper.pad = Missing
     helper.trackerByHandId = Missing
-    handId = helper.handId
 
     for hId in helper.otherHandIds:
         ys, ns, ms = _.pad >> yesNoMaybesFor(_, hId)
@@ -180,7 +187,7 @@ def processResponses(helper:cluedo_helper, events:pylist) -> cluedo_helper:
 
     for ev in events:
         if isinstance(ev, list) and len(ev) == 4:
-            accuser, pe, we, ro = ev
+            player, pe, we, ro = ev
             suggestion = (pe, we, ro)
         elif ev >> typeOf == HasOne:
             respondant = ev.handId
@@ -227,7 +234,7 @@ def processResponses(helper:cluedo_helper, events:pylist) -> cluedo_helper:
 
 
 @coppertop(style=binary)
-def processSuggestions(helper:cluedo_helper, events:pylist, like:pydict) -> cluedo_helper:
+def processSuggestions1(helper:cluedo_helper, events:pylist, like:pydict) -> cluedo_helper:
     _.pad = helper.pad
     _.trackerByHandId = helper.trackerByHandId
     helper.pad = Missing
@@ -235,14 +242,14 @@ def processSuggestions(helper:cluedo_helper, events:pylist, like:pydict) -> clue
 
     for ev in events:
         if isinstance(ev, list) and len(ev) == 4:
-            accuser, pe, we, ro = ev
-            if accuser != helper.handId:
+            player, pe, we, ro = ev
+            if player != helper.handId:
                 suggestion = set([pe, we, ro])
-                combs = _.trackerByHandId[accuser].combs
+                combs = _.trackerByHandId[player].combs
                 for comb in combs:
                     overlap = suggestion.intersection(comb)
-                    _.trackerByHandId[accuser].posterior[comb] = \
-                        _.trackerByHandId[accuser].posterior[comb] * like[len(overlap)] #>> PP
+                    _.trackerByHandId[player].posterior[comb] = \
+                        _.trackerByHandId[player].posterior[comb] * like[len(overlap)] #>> PP
 
     # divide by P(data)
     for hId in helper.otherHandIds:
@@ -275,6 +282,59 @@ def processSuggestions(helper:cluedo_helper, events:pylist, like:pydict) -> clue
     del _.trackerByHandId
 
     return helper
+
+
+@coppertop(style=binary)
+def processSuggestions2(helper:cluedo_helper, events:pylist, like:pydict) -> cluedo_helper:
+    _.pad = helper.pad
+    _.trackerByHandId = helper.trackerByHandId
+    helper.pad = Missing
+    helper.trackerByHandId = Missing
+
+    for ev in events:
+        if isinstance(ev, list) and len(ev) == 4:
+            player, pe, we, ro = ev
+            if player != helper.handId:
+                suggestion = set([pe, we, ro])
+                _.trackerByHandId[player].suggestions.append(suggestion)
+                combs = _.trackerByHandId[player].combs
+                for comb in combs:
+                    overlap = suggestion.intersection(comb)
+                    _.trackerByHandId[player].posterior[comb] = \
+                        _.trackerByHandId[player].posterior[comb] * like[len(overlap)] #>> PP
+
+    # divide by P(data)
+    for hId in helper.otherHandIds:
+        sum = 0
+        for comb in _.trackerByHandId[hId].combs:
+            sum += _.trackerByHandId[hId].posterior[comb]
+        sum >> PP
+        for comb in _.trackerByHandId[hId].combs:
+            p = _.trackerByHandId[hId].posterior[comb] / sum
+            _.trackerByHandId[hId].posterior[comb] = p
+            # _.trackerByHandId[hId].posterior[comb] >> PP
+        # _.trackerByHandId[hId].posterior >> PPPost
+
+    # as a temporary stop gap let's put the prob into the score - later we'll do the prior and update the PP code
+    for hId in helper.otherHandIds:
+        combs = _.trackerByHandId[hId].combs
+        nCombs = combs >> count
+        for c in _.pad >> keys:
+            p = 0
+            for comb in combs:
+                if c in comb:
+                    p += _.trackerByHandId[hId].posterior[comb]
+            _.pad[c][hId].posterior = p #>> PP
+        # _.trackerByHandId[hId].prior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+        # _.trackerByHandId[hId].posterior = combs >> pair >> ([1] * nCombs) >> to >> pydict
+
+    helper.pad = _.pad
+    helper.trackerByHandId = _.trackerByHandId
+    del _.pad
+    del _.trackerByHandId
+
+    return helper
+
 
 @coppertop
 def PPPost(pByComb):
@@ -309,10 +369,10 @@ def createHelper(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_
     # SHOULDDO replace these with struct creation
     @coppertop
     def newPadCell(c, hId):
-        return dstruct(state=MAYBE, suggestions=[], prior=0, posterior=0)
+        return dstruct(cell, state=MAYBE, suggestions=[], haveOnes=[], prior=0, posterior=0)
 
     def newHandTracker(hId):
-        return dstruct(ys=Missing, ns=Missing, ms=Missing, combs=Missing, prior=Missing)
+        return dstruct(ys=Missing, ns=Missing, ms=Missing, combs=Missing, prior=Missing, suggestions=[])
 
     @coppertop
     def newRow(c, hIds):
@@ -326,14 +386,14 @@ def createHelper(handId:Card, hand:pylist, otherHandSizesById:pydict) -> cluedo_
     otherHandIds = otherHandSizesById >> keys
     trackerByHandId = otherHandIds >> pair >> (otherHandIds >> collect >> newHandTracker) >> to >> pydict
 
-    return dstruct(cluedo_helper,
+    return dstruct(
         handId=handId,
         hand=hand,
         sizeByHandId=sizeByHandId,
         pad=pad,
         trackerByHandId=trackerByHandId,
         otherHandIds=otherHandIds,
-    )
+    ) | cluedo_helper
 
 
 cluedo_helper.setConstructor(createHelper)
