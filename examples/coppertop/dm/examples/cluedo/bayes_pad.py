@@ -11,12 +11,51 @@ import numpy as np, time
 from coppertop.pipe import *
 from bones.core.sentinels import Missing
 from coppertop.dm.core.types import pylist, num
-from coppertop.dm.examples.cluedo.core import *
+from coppertop.dm.examples.cluedo.core import people, weapons, rooms
 from coppertop.dm.examples.cluedo.core import HasOne, NS_TO_S
 from coppertop.dm.examples.cluedo.utils import cardIds
-from coppertop.dm.core import without, count, collect, inject, minus, sort, zipAll, unpack, nPartitions, join, sum, allPartitionsInto
+from coppertop.dm.core import without, count, collect, inject, minus, sort, zipAll, unpack, nPartitions, join, sum, \
+    allPartitionsInto, kvs, first, values, drop
 from coppertop.dm.pp import PP
+from coppertop.dm.examples.cluedo.cards import *
+from coppertop.dm.examples.cluedo.games import games
 
+
+# we generate all possibilities of hands and, as well as eliminating possible hands that include a suggestion if the
+# player passed, we can also eliminate all possible hands that do not include a suggestion if the player revealed a card
+# we can then calculate the probabilities of the location of every card in every hand
+# this can be used as a prior for analysing each player's suggestions - e.g. likelihood of a suggestion with 0 cards in
+# a players hand presumably is higher than the likelihood of a suggestion with 1 card in a players hand and so on
+
+# combinations of cards in hands - in TBI there are 6 * 6 * 9 possible combinations
+# [5, 4, 4] game
+# 90090 combinations for the other players hands * 324 for the different TBI combinations
+
+
+# [5, 4, 4] >> nPartitions = 90090              16 free cards -> 4 bits is fine
+# [4, 4, 3, 3] >> nPartitions = 4,204,200       17 free cards -> 8 bits is required
+# [3, 3, 3, 3, 3] >> nPartitions = 168,168,000  18 free cards -> 8 bits is required
+
+# likelihood is a f64, cardId are u8
+# (90090 * 8 + 90090 * 13) * 324 = 1,891,890 * 324 = 612,972,360
+# (4204200 * 8 + 4204200 * 14) * 324 = 92,492,400 * 324 = 29,999,999,600
+# (168168000 * 8 + 168168000 * 15) * 324 = 3,564,528,000 * 324 = 1,156,800,000,000
+
+# for a 5, 4, 4 game our combinations array is 90090 * 324 columns and 16 rows
+# cols 1, 2, 3 are TBI cards where P(personcard) = normalised sum of P where card is in col 1, P(weaponcard) in col 2, etc
+# cols 4, 5, 6, 7 are player2 cards where P(card) = normalised sum of P where card is in col 4 or 5 or 6 or 7
+
+# 6 player game => 817,296,480,000 and even with 4 bits per cardId it is 400GB! so only model once there is enough
+# information known to reduce the number of possibilities to a manageable size
+
+
+# unless we're going to dynamically shrink the size of the array the combinations array will last the duration of the
+# entire game
+
+# how much edge can we get from the combinations array?
+# how much additional edge can we get from incorporating the suggestion likelihood function?
+
+# if we are equal to the computer players we will win 1 in 4 4 player games, 1 in 5 5 player games, etc.
 
 
 partitionsTime = None
@@ -189,15 +228,19 @@ def processEvents(events: pylist, s0: num, s1: num, s2: num, s3: num):
     # expect events to be a super set of _.events
     for i, (a, b) in enumerate(zip(_.events, events)):
         if a != b: raise Exception(i)
+
     for ev in events[len(_.events):]:
-        if isinstance(ev, int) and type(ev) is not Card:
-            t1 = time.perf_counter_ns()
-            _.pads[ev] = calcPad(_.l, _.poss, people, weapons, rooms, _.otherPlayers >> collect >> (lambda x: _.ss[x]))
-            t2 = time.perf_counter_ns()
-            if _.DEBUG: f'calcPad: #{ev}, {(t2 - t1) / 1_000_000:,.1f}ms' >> PP
-        elif isinstance(ev, list):
+
+        if isinstance(ev, list):
             s = _.ss.get(ev[0], Missing)
             if len(ev) == 4:
+                if _.suggestId not in _.pads:
+                    t1 = time.perf_counter_ns()
+                    _.pads[_.suggestId] = calcPad(_.l, _.poss, people, weapons, rooms, _.otherPlayers >> collect >> (lambda x: _.ss[x]))
+                    t2 = time.perf_counter_ns()
+                    if _.DEBUG: f'calcPad: #{_.suggestId}, {(t2 - t1) / 1_000_000:,.1f}ms' >> PP
+                _.suggestId += 1
+
                 suggest = ev[1:]
                 if s:
                     _.l = updateSuggest(s, suggest, _.l, _.poss, s0, s1, s2, s3)
@@ -215,6 +258,12 @@ def processEvents(events: pylist, s0: num, s1: num, s2: num, s3: num):
                 _.l = updateNone(s, suggest, _.l, _.poss)
         _.events.append(ev)
         _.l, _.poss = trimPoss(_.l, _.poss)
+
+    if _.suggestId not in _.pads:
+        t1 = time.perf_counter_ns()
+        _.pads[_.suggestId] = calcPad(_.l, _.poss, people, weapons, rooms, _.otherPlayers >> collect >> (lambda x: _.ss[x]))
+        t2 = time.perf_counter_ns()
+        if _.DEBUG: f'calcPad: #{_.suggestId}, {(t2 - t1) / 1_000_000:,.1f}ms' >> PP
 
 @coppertop
 def printBayesPad(id):
@@ -322,7 +371,7 @@ def createPossibilities(ps, ws, rs, handSizes, handKnowns):
                 msg += f'({repr(p)}, {repr(w)}, {repr(r)}) {srow1}:{srow2}  {res.shape}  '
                 msg += f'partition: {np.average(partitionsTimes) * NS_TO_S:>3.3f} '
                 msg += f'assign: {np.average(assignTimes) * NS_TO_S:>3.3f}'
-                msg >> PP
+                # msg >> PP
                 partitionsTime += t4 - t2
                 oTBI += 1
 
@@ -331,31 +380,17 @@ def createPossibilities(ps, ws, rs, handSizes, handKnowns):
 
 
 if __name__ == '__main__':
-
-    # ps = [Gr, Mu, Or, Pe, Pl, Sc]
-    # ws = [Da, Le]
-    # rs = []
-    # ps1, pk1 = 2, [Gr]
-    # ps2, pk2 = 2, [Sc]
-    # ps3, pk3 = 2, []
-    # x = createPossibilities(ps, ws, rs, [ps1, ps2, ps3], [pk1, pk2, pk3])
-    # x >> PP
-
-    # game 6
-    people = [Gr, Mu, Or, Pe, Pl, Sc]
-    weapons = [Ca, Da, Le, Re, Ro, Wr]
-    rooms = [Ba, Bi, Co, Di, Ha, Ki, Li, Lo, St]
-
-    ps0, pk0 = 5, [Li, Di, Co, Wr, Ro]
-    ps1, pk1 = 5, []
-    ps2, pk2 = 4, []
-    ps3, pk3 = 4, []
+    deal, preevents, events = games[5]
+    Me, hand = deal >> kvs >> first
+    handSizes = [len(hand)] + list(deal >> values >> drop >> 1)
+    knowns = [hand] + [[]] * (len(deal) - 1)
 
     t1 = time.perf_counter_ns()
-    x = createPossibilities(people, weapons, rooms, [ps0, ps1, ps2, ps3], [pk0, pk1, pk2, pk3])
+    combinations, slices = createPossibilities(people, weapons, rooms, handSizes, knowns)
     # (16, 11351340)
     t2 = time.perf_counter_ns()
     f'total: {(t2-t1)/1_000_000}   partition: {partitionsTime/1_000_000}' >> PP
-    x.shape >> PP
-
+    combinations.shape >> PP
+    probs = np.zeros(combinations.shape[0], np.float16, order="F")
+    stop = 'here'
 

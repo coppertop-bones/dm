@@ -13,31 +13,21 @@ from coppertop.pipe import *
 from coppertop.dm.core import keys_, first, kvs, drop
 from coppertop.dm.examples.cluedo.core import *
 from coppertop.dm.examples.cluedo.core import one
-from coppertop.dm.examples.cluedo.algos import createHelper, figureKnown, processResponses, processSuggestions1, \
+from coppertop.dm.examples.cluedo.simple import createHelper, figureKnown, processResponses, processSuggestions1, \
     processSuggestions2
-from coppertop.dm.examples.cluedo.reports import PP, rep2
+from coppertop.dm.examples.cluedo.reports import PP, rep1, rep2
+
+__all__ = ['game1_data', 'game2_data', 'game3_data', 'game4_data', 'game5_data', 'game6_data', 'game7_data']
 
 
-
-def game1():
-    deal, events = game1_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Or, Bi],
-        [Or, Mu],
-        [Mu, Re],
-        [Pl, Ca],
-    ] + events
-
-    createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> PP
-
-def game1_data():
-    return (
+game1_data = (
         {Sc: [Ha, Co, Sc], Pe: 3, Pl: 3, Gr: 3, Mu: 3, Or: 3},
+        [
+            [Or, Bi],
+            [Or, Mu],
+            [Mu, Re],
+            [Pl, Ca],
+        ],
         [
             [Gr, Pe, Ro, Bi], Mu, Or - one,
             [Mu, Mu, Ro, Li], Or - one,
@@ -64,26 +54,14 @@ def game1_data():
     )
 
 
-
-def game2():
-    deal, events = game2_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Sc, Pl],
-        [Pe, Ha],
-        [Sc, Sc],
-        [Or, Mu],
-    ] + events
-
-    createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> PP
-
-def game2_data():
-    return (
+game2_data = (
         {Pl: [Gr, Ro, Lo], Gr: 3, Mu: 3, Or: 3, Sc: 3, Pe: 3},
+        [
+            [Sc, Pl],
+            [Pe, Ha],
+            [Sc, Sc],
+            [Or, Mu],
+        ],
         [
             [Pl, Mu, Da, Di], Gr, [Mu, Di],
             [Gr, Gr, Da, Li], Mu, Or, Sc, Pe, [Pl, Gr],
@@ -104,23 +82,11 @@ def game2_data():
     )
 
 
-
-def game3():
-    deal, events = game3_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Or, Ro],
-    ] + events
-
-    createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> PP
-
-def game3_data():
-    return (
+game3_data = (
         {Pl: [St, Li, Di, Wr, Sc], Gr: 5, Or: 4, Pe: 4},
+        [
+            [Or, Ro],
+        ],
         [
             [Gr, Mu, Da, Bi], Or - one,
             [Or, Gr, Re, Ba], Pe - one,
@@ -139,48 +105,11 @@ def game3_data():
     )
 
 
-
-def game4():
-    deal, events = game4_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Or, Ro],
-    ] + events
-
-    createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> PP
-
-    #                                   Me          Green       Orchid      Peacock
-    # Green            -                   X           -           -           -
-    # Mustard          -                   X           -           -           -
-    # Orchid           X                   -           -           -           -
-    # Peacock          -                   X           -           -           -
-    # Plum             -         L1        -           -           -           X L1
-    # Scarlet          -                   -           -           X           -
-    # ----
-    # Candlestick        4                 -           ?           ?           ?
-    # Dagger             2    S2 L1     2  -        1  -           -        2  ? L1
-    # Lead Pipe          3    S1 L4        -        1  ?        1  -           ? L4
-    # Revolver           4    S1 L2        -        1  ?           ? L2        ?
-    # Rope               3    S1           -           ?        1  ?           -
-    # Wrench           -                   X           -           -           -
-    # ----
-    # Kitchen            4    S1           -           ?           ?        1  ?
-    # Ballroom           3    S2 L2        -        1  ?           -        1  ? L2
-    # Conservatory       4                 -           ?           ?           ?
-    # Billiard Room      4    S1 L2        -           ?        1  ?           ? L2
-    # Library            3    S1           -           ?        1  ?           -
-    # Study              3    S2 L2        -        1  ?        1  ? L2        -
-    # Hall               4                 -           ?           ?           ?
-    # Lounge           -                   X           -           -           -
-    # Dining Room        2    S1 L1     2  -        1  -           -        1  ? L1
-
-def game4_data():
-    return (
+game4_data = (
         {Pl: [Lo, Wr, Pe, Mu, Gr], Gr: 5, Or: 4, Pe: 4},
+        [
+            [Or, Ro],
+        ],
         [
             [Gr, Pl, Da, Di], Or, Pe - one,
             [Or, Mu, Le, Bi], Pe - one,
@@ -199,24 +128,11 @@ def game4_data():
     )
 
 
-def game5():
-    deal, events = game5_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Or, Ro],
-    ] + events
-
-    like = {0:100, 1:10, 2:5, 3:0}
-    helper = createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> processSuggestions1(_, _, like) >> events
-    helper >> PP
-
-def game5_data():
-    return (
+game5_data = (
         {Pl: [Ki, Di, Le, Da, Ca], Gr: 5, Or: 4, Pe: 4},
+        [
+            [Or, Ro],
+        ],
         [
             [Pl, Gr, Re, Ba], [Gr, Ba],
             [Gr, Mu, Re, Ki], Or - one,
@@ -235,26 +151,13 @@ def game5_data():
     )
 
 
-def game6():
-    deal, events = game6_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Or, Wr],
-        [Mu, Ha],
-        [Or, Sc],
-    ] + events
-
-    like = {0:100, 1:10, 2:5, 3:0}
-    helper = createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events  \
-        >> processResponses >> events  \
-        >> processSuggestions1(_, _, like) >> events
-    helper >> rep2 >> PP
-
-def game6_data():
-    return (
+game6_data = (
         {Pl: [Ba, Pl, Pe, Mu], Gr: 4, Mu: 4, Or: 3, Pe: 3},
+        [
+            [Or, Wr],
+            [Mu, Ha],
+            [Or, Sc],
+        ],
         [
             [Pe, Sc, Ro, Ki], Pl, Gr - one,
             [Pl, Mu, Re, St], Gr, [Mu, Re],
@@ -275,26 +178,13 @@ def game6_data():
     )
 
 
-def game7():
-    deal, events = game7_data()
-    Me, hand = deal >> kvs >> first
-    otherHandSizesById = deal >> drop >> Me
-    events = [
-        [Pe, Ha],
-        [Pe, Or],
-        [Mu, Wr],
-    ] + events
-
-    like = {0:100, 1:10, 2:5, 3:0}
-    helper = createHelper(Me, hand, otherHandSizesById)  \
-        >> figureKnown >> events \
-        >> processResponses >> events \
-        >> processSuggestions2(_, _, like) >> events
-    helper >> rep2 >> PP
-
-def game7_data():
-    return (
+game7_data = (
         {Pl: [St, Di, Co, Ca], Gr: 4, Mu: 4, Or: 3, Pe: 3},
+        [
+            [Pe, Ha],
+            [Pe, Or],
+            [Mu, Wr],
+        ],
         [
             [Pl, Gr, Da, Ha], [Gr, Gr],
             [Gr, Mu, Wr, Ha], Mu - one,
@@ -315,14 +205,98 @@ def game7_data():
         ]
     )
 
+game13_data = (
+    {Pl: [Da, Ca, Sc, Pe], Gr: 4, Mu: 4, Or: 3, Pe: 3},
+    [
+        [Pe, Ha],
+        [Pe, Or],
+        [Mu, Wr],
+    ],
+    [  # 0,
+        [Pe, Mu, Le, Ki], Pl, Gr, Mu, Or - one, 1,      # Le% or Ki
+        [Pl, Pe, Da, Ki], Gr, Mu, [Or, Ki],
+        [Gr, Sc, Ca, Ba], Mu, Or, Pe, [Pl, Ca], 3,
+        [Mu, Or, Ro, Di], Or - one, 4,                  # Or%, Ro%
+        [Or, Mu, Le, Di], Pe, Pl, Gr, Mu - one, 5,      # Di
 
-# if someone suggests a card that I know they have it increases the likelihood of them not having the other two cards
+        [Pe, Sc, Ca, St], [Pl, Ca], 6,
+        [Pl, Mu, Le, Ba], [Gr, Ba], 7,
+        [Gr, Mu, Le, Ki], [Or, Ki], 8,                  # Le%, Ki
+        [Mu, Mu, Re, St], Or, Pe - one, 9,
+        [Or, Mu, Ro, Ha], Pe - one, 10,                 # Ha
+
+        [Pe, Mu, Le, Li], Gr - one, 11,                 # Li
+        [Pl, Sc, Da, Co], Gr, [Mu, Co], 12,
+        [Gr, Or, Le, Bi], Mu, Or - one, 13,             # Or%, Le%, Bi%
+        [Mu, Pl, Le, Bi], Or - one, 14,                 # Le%, Bi%
+        [Or, Mu, Ro, Bi], Pe, Pl, Gr, Mu, 15,
+
+        [Pe, Mu, Re, St], Pl, Gr, Mu, Or, 16,
+        [Pl, Sc, Le, Bi], Gr, Mu, [Or, Bi], 17,
+    ]
+
+)
+
+
+game14_data = (
+    {Pl: [Da, Ca, Sc, Pe], Gr: 4, Mu: 4, Or: 3, Pe: 3},
+    [
+    ],
+    [
+        [Pl, Gr, Da, Ba], [Gr, Da],
+        [Gr, Pe, Le, Ki], Or, Pe - one,
+        [Or, Sc, Ca, Ki], Pe, [Pl, Ca],
+        [Pe, Or, Re, St], [Pl, Or],
+
+        [Pl, Sc, Le, Co], Gr, Or, [Pe, Le],
+        [Gr, Sc, Da, Ba], Or - one,
+        [Or, Sc, Ro, Li], Pe - one,
+        [Pe, Sc, Re, Li], Pl, Gr - one,
+
+        [Pl, Sc, Wr, Ki], Gr, Or, Pe,
+        [Gr, Sc, Wr, Ki], Or, Pe, [Pl, Ki],
+        [Or, Sc, Wr, St], Pe, [Pl, Ki],
+        [Pe, Pe, Wr, Ha], [Pl, Ha],
+
+        [Pl, Or, Ca, Di], Gr, [Or, Di],
+        [Gr, Sc, Wr, Lo], Or, Pe, Pl,  # Gr won - I gave away Scarlet and Wrench?
+    ]
+)
+
+
+games = {
+    1: game1_data,
+    2: game2_data,
+    3: game3_data,
+    4: game4_data,
+    5: game5_data,
+    6: game6_data,
+    7: game7_data,
+    13: game13_data,
+    14: game14_data,
+
+}
+
+
+def play(data):
+    deal, preevents, events = data
+    Pl, hand = deal >> kvs >> first
+    otherHandSizesById = deal >> drop >> Pl
+
+    like = {0: 100, 1: 10, 2: 5, 3: 0}
+
+    helper = createHelper(Pl, hand, otherHandSizesById)
+    helper = helper >> figureKnown >> preevents + events
+    helper = helper >> processResponses >> events
+    # helper = helper >> processSuggestions1(_, _, like) >> events
+    helper = helper >> processSuggestions2(_, _, like) >> events
+    helper >> rep2 >> PP
+
 
 
 def main():
-    game6()
     t1 = datetime.datetime.now()
-    # game7()
+    play(game4_data)
     t2 = datetime.datetime.now()
     f'\n{(t2 - t1).microseconds / 1000}ms' >> PP
 

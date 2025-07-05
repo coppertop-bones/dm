@@ -7,14 +7,13 @@
 # License. See the NOTICE file distributed with this work for additional information regarding copyright ownership.
 # **********************************************************************************************************************
 
-# Defines structs, types and enums
-
-
 from enum import IntEnum
 
-from bones.ts.metatypes import BTAtom, BTStruct, BType
-from coppertop.dm.core.types import txt, pylist, pydict, index, N, pyset, num, count, dstruct, dseq, dmap
+
+from bones.ts.metatypes import BType
+from coppertop.dm.examples.cluedo.cards import *
 from bones.core.sentinels import Missing
+
 
 __all__ = [
     'TBI',
@@ -25,84 +24,6 @@ __all__ = [
     'Card',
     'one',
 ]
-
-ppLongNames = [
-    'TBI',
-    'Green', 'Mustard', 'Orchid', 'Peacock', 'Plum', 'Scarlet',
-    'Candlestick', 'Dagger', 'Lead Pipe', 'Revolver', 'Rope', 'Wrench',
-    'Ballroom', 'Billiard Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Library', 'Lounge', 'Study'
-]
-
-ppShortNames = [
-    'TBI',
-    'Gr', 'Mu', 'Or', 'Pe', 'Pl', 'Sc',
-    'Ca', 'Da', 'Le', 'Re', 'Ro', 'Wr',
-    'Ba', 'Bi', 'Co', 'Di', 'Ha', 'Ki', 'Li', 'Lo', 'St'
-]
-
-class Card(IntEnum):
-    TBI = 0
-
-    Gr = 1
-    Mu = 2
-    Or = 3
-    Pe = 4
-    Pl = 5
-    Sc = 6
-
-    Ca = 7
-    Da = 8
-    Le = 9
-    Re = 10
-    Ro = 11
-    Wr = 12
-
-    Ba = 13
-    Bi = 14
-    Co = 15
-    Di = 16
-    Ha = 17
-    Ki = 18
-    Li = 19
-    Lo = 20
-    St = 21
-
-    def __str__(self):
-        return ppLongNames[self]
-
-    def __repr__(self):
-        return ppShortNames[self]
-
-
-TBI = Card.TBI
-
-Gr = Card.Gr
-Mu = Card.Mu
-Or = Card.Or
-Pe = Card.Pe
-Pl = Card.Pl
-Sc = Card.Sc
-
-Ca = Card.Ca
-Da = Card.Da
-Le = Card.Le
-Re = Card.Re
-Ro = Card.Ro
-Wr = Card.Wr
-
-Ba = Card.Ba
-Bi = Card.Bi
-Co = Card.Co
-Di = Card.Di
-Ha = Card.Ha
-Ki = Card.Ki
-Li = Card.Li
-Lo = Card.Lo
-St = Card.St
-
-people = [Gr, Mu, Or, Pe, Pl, Sc]
-weapons = [Ca, Da, Le, Re, Ro, Wr]
-rooms = [Ba, Bi, Co, Di, Ha, Ki, Li, Lo, St]
 
 
 NS_TO_S = 1 / 1_000_000_000
@@ -122,6 +43,7 @@ suggestion = BType('''suggestion: suggestion &
         room: card
     } & event in mem
 ''')
+
 noneOf = BType('''noneOf: noneOf & 
     {
         player: handId,
@@ -130,6 +52,7 @@ noneOf = BType('''noneOf: noneOf &
         room: card
     } & event in mem
 ''')
+
 oneOf = BType('''oneOf: oneOf & 
     {
         player: handId,
@@ -138,6 +61,7 @@ oneOf = BType('''oneOf: oneOf &
         room: card
     } & event in mem
 ''')
+
 showsOne = BType('''showsOne: showsOne & 
     {
         player: handId,
@@ -145,8 +69,7 @@ showsOne = BType('''showsOne: showsOne &
     } & event in mem
 ''')
 
-
-ndmap = BTAtom('ndmap')
+ndmap = BType('ndmap: atom')
 
 handTracker = BType('''
     handTracker: 

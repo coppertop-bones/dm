@@ -30,15 +30,22 @@ from coppertop.dm.examples.cluedo.utils import pair, to
 # we track suggestions and responses as lists in each hand (i.e. without aggregating them)
 
 
+# the probability of a card being in the TBI or a player's hand is 1 - bayes update? not really however there is an
+# increase probability of a card being in the hand of a player who has to show a card in response to a suggestion
+
+
+
 
 @coppertop(style=binary)
 def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
+    # extract everything known from events
+
+
     _.pad = helper.pad
     helper.pad = Missing   # pass ownership of pad to _
     handId = helper.handId
     _.handIds = helper.sizeByHandId >> keys
 
-    # extract everything known from history (starting with this players hand which we convert into event format)
     _.iSuggest = 0
     turnId = Missing
     off = ord('a') - 1
@@ -65,6 +72,7 @@ def figureKnown(helper:cluedo_helper, events) -> cluedo_helper:
             ensureDefinitely(c, hId, YES)
             _.handIds >> drop >> hId >> do >> ensureDefinitely(c, _, NO)        # mark other hands as definite NOs
             if pe and we and ro:
+                # record the response to a suggestion
                 _.pad[pe][hId].haveOnes.append(turnId)
                 _.pad[we][hId].haveOnes.append(turnId)
                 _.pad[ro][hId].haveOnes.append(turnId)

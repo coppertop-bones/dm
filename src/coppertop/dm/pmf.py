@@ -200,10 +200,10 @@ def mean(pmf:PMF) -> num:
     fs = pmf >> keys
     ws = pmf >> values
     try:
-        return np.average(fs, weights=ws) >> to >> num
+        return num(np.average(fs, weights=ws))
     except TypeError:
         fs, ws = list([fs, ws] >> zipAll) >> select >> (lambda fv: not isinstance(fv[0], str)) >> zipAll
-        return np.average(fs, weights=ws) >> to >> num
+        return num(np.average(fs, weights=ws))
 
 @coppertop
 def gaussian_kde(data) -> scipy.stats.kde.gaussian_kde:

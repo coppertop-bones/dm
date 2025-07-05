@@ -643,12 +643,11 @@ def drop(xs:pylist+pydict_keys, ks:pylist) -> pylist:
     return answer
 
 @coppertop(style=binary)
-def drop(xs:pylist+pydict_keys+pydict_values, e) -> pylist:    #(N**T1, T1)-> N**T1
-    answer = []
-    for x in xs:
-        if x != e:
-            answer.append(x)
-    return answer
+def drop(xs:pylist, n) -> pylist:    #(N**T1(im), count)-> N**T1(im)
+    if n > 0:
+        return xs[n:]
+    else:
+        raise NotYetImplemented('drop(xs:pylist, n:count) -> pylist')
 
 @coppertop(style=binary)
 def drop(xs:pylist, n:t.count) -> pylist:    #(N**T1(im), count)-> N**T1(im)
@@ -659,6 +658,13 @@ def drop(xs:pylist, n:t.count) -> pylist:    #(N**T1(im), count)-> N**T1(im)
 
 @coppertop(style=binary)
 def drop(xs:pytuple, n:t.count) -> pytuple:    #(N**T1(im), count)-> N**T1(im)
+    if n > 0:
+        return xs[n:]
+    else:
+        raise NotYetImplemented('drop(xs:txt, n:count) -> txt')
+
+@coppertop(style=binary)
+def drop(xs:pytuple, n) -> pytuple:    #(N**T1(im), py)-> N**T1(im)
     if n > 0:
         return xs[n:]
     else:
@@ -1756,6 +1762,13 @@ def take(d:dstruct, k:txt) -> dstruct:
 
 @coppertop(style=binary)
 def take(xs:pylist, c:t.count) -> pylist:
+    if c >= 0:
+        return xs[0:c]
+    else:
+        return xs[c:]
+
+@coppertop(style=binary)
+def take(xs:pylist, c) -> pylist:
     if c >= 0:
         return xs[0:c]
     else:
